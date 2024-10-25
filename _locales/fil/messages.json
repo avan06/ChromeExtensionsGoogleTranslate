@@ -11,6 +11,9 @@
    "2188433896094691489": {
       "message": "Naka-save na Mga Opsyon."
    },
+   "240104395545014795": {
+      "message": "Naka-built in sa Chrome ang pagsasalin ng page."
+   },
    "2509634311667449183": {
       "message": "Google Translate\n\nMag-left-click para isalin!\nMag-right-click para sa mga opsyon."
    },
@@ -19,9 +22,6 @@
    },
    "3715106636322454053": {
       "message": "HIGIT PA »"
-   },
-   "3720475250982395530": {
-      "message": "ISALIN ANG PAGE NA ITO"
    },
    "3798355593581482387": {
       "message": "Homepage ng Google Translate"
@@ -59,6 +59,9 @@
    "719896791478226289": {
       "message": "Google Translate Extension Options"
    },
+   "7432447050681380507": {
+      "message": "MATUTO PA"
+   },
    "7572626056779822063": {
       "message": "I-reset"
    },
@@ -88,6 +91,9 @@
    },
    "MSG_FOOTER_TRANSLATE": {
       "message": "8969005060131950570"
+   },
+   "MSG_LEARN_MORE": {
+      "message": "7432447050681380507"
    },
    "MSG_MORE": {
       "message": "3715106636322454053"
@@ -149,8 +155,8 @@
    "MSG_TRANSLATE": {
       "message": "2823656161254750288"
    },
-   "MSG_TRANSLATE_PAGE": {
-      "message": "3720475250982395530"
+   "MSG_TRANSLATE_PAGE_INFO": {
+      "message": "240104395545014795"
    },
    "MSG_TRANSLATION_ERROR": {
       "message": "6131124164729815942"

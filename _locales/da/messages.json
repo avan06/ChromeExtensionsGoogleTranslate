@@ -11,6 +11,9 @@
    "2188433896094691489": {
       "message": "Indstillingerne blev gemt"
    },
+   "240104395545014795": {
+      "message": "Sideoversættelse er indbygget i Chrome."
+   },
    "2509634311667449183": {
       "message": "Google Oversæt\n\nVenstreklik for at oversætte.\nHøjreklik for valgmuligheder."
    },
@@ -19,9 +22,6 @@
    },
    "3715106636322454053": {
       "message": "MERE »"
-   },
-   "3720475250982395530": {
-      "message": "OVERSÆT DENNE SIDE"
    },
    "3798355593581482387": {
       "message": "Google Oversæt-startside"
@@ -59,6 +59,9 @@
    "719896791478226289": {
       "message": "Udvidelsesmuligheder for Google Translate"
    },
+   "7432447050681380507": {
+      "message": "FÅ FLERE OPLYSNINGER"
+   },
    "7572626056779822063": {
       "message": "Nulstil"
    },
@@ -88,6 +91,9 @@
    },
    "MSG_FOOTER_TRANSLATE": {
       "message": "8969005060131950570"
+   },
+   "MSG_LEARN_MORE": {
+      "message": "7432447050681380507"
    },
    "MSG_MORE": {
       "message": "3715106636322454053"
@@ -149,8 +155,8 @@
    "MSG_TRANSLATE": {
       "message": "2823656161254750288"
    },
-   "MSG_TRANSLATE_PAGE": {
-      "message": "3720475250982395530"
+   "MSG_TRANSLATE_PAGE_INFO": {
+      "message": "240104395545014795"
    },
    "MSG_TRANSLATION_ERROR": {
       "message": "6131124164729815942"

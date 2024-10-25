@@ -11,6 +11,9 @@
    "2188433896094691489": {
       "message": "Opciones guardadas."
    },
+   "240104395545014795": {
+      "message": "La traducción de páginas está integrada en Chrome."
+   },
    "2509634311667449183": {
       "message": "Traductor de Google\n\nHaz clic con el botón izquierdo  para traducir.\nHaz clic con el botón derecho para ver opciones."
    },
@@ -19,9 +22,6 @@
    },
    "3715106636322454053": {
       "message": "MÁS »"
-   },
-   "3720475250982395530": {
-      "message": "TRADUCIR ESTA PÁGINA"
    },
    "3798355593581482387": {
       "message": "Página principal del Traductor de Google"
@@ -59,6 +59,9 @@
    "719896791478226289": {
       "message": "Opciones de la extensión del Traductor de Google"
    },
+   "7432447050681380507": {
+      "message": "MÁS INFORMACIÓN"
+   },
    "7572626056779822063": {
       "message": "Restablecer"
    },
@@ -88,6 +91,9 @@
    },
    "MSG_FOOTER_TRANSLATE": {
       "message": "8969005060131950570"
+   },
+   "MSG_LEARN_MORE": {
+      "message": "7432447050681380507"
    },
    "MSG_MORE": {
       "message": "3715106636322454053"
@@ -149,8 +155,8 @@
    "MSG_TRANSLATE": {
       "message": "2823656161254750288"
    },
-   "MSG_TRANSLATE_PAGE": {
-      "message": "3720475250982395530"
+   "MSG_TRANSLATE_PAGE_INFO": {
+      "message": "240104395545014795"
    },
    "MSG_TRANSLATION_ERROR": {
       "message": "6131124164729815942"

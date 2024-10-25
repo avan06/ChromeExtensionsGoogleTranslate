@@ -11,8 +11,11 @@
    "2188433896094691489": {
       "message": "Pilihan disimpan."
    },
+   "240104395545014795": {
+      "message": "Terjemahan halaman terbina dalam Chrome."
+   },
    "2509634311667449183": {
-      "message": "Google Terjemah\n\nKlik kiri untuk menterjemah!\nKlik kanan untuk pilihan."
+      "message": "Google Translate\n\nKlik kiri untuk menterjemah!\nKlik kanan untuk pilihan."
    },
    "2823656161254750288": {
       "message": "Terjemah"
@@ -20,11 +23,8 @@
    "3715106636322454053": {
       "message": "LAGI »"
    },
-   "3720475250982395530": {
-      "message": "TERJEMAHKAN HALAMAN INI"
-   },
    "3798355593581482387": {
-      "message": "Halaman utama Google Terjemah"
+      "message": "Halaman utama Google Translate"
    },
    "3955566821402057": {
       "message": "Pilihan Sambungan"
@@ -33,7 +33,7 @@
       "message": "Jangan paparkan ikon atau terjemahan timbul."
    },
    "4799572612327798818": {
-      "message": "Anda masih boleh menterjemah teks yang dipilih dengan mengklik ikon sambungan Google Terjemah."
+      "message": "Anda masih boleh menterjemah teks yang dipilih dengan mengklik ikon sambungan Google Translate."
    },
    "5029249418176901843": {
       "message": "Apabila saya memilih perkataan atau frasa:"
@@ -42,7 +42,7 @@
       "message": "BUKA DALAM TERJEMAHAN GOOGLE"
    },
    "5636646071825253269": {
-      "message": "Lihat terjemahan dengan mudah sambil anda menyemak imbas web. Oleh pasukan Google Terjemah."
+      "message": "Lihat terjemahan dengan mudah sambil anda menyemak imbas web. Oleh pasukan Google Translate."
    },
    "564411404725368794": {
       "message": "Terjemahan timbul:"
@@ -57,7 +57,10 @@
       "message": "MATIKAN GELEMBUNG TIMBUL"
    },
    "719896791478226289": {
-      "message": "Pilihan Sambungan Google Terjemah"
+      "message": "Pilihan Sambungan Google Translate"
+   },
+   "7432447050681380507": {
+      "message": "KETAHUI LEBIH LANJUT"
    },
    "7572626056779822063": {
       "message": "Tetapkan semula"
@@ -75,7 +78,7 @@
       "message": "Simpan"
    },
    "8969005060131950570": {
-      "message": "Google Terjemah"
+      "message": "Google Translate"
    },
    "MSG_BROWSER_ACTION_TITLE": {
       "message": "2509634311667449183"
@@ -88,6 +91,9 @@
    },
    "MSG_FOOTER_TRANSLATE": {
       "message": "8969005060131950570"
+   },
+   "MSG_LEARN_MORE": {
+      "message": "7432447050681380507"
    },
    "MSG_MORE": {
       "message": "3715106636322454053"
@@ -149,8 +155,8 @@
    "MSG_TRANSLATE": {
       "message": "2823656161254750288"
    },
-   "MSG_TRANSLATE_PAGE": {
-      "message": "3720475250982395530"
+   "MSG_TRANSLATE_PAGE_INFO": {
+      "message": "240104395545014795"
    },
    "MSG_TRANSLATION_ERROR": {
       "message": "6131124164729815942"

@@ -11,6 +11,9 @@
    "2188433896094691489": {
       "message": "Seçenekler kaydedildi."
    },
+   "240104395545014795": {
+      "message": "Sayfa çevirisi Chrome'da yerleşik olarak sunulmaktadır."
+   },
    "2509634311667449183": {
       "message": "Google Çeviri\n\nÇevirmek için sol tıklayın!\nSeçenekler için sağ tıklayın."
    },
@@ -19,9 +22,6 @@
    },
    "3715106636322454053": {
       "message": "DAHA FAZLA »"
-   },
-   "3720475250982395530": {
-      "message": "BU SAYFAYI ÇEVİR"
    },
    "3798355593581482387": {
       "message": "Google Çeviri Ana Sayfası"
@@ -59,6 +59,9 @@
    "719896791478226289": {
       "message": "Google Çeviri Uzantı Seçenekleri"
    },
+   "7432447050681380507": {
+      "message": "DAHA FAZLA BİLGİ"
+   },
    "7572626056779822063": {
       "message": "Sıfırla"
    },
@@ -88,6 +91,9 @@
    },
    "MSG_FOOTER_TRANSLATE": {
       "message": "8969005060131950570"
+   },
+   "MSG_LEARN_MORE": {
+      "message": "7432447050681380507"
    },
    "MSG_MORE": {
       "message": "3715106636322454053"
@@ -149,8 +155,8 @@
    "MSG_TRANSLATE": {
       "message": "2823656161254750288"
    },
-   "MSG_TRANSLATE_PAGE": {
-      "message": "3720475250982395530"
+   "MSG_TRANSLATE_PAGE_INFO": {
+      "message": "240104395545014795"
    },
    "MSG_TRANSLATION_ERROR": {
       "message": "6131124164729815942"
