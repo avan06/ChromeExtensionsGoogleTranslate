@@ -11,6 +11,9 @@
    "2188433896094691489": {
       "message": "Možnosti uloženy."
    },
+   "240104395545014795": {
+      "message": "Překlad stránek je vestavěný v Chromu."
+   },
    "2509634311667449183": {
       "message": "Překladač Google\n\nPřeložit kliknutím na levé tlačítko myši.\nZobrazit možnosti kliknutím na pravé tlačítko myši."
    },
@@ -19,9 +22,6 @@
    },
    "3715106636322454053": {
       "message": "DALŠÍ »"
-   },
-   "3720475250982395530": {
-      "message": "PŘELOŽIT TUTO STRÁNKU"
    },
    "3798355593581482387": {
       "message": "Domovská stránka Překladače Google"
@@ -59,6 +59,9 @@
    "719896791478226289": {
       "message": "Možnosti rozšíření Překladače Google"
    },
+   "7432447050681380507": {
+      "message": "DALŠÍ INFORMACE"
+   },
    "7572626056779822063": {
       "message": "Obnovit"
    },
@@ -88,6 +91,9 @@
    },
    "MSG_FOOTER_TRANSLATE": {
       "message": "8969005060131950570"
+   },
+   "MSG_LEARN_MORE": {
+      "message": "7432447050681380507"
    },
    "MSG_MORE": {
       "message": "3715106636322454053"
@@ -149,8 +155,8 @@
    "MSG_TRANSLATE": {
       "message": "2823656161254750288"
    },
-   "MSG_TRANSLATE_PAGE": {
-      "message": "3720475250982395530"
+   "MSG_TRANSLATE_PAGE_INFO": {
+      "message": "240104395545014795"
    },
    "MSG_TRANSLATION_ERROR": {
       "message": "6131124164729815942"

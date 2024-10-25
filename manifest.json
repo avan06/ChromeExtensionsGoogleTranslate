@@ -1,11 +1,4 @@
 {
-   "author": {
-      "email": "google-translate-chrome-extension-owners@google.com"
-   },
-   "background": {
-      "service_worker": "main_compiled.js",
-      "service_worker": "injection.js"
-   },
    "action": {
       "default_icon": {
          "19": "icons/19.png",
@@ -14,15 +7,18 @@
       "default_popup": "popup.html",
       "default_title": "__MSG_2509634311667449183__"
    },
+   "author": {
+      "email": "google-translate-chrome-extension-owners@google.com"
+   },
+   "background": {
+      "service_worker": "main_compiled.js"
+   },
    "content_scripts": [ {
       "all_frames": true,
       "css": [ "bubble_gss.css" ],
       "js": [ "bubble_compiled.js" ],
       "matches": [ "\u003Call_urls>" ]
    } ],
-   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'"
-   },
    "default_locale": "en",
    "description": "__MSG_5636646071825253269__",
    "icons": {
@@ -35,14 +31,14 @@
    },
    "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCfHy1M+jghaHyaVAILzx/c/Dy+RXtcaP9/5pC7EY8JlNEI/G4DIIng9IzlrH8UWStpMWMyGUsdyusn2PkYFrqfVzhc2azVF3PX9D0KHG3FLN3mNoz1YTBHvO5QSXJf292qW0tTYuoGqeTfXtF9odLdg20Xd0YrLmtS4TQkpSYGDwIDAQAB",
    "manifest_version": 3,
+   "minimum_chrome_version": "115",
    "name": "__MSG_8969005060131950570__",
    "options_page": "options.html",
-   "permissions": [ "activeTab", "contextMenus", "storage" ],
+   "permissions": [ "activeTab", "contextMenus", "storage", "offscreen", "scripting" ],
    "update_url": "https://clients2.google.com/service/update2/crx",
-   "version": "2.0.14",
-   "web_accessible_resources": [{
-    "resources": ["popup_css_compiled.css", "options.html"],
-    "matches": ["<all_urls>"],
-    "extension_ids": []
-   }]
+   "version": "2.0.16",
+   "web_accessible_resources": [ {
+      "matches": [ "\u003Call_urls>" ],
+      "resources": [ "popup_css_compiled.css" ]
+   } ]
 }
