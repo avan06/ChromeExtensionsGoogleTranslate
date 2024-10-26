@@ -1,4 +1,4 @@
-/* Copyright 2014 Google */
+﻿/* Copyright 2014 Google */
 (function() {
   var $jscomp = $jscomp || {};
   $jscomp.scope = {};
@@ -25707,12 +25707,11 @@
     return "http://translate.google.com/translate?sl=" + a + "&tl=" + b + "&hl=" + c + "&u=" + encodeURIComponent(d)
   }
 
-  function module$contents$gtx$utils_getApiKey() {
-    return "AIzaSyDLEeFI5OtFBwYBIoK_jj5m32rZK5CkCXA"
+  function module$contents$gtx$utils_getKA() {
+    return "]axBebZA^Q\x84RfafVZaE<^wV?caVVn<\x80rmy{=n`Y\x85ox|XZaZ~]=tN";
   }
   gtx.utils.applyTemplate = module$contents$gtx$utils_applyTemplate;
   gtx.utils.escapeJs = module$contents$gtx$utils_escapeJs;
-  gtx.utils.getApiKey = module$contents$gtx$utils_getApiKey;
   gtx.utils.getImageTranslateUrl = module$contents$gtx$utils_getImageTranslateUrl;
   gtx.utils.getMessage = module$contents$gtx$utils_getMessage;
   gtx.utils.getTranslateUrl = module$contents$gtx$utils_getTranslateUrl;
@@ -32324,10 +32323,11 @@
       c = c.getContextDir();
       return a ? module$contents$soy_VERY_UNSAFE.ordainSanitizedHtml(b, c) : b
     },
-    module$contents$soy_assertParamType = function(a, b, c, d, e) {
-      module$exports$google3$javascript$common$asserts$enable_goog_asserts.ENABLE_GOOG_ASSERTS && !a && (goog.DEBUG && goog.asserts.fail("expected " +
-        d + " " + b + " of type " + e + ", but got " + goog.debug.runtimeType(c) + "."), goog.asserts.fail("parameter type error. Enable DEBUG to see details."));
-      return c
+    module$contents$soy_assertParamType = function(isDictionaryArray, dictionaryName, dictionary, paramName, typeName) {
+      module$exports$google3$javascript$common$asserts$enable_goog_asserts.ENABLE_GOOG_ASSERTS && !isDictionaryArray && 
+      (goog.DEBUG && goog.asserts.fail("expected " + paramName + " " + dictionaryName + " of type " + typeName + ", but got " + goog.debug.runtimeType(dictionary) + "."), 
+      goog.asserts.fail("parameter type error. Enable DEBUG to see details."));
+      return dictionary
     },
     module$contents$soy_$$internalCallMarkerDoNotUse = {},
     module$contents$soy_$$areYouAnInternalCaller = function(a) {
@@ -33837,87 +33837,87 @@
   goog.dom.getDocument = function() {
     return document
   };
-  goog.dom.getElement = function(a) {
-    return goog.dom.getElementHelper_(document, a)
+  goog.dom.getElement = function(id) {
+    return goog.dom.getElementHelper_(document, id)
   };
-  goog.dom.getHTMLElement = function(a) {
-    return (a = goog.dom.getElement(a)) ? module$contents$goog$asserts$dom_assertIsHtmlElement(a) : null
+  goog.dom.getHTMLElement = function(id) {
+    return (id = goog.dom.getElement(id)) ? module$contents$goog$asserts$dom_assertIsHtmlElement(id) : null
   };
-  goog.dom.getElementHelper_ = function(a, b) {
-    return typeof b === "string" ? a.getElementById(b) : b
+  goog.dom.getElementHelper_ = function(element, id) {
+    return typeof id === "string" ? element.getElementById(id) : id
   };
-  goog.dom.getRequiredElement = function(a) {
-    return goog.dom.getRequiredElementHelper_(document, a)
+  goog.dom.getRequiredElement = function(id) {
+    return goog.dom.getRequiredElementHelper_(document, id)
   };
-  goog.dom.getRequiredHTMLElement = function(a) {
-    return module$contents$goog$asserts$dom_assertIsHtmlElement(goog.dom.getRequiredElementHelper_(document, a))
+  goog.dom.getRequiredHTMLElement = function(id) {
+    return module$contents$goog$asserts$dom_assertIsHtmlElement(goog.dom.getRequiredElementHelper_(document, id))
   };
-  goog.dom.getRequiredElementHelper_ = function(a, b) {
-    goog.asserts.assertString(b);
-    a = goog.dom.getElementHelper_(a, b);
-    return goog.asserts.assert(a, "No element found with id: " + b)
+  goog.dom.getRequiredElementHelper_ = function(element, id) {
+    goog.asserts.assertString(id);
+    element = goog.dom.getElementHelper_(element, id);
+    return goog.asserts.assert(element, "No element found with id: " + id)
   };
   goog.dom.$ = goog.dom.getElement;
-  goog.dom.getElementsByTagName = function(a, b) {
-    return (b || document).getElementsByTagName(String(a))
+  goog.dom.getElementsByTagName = function(tagname, element) {
+    return (element || document).getElementsByTagName(String(tagname))
   };
-  goog.dom.getElementsByTagNameAndClass = function(a, b, c) {
-    return goog.dom.getElementsByTagNameAndClass_(document, a, b, c)
+  goog.dom.getElementsByTagNameAndClass = function(tagname, classname, element) {
+    return goog.dom.getElementsByTagNameAndClass_(document, tagname, classname, element)
   };
-  goog.dom.getElementByTagNameAndClass = function(a, b, c) {
-    return goog.dom.getElementByTagNameAndClass_(document, a, b, c)
+  goog.dom.getElementByTagNameAndClass = function(tagname, classname, element) {
+    return goog.dom.getElementByTagNameAndClass_(document, tagname, classname, element)
   };
-  goog.dom.getElementsByClass = function(a, b) {
-    var c = b || document;
-    return goog.dom.canUseQuerySelector_(c) ? c.querySelectorAll("." + a) : goog.dom.getElementsByTagNameAndClass_(document, "*", a, b)
+  goog.dom.getElementsByClass = function(classname, element) {
+    var element_ = element || document;
+    return goog.dom.canUseQuerySelector_(element_) ? element_.querySelectorAll("." + classname) : goog.dom.getElementsByTagNameAndClass_(document, "*", classname, element)
   };
-  goog.dom.getElementByClass = function(a, b) {
-    var c = b || document;
-    return (c.getElementsByClassName ? c.getElementsByClassName(a)[0] : goog.dom.getElementByTagNameAndClass_(document, "*", a, b)) || null
+  goog.dom.getElementByClass = function(classname, element) {
+    var element_ = element || document;
+    return (element_.getElementsByClassName ? element_.getElementsByClassName(classname)[0] : goog.dom.getElementByTagNameAndClass_(document, "*", classname, element)) || null
   };
-  goog.dom.getHTMLElementByClass = function(a, b) {
-    return (a = goog.dom.getElementByClass(a, b)) ? module$contents$goog$asserts$dom_assertIsHtmlElement(a) : null
+  goog.dom.getHTMLElementByClass = function(classname, element) {
+    return (classname = goog.dom.getElementByClass(classname, element)) ? module$contents$goog$asserts$dom_assertIsHtmlElement(classname) : null
   };
-  goog.dom.getRequiredElementByClass = function(a, b) {
-    b = goog.dom.getElementByClass(a, b);
-    return goog.asserts.assert(b, "No element found with className: " + a)
+  goog.dom.getRequiredElementByClass = function(classname, element) {
+    element = goog.dom.getElementByClass(classname, element);
+    return goog.asserts.assert(element, "No element found with className: " + classname)
   };
-  goog.dom.getRequiredHTMLElementByClass = function(a, b) {
-    b = goog.dom.getElementByClass(a, b);
-    goog.asserts.assert(b, "No HTMLElement found with className: " + a);
-    return module$contents$goog$asserts$dom_assertIsHtmlElement(b)
+  goog.dom.getRequiredHTMLElementByClass = function(classname, element) {
+    element = goog.dom.getElementByClass(classname, element);
+    goog.asserts.assert(element, "No HTMLElement found with className: " + classname);
+    return module$contents$goog$asserts$dom_assertIsHtmlElement(element)
   };
-  goog.dom.canUseQuerySelector_ = function(a) {
-    return !(!a.querySelectorAll || !a.querySelector)
+  goog.dom.canUseQuerySelector_ = function(element) {
+    return !(!element.querySelectorAll || !element.querySelector)
   };
-  goog.dom.getElementsByTagNameAndClass_ = function(a, b, c, d) {
-    a = d || a;
-    b = b && b != "*" ? String(b).toUpperCase() : "";
-    if (goog.dom.canUseQuerySelector_(a) && (b || c)) return a.querySelectorAll(b + (c ? "." + c : ""));
-    if (c && a.getElementsByClassName) {
-      a = a.getElementsByClassName(c);
-      if (b) {
-        d = {};
-        for (var e = 0, f = 0, g; g = a[f]; f++) b == g.nodeName && (d[e++] = g);
-        d.length = e;
-        return d
+  goog.dom.getElementsByTagNameAndClass_ = function(document, tagname, classname, element) {
+    document = element || document;
+    tagname = tagname && tagname != "*" ? String(tagname).toUpperCase() : "";
+    if (goog.dom.canUseQuerySelector_(document) && (tagname || classname)) return document.querySelectorAll(tagname + (classname ? "." + classname : ""));
+    if (classname && document.getElementsByClassName) {
+      document = document.getElementsByClassName(classname);
+      if (tagname) {
+        element = {};
+        for (var e = 0, f = 0, g; g = document[f]; f++) tagname == g.nodeName && (element[e++] = g);
+        element.length = e;
+        return element
       }
-      return a
+      return document
     }
-    a = a.getElementsByTagName(b || "*");
-    if (c) {
-      d = {};
-      for (f = e = 0; g = a[f]; f++) b = g.className, typeof b.split == "function" && module$contents$goog$array_contains(b.split(/\s+/),
-        c) && (d[e++] = g);
-      d.length = e;
-      return d
+    document = document.getElementsByTagName(tagname || "*");
+    if (classname) {
+      element = {};
+      for (f = e = 0; g = document[f]; f++) tagname = g.className, typeof tagname.split == "function" && module$contents$goog$array_contains(tagname.split(/\s+/),
+        classname) && (element[e++] = g);
+      element.length = e;
+      return element
     }
-    return a
+    return document
   };
-  goog.dom.getElementByTagNameAndClass_ = function(a, b, c, d) {
-    var e = d || a,
-      f = b && b != "*" ? String(b).toUpperCase() : "";
-    return goog.dom.canUseQuerySelector_(e) && (f || c) ? e.querySelector(f + (c ? "." + c : "")) : goog.dom.getElementsByTagNameAndClass_(a, b, c, d)[0] || null
+  goog.dom.getElementByTagNameAndClass_ = function(document, tagname, classname, element) {
+    var element_ = element || document,
+      tagname_ = tagname && tagname != "*" ? String(tagname).toUpperCase() : "";
+    return goog.dom.canUseQuerySelector_(element_) && (tagname_ || classname) ? element_.querySelector(tagname_ + (classname ? "." + classname : "")) : goog.dom.getElementsByTagNameAndClass_(document, tagname, classname, element)[0] || null
   };
   goog.dom.$$ = goog.dom.getElementsByTagNameAndClass;
   goog.dom.setProperties = function(a, b) {
@@ -34474,17 +34474,17 @@
   goog.dom.DomHelper.prototype.getElementsByTagNameAndClass = function(a, b, c) {
     return goog.dom.getElementsByTagNameAndClass_(this.document_, a, b, c)
   };
-  goog.dom.DomHelper.prototype.getElementByTagNameAndClass = function(a, b, c) {
-    return goog.dom.getElementByTagNameAndClass_(this.document_, a, b, c)
+  goog.dom.DomHelper.prototype.getElementByTagNameAndClass = function(a, classname, element) {
+    return goog.dom.getElementByTagNameAndClass_(this.document_, a, classname, element)
   };
-  goog.dom.DomHelper.prototype.getElementsByClass = function(a, b) {
-    return goog.dom.getElementsByClass(a, b || this.document_)
+  goog.dom.DomHelper.prototype.getElementsByClass = function(classname, element) {
+    return goog.dom.getElementsByClass(classname, element || this.document_)
   };
-  goog.dom.DomHelper.prototype.getElementByClass = function(a, b) {
-    return goog.dom.getElementByClass(a, b || this.document_)
+  goog.dom.DomHelper.prototype.getElementByClass = function(classname, element) {
+    return goog.dom.getElementByClass(classname, element || this.document_)
   };
-  goog.dom.DomHelper.prototype.getRequiredElementByClass = function(a, b) {
-    return goog.dom.getRequiredElementByClass(a, b || this.document_)
+  goog.dom.DomHelper.prototype.getRequiredElementByClass = function(classname, element) {
+    return goog.dom.getRequiredElementByClass(classname, element || this.document_)
   };
   goog.dom.DomHelper.prototype.$$ = goog.dom.DomHelper.prototype.getElementsByTagNameAndClass;
   goog.dom.DomHelper.prototype.setProperties = goog.dom.setProperties;
@@ -34589,8 +34589,15 @@
   }
   goog.soy.renderHtml = module$contents$goog$soy_renderHtml;
 
-  function module$contents$goog$soy_renderElement(a, b, c, d) {
-    (b = b(c || module$contents$goog$soy_defaultTemplateData, d)) && b.renderElement && a ? b.renderElement(a) : (b = module$contents$goog$soy_ensureTemplateOutputHtml(b), module$contents$goog$soy_unsafeSetInnerHtmlInternal(goog.asserts.assert(a), b))
+  function module$contents$goog$soy_renderElement(translationHost, extension_translation, translationResultData, d) {
+    var gtxLanguageContent = extension_translation(translationResultData || module$contents$goog$soy_defaultTemplateData, d);
+    if (gtxLanguageContent && gtxLanguageContent.renderElement && translationHost) {
+      gtxLanguageContent.renderElement(translationHost);
+    } else {
+      var gtxLanguageHtml = module$contents$goog$soy_ensureTemplateOutputHtml(gtxLanguageContent);
+      module$contents$goog$soy_unsafeSetInnerHtmlInternal(goog.asserts.assert(translationHost), gtxLanguageHtml);
+    }
+
   }
   goog.soy.renderElement = module$contents$goog$soy_renderElement;
 
@@ -39862,7 +39869,7 @@
       ["language", b],
       ["text", a],
       ["voice_speed", 1],
-      ["key", module$contents$gtx$utils_getApiKey()]
+      ["key", atob(module$contents$gtx$utils_getKA().split("").map(c => String.fromCharCode(c.charCodeAt(0) - 12)).join(""))]
     ]);
     fetch(module$contents$google3$third_party$javascript$safevalues$builders$resource_url_builders_appendParams(c, a).toString(), {
       headers: {
@@ -39989,7 +39996,7 @@
       c = new Map([
         ["client", "gtx"],
         ["display_language", a],
-        ["key", module$contents$gtx$utils_getApiKey()]
+        ["key", atob(module$contents$gtx$utils_getKA().split("").map(c => String.fromCharCode(c.charCodeAt(0) - 12)).join(""))]
       ]);
     fetch(module$contents$google3$third_party$javascript$safevalues$builders$resource_url_builders_appendParams(b, c).toString(), {
       headers: {
@@ -40050,55 +40057,89 @@
   };
   gtx.Options = module$contents$gtx$Options_Options;
   var extension = {
-    translation: function(a, b) {
-      return extension.translation$(module$contents$soy_$$internalCallMarkerDoNotUse, b, a.query, a.translationResult, a.sourceLanguageCode, a.targetLanguage, a.sourceLanguageList, a.dictionary, a.popup)
+    translation: function(a, extension_translation) {
+      return extension.translation$(module$contents$soy_$$internalCallMarkerDoNotUse, extension_translation, a.query, a.translationResult, a.sourceLanguageCode, a.targetLanguage, a.sourceLanguageList, a.dictionary, a.popup)
     },
-    translation$: function(a, b, c, d, e, f, g, h, k) {
-      module$contents$soy_$$areYouAnInternalCaller(a);
+    translation$: function($$internalCallMarkerDoNotUse, extension_translation, sourceString, targetString, sourceLanguageCode, targetLanguage, sourceLanguageList, dictionary, popup) {
+      module$contents$soy_$$areYouAnInternalCaller($$internalCallMarkerDoNotUse);
       if (goog.DEBUG && module$contents$soy_$$stubsMap["extension.translation"]) return module$contents$soy_$$stubsMap["extension.translation"]({
-        query: c,
-        translationResult: d,
-        sourceLanguageCode: e,
-        targetLanguage: f,
-        sourceLanguageList: g,
-        dictionary: h,
-        popup: k
-      }, b);
-      b = module$contents$soy_assertParamType(h == null || Array.isArray(h), "dictionary", h, "@param", "!ReadonlyArray<!proto.translating.frontend.ReadonlyDictionaryResult>|null|undefined");
-      a = "";
-      if (module$contents$soy_$$isTruthyNonEmpty(c))
-        if (module$contents$soy_$$isTruthyNonEmpty(d)) {
-          a += '<div class="gtx-language"' + (goog.DEBUG && module$contents$soy_$$getDebugSoyTemplateInfo() ? ' data-debug-soy="extension.translation googledata/translate/clients/chrome_extensions/translate/translation.soy:25"' :
-            "") + '><select class="gtx-lang-selector">';
-          g = module$contents$soy_$$asReadonlyArray(g);
-          h = g.length;
-          for (var l = 0; l < h; l++) {
-            var m = g[l];
-            a += module$contents$soy_$$equals(m, "auto") ? "" : '<option value="' + module$contents$soy_$$escapeHtmlAttribute(m[0]) + '"' + (module$contents$soy_$$equals(m[0], e) ? " selected" : "") + ">" + module$contents$soy_$$escapeHtml(m[1]) + "</option>"
+        query: sourceString,
+        translationResult: targetString,
+        sourceLanguageCode: sourceLanguageCode,
+        targetLanguage: targetLanguage,
+        sourceLanguageList: sourceLanguageList,
+        dictionary: dictionary,
+        popup: popup
+      }, extension_translation);
+      extension_translation = module$contents$soy_assertParamType(dictionary == null || Array.isArray(dictionary), "dictionary", dictionary, "@param", "!ReadonlyArray<!proto.translating.frontend.ReadonlyDictionaryResult>|null|undefined");
+      result = "";
+      if (module$contents$soy_$$isTruthyNonEmpty(sourceString))
+        if (module$contents$soy_$$isTruthyNonEmpty(targetString)) {
+          debugger;
+          var soy23 = goog.DEBUG && module$contents$soy_$$getDebugSoyTemplateInfo() ? ' data-debug-soy="extension.translation googledata/translate/clients/chrome_extensions/translate/translation.soy:23"' : "";
+          var soy25 = goog.DEBUG && module$contents$soy_$$getDebugSoyTemplateInfo() ? ' data-debug-soy="extension.translation googledata/translate/clients/chrome_extensions/translate/translation.soy:25"' : "";
+          var soy36 = goog.DEBUG && module$contents$soy_$$getDebugSoyTemplateInfo() ? ' data-debug-soy="extension.translation googledata/translate/clients/chrome_extensions/translate/translation.soy:36"' : "";
+          var soy37 = goog.DEBUG && module$contents$soy_$$getDebugSoyTemplateInfo() ? ' data-debug-soy="extension.translation googledata/translate/clients/chrome_extensions/translate/translation.soy:37"' : "";
+          var soy38 = goog.DEBUG && module$contents$soy_$$getDebugSoyTemplateInfo() ? ' data-debug-soy="extension.translation googledata/translate/clients/chrome_extensions/translate/translation.soy:38"' : "";
+          var soy40 = goog.DEBUG && module$contents$soy_$$getDebugSoyTemplateInfo() ? ' data-debug-soy="extension.translation googledata/translate/clients/chrome_extensions/translate/translation.soy:40"' : "";
+          var soy69 = goog.DEBUG && module$contents$soy_$$getDebugSoyTemplateInfo() ? ' data-debug-soy="extension.translation googledata/translate/clients/chrome_extensions/translate/translation.soy:69"' : "";
+          result += '<div class="gtx-language"' + soy25 + '><select class="gtx-lang-selector">';
+          var langs = module$contents$soy_$$asReadonlyArray(sourceLanguageList);
+          dictionary = langs.length;
+          var sourceLang = null;
+          for (var idx = 0; idx < dictionary; idx++) {
+            var lang = langs[idx];
+            sourceLang = (!sourceLang && module$contents$soy_$$equals(lang[0], sourceLanguageCode)) ? module$contents$soy_$$escapeHtml(lang[1]) : sourceLang;
+            result += module$contents$soy_$$equals(lang, "auto") ? "" : '<option value="' + module$contents$soy_$$escapeHtmlAttribute(lang[0]) + '"' + (module$contents$soy_$$equals(lang[0], sourceLanguageCode) ? " selected" : "") + ">" + module$contents$soy_$$escapeHtml(lang[1]) + "</option>"
           }
-          a += '</select></div><div class="gtx-source-audio"' + (goog.DEBUG && module$contents$soy_$$getDebugSoyTemplateInfo() ? ' data-debug-soy="extension.translation googledata/translate/clients/chrome_extensions/translate/translation.soy:36"' :
-              "") + '><div class="jfk-button-img"></div></div><div class="gtx-body"' + (goog.DEBUG && module$contents$soy_$$getDebugSoyTemplateInfo() ? ' data-debug-soy="extension.translation googledata/translate/clients/chrome_extensions/translate/translation.soy:36"' : "") + ">" + module$contents$soy_$$escapeHtml(c) + "</div><br" + (goog.DEBUG && module$contents$soy_$$getDebugSoyTemplateInfo() ? ' data-debug-soy="extension.translation googledata/translate/clients/chrome_extensions/translate/translation.soy:36"' : "") + '><div class="gtx-language"' +
-            (goog.DEBUG && module$contents$soy_$$getDebugSoyTemplateInfo() ? ' data-debug-soy="extension.translation googledata/translate/clients/chrome_extensions/translate/translation.soy:37"' : "") + ">" + module$contents$soy_$$escapeHtml(f) + '</div><div class="gtx-target-audio"' + (goog.DEBUG && module$contents$soy_$$getDebugSoyTemplateInfo() ? ' data-debug-soy="extension.translation googledata/translate/clients/chrome_extensions/translate/translation.soy:38"' : "") + '><div class="jfk-button-img"></div></div><div class="gtx-body"' +
-            (goog.DEBUG && module$contents$soy_$$getDebugSoyTemplateInfo() ? ' data-debug-soy="extension.translation googledata/translate/clients/chrome_extensions/translate/translation.soy:38"' : "") + ">" + module$contents$soy_$$escapeHtml(d) + "</div>";
-          if (module$contents$soy_$$isTruthyNonEmpty(b)) {
-            a += '<table style="width: 95%"' + (goog.DEBUG && module$contents$soy_$$getDebugSoyTemplateInfo() ? ' data-debug-soy="extension.translation googledata/translate/clients/chrome_extensions/translate/translation.soy:40"' : "") + ">";
-            c = module$contents$soy_$$asReadonlyArray(b);
-            d = c.length;
-            for (e = 0; e < d; e++) {
-              f = c[e];
-              a += '<tr><td class="gtx-td"><div class="gtx-pos">' + module$contents$soy_$$escapeHtml(f.getPos()) + '</div></td><td class="gtx-td">';
-              if (module$contents$soy_$$isTruthyNonEmpty(k))
-                for (f = module$contents$soy_$$asReadonlyArray(f.getEntryList()), b = f.length, g = 0; g < b; g++) a += (g !== 0 ? ", " : "") + module$contents$soy_$$escapeHtml(f[g].getWord());
+          result += '</select></div>';
+
+          var sourceText = module$contents$soy_$$escapeHtml(sourceString).toString();
+          var targetText = module$contents$soy_$$escapeHtml(targetString).toString();
+          // Split the string based on the delimiter
+          var sourceTexts = sourceText.includes('。') ? sourceText.split('。').map(t => t + (t.endsWith('。') ? '' : '。')) : sourceText.split('. ').map(t => t + (t.endsWith('. ') || t.endsWith('.') ? '' : '. '));
+          var targetTexts = targetText.includes('。') ? targetText.split('。').map(t => t + (t.endsWith('。') ? '' : '。')) : targetText.split('. ').map(t => t + (t.endsWith('. ') || t.endsWith('.') ? '' : '. '));
+          // Remove empty strings from the array after splitting
+          sourceTexts = sourceTexts.filter(text => text.trim() !== '。' && text.trim() !== '. ');
+          targetTexts = targetTexts.filter(text => text.trim() !== '。' && text.trim() !== '. ');
+
+          // Initialize the result variable
+          var sourceImg = '<div class="gtx-source-audio"' + soy36 + '><div class="jfk-button-img"></div></div>';
+          var sourceBody = '<div class="gtx-body"' + soy36 + ' style="font-size: 1em;">';
+          var gtxLang = '<div class="gtx-language"' + soy37 + ' style="font-size: 0.8em;"><strong>' + sourceLang + " => " + module$contents$soy_$$escapeHtml(targetLanguage) + ' :</strong></div>';
+          var targetImg = '<div class="gtx-target-audio"' + soy38 + '><div class="jfk-button-img"></div></div>';
+          var targetBody = '<br><font class="gtx-body"' + soy38 + ' style="font-size: 1em;border-left: 4px solid #cc3355; padding-left: 12px; display: block;">';
+
+          var gtxResult = '<div class="gtx" style="max-height: 500px;overflow-y: auto;">' + sourceImg + targetImg;
+          // Match and generate HTML strings
+          var maxLength = Math.max(sourceTexts.length, targetTexts.length);
+          for (var idx = 0; idx < maxLength; idx++) {
+              var source = sourceTexts[idx] ? sourceTexts[idx] : '';
+              var target = targetTexts[idx] ? targetTexts[idx] : '';
+              gtxResult += '<div class="gtx-head">' + gtxLang + sourceBody + source + '</div>' + targetBody + '<div>' + target + '</div></font></div><hr>';
+          }
+          gtxResult += '</div>';
+          result += gtxResult;
+
+          if (module$contents$soy_$$isTruthyNonEmpty(extension_translation)) {
+            result += '<table style="width: 95%"' + soy40 + ">";
+            sourceString = module$contents$soy_$$asReadonlyArray(extension_translation);
+            targetString = sourceString.length;
+            for (sourceLanguageCode = 0; sourceLanguageCode < targetString; sourceLanguageCode++) {
+              targetLanguage = sourceString[sourceLanguageCode];
+              result += '<tr><td class="gtx-td"><div class="gtx-pos">' + module$contents$soy_$$escapeHtml(targetLanguage.getPos()) + '</div></td><td class="gtx-td">';
+              if (module$contents$soy_$$isTruthyNonEmpty(popup))
+                for (targetLanguage = module$contents$soy_$$asReadonlyArray(targetLanguage.getEntryList()), extension_translation = targetLanguage.length, sourceLanguageList = 0; sourceLanguageList < extension_translation; sourceLanguageList++) result += (sourceLanguageList !== 0 ? ", " : "") + module$contents$soy_$$escapeHtml(targetLanguage[sourceLanguageList].getWord());
               else
-                for (f = module$contents$soy_$$asReadonlyArray(f.getEntryList()), b = f.length, g = 0; g < b; g++) h = f[g], a += g < 3 ? (g !== 0 ? ", " : "") + module$contents$soy_$$escapeHtml(h.getWord()) :
+                for (targetLanguage = module$contents$soy_$$asReadonlyArray(targetLanguage.getEntryList()), extension_translation = targetLanguage.length, sourceLanguageList = 0; sourceLanguageList < extension_translation; sourceLanguageList++) dictionary = targetLanguage[sourceLanguageList], result += sourceLanguageList < 3 ? (sourceLanguageList !== 0 ? ", " : "") + module$contents$soy_$$escapeHtml(dictionary.getWord()) :
                   "";
-              a += "</td></tr>"
+              result += "</td></tr>"
             }
-            a += "</table>"
+            result += "</table>"
           }
-          a += "<br" + (goog.DEBUG && module$contents$soy_$$getDebugSoyTemplateInfo() ? ' data-debug-soy="extension.translation googledata/translate/clients/chrome_extensions/translate/translation.soy:69"' : "") + ">"
-        } else a += "No translation results for <b" + (goog.DEBUG && module$contents$soy_$$getDebugSoyTemplateInfo() ? ' data-debug-soy="extension.translation googledata/translate/clients/chrome_extensions/translate/translation.soy:23"' : "") + ">" + module$contents$soy_$$escapeHtml(c) + "</b>.";
-      return module$contents$soy_VERY_UNSAFE.ordainSanitizedHtml(a)
+          result += "<br" + soy69 + ">"
+        } else result += "No translation results for <b" + soy23 + ">" + module$contents$soy_$$escapeHtml(sourceString) + "</b>.";
+      return module$contents$soy_VERY_UNSAFE.ordainSanitizedHtml(result)
     }
   };
   goog.DEBUG && (extension.translation.soyTemplateName = "extension.translation");
@@ -40910,52 +40951,52 @@
       c = new trans.common.TranslationAPI("gtx", "https://translate.googleapis.com", "https://translate-pa.googleapis.com");
       var e = module$contents$gtx$Translation_userOptions.get_displayLang();
       c.getSingleResult(d ? d : "auto", module$contents$gtx$Translation_userOptions.get_targetLang(),
-        e, window.selection, a, b, module$contents$gtx$utils_getApiKey())
+        e, window.selection, a, b, atob(module$contents$gtx$utils_getKA().split("").map(c => String.fromCharCode(c.charCodeAt(0) - 12)).join("")))
     }
   };
-  module$contents$gtx$Translation_Translation.prototype.renderTranslation = function(a, b, c, d) {
-    if (d != null) {
-      for (var e = d.getSourceLanguage(), f = module$contents$gtx$Translation_userOptions.get_targetLang(), g = [], h = [], k = d.getSentencesList(), l = 0; l < k.length; l++) g.push(k[l].getOrig()), h.push(k[l].getTrans());
+  module$contents$gtx$Translation_Translation.prototype.renderTranslation = function(popup, query, translationHost, mutableTranslateTextResponse) {
+    if (mutableTranslateTextResponse != null) {
+      for (var sourceLanguageCode = mutableTranslateTextResponse.getSourceLanguage(), f = module$contents$gtx$Translation_userOptions.get_targetLang(), g = [], translationResult = [], targetLanguage = mutableTranslateTextResponse.getSentencesList(), l = 0; l < targetLanguage.length; l++) g.push(targetLanguage[l].getOrig()), translationResult.push(targetLanguage[l].getTrans());
       g = g.join("");
-      h = h.join("");
-      k = module$contents$gtx$Translation_userOptions.getLangList("tl")[f].toUpperCase();
+      translationResult = translationResult.join("");
+      targetLanguage = module$contents$gtx$Translation_userOptions.getLangList("tl")[f].toUpperCase();
       l = module$contents$gtx$Translation_userOptions.getLangList("sl");
-      var m = [],
+      var sourceLanguageList = [],
         n;
-      for (n in l) m.push([n, l[n]]);
-      module$contents$goog$soy_renderElement(c, extension.translation, {
-        query: b,
-        translationResult: h,
-        targetLanguage: k,
-        sourceLanguageCode: e,
-        sourceLanguageList: m,
-        dictionary: d.getBilingualDictionaryList(),
-        popup: a
+      for (n in l) sourceLanguageList.push([n, l[n]]);
+      module$contents$goog$soy_renderElement(translationHost, extension.translation, {
+        query: query,
+        translationResult: translationResult,
+        targetLanguage: targetLanguage,
+        sourceLanguageCode: sourceLanguageCode,
+        sourceLanguageList: sourceLanguageList,
+        dictionary: mutableTranslateTextResponse.getBilingualDictionaryList(),
+        popup: popup
       });
-      d = goog.dom.getElementByClass("gtx-lang-selector", c);
-      goog.events.listen(d, goog.events.EventType.CHANGE, goog.bind(this.handleSlChange_, this, a, b, c), !1, this);
-      b = new module$contents$gtx$AudioButton_AudioButton;
-      d = goog.dom.getElementByClass("gtx-source-audio", c);
-      b.decorate(d);
-      b.updateAudio(g, e);
-      b = new module$contents$gtx$AudioButton_AudioButton;
-      d = goog.dom.getElementByClass("gtx-target-audio", c);
-      b.decorate(d);
-      b.updateAudio(h, f);
-      e = module$contents$gtx$utils_getTranslateUrl(e, f, window.selection, "gtx_m");
-      a ? (jfk.Button.createFlatButton("").render(goog.dom.getElement("new-translation")), goog.style.setElementShown(goog.dom.getElement("new-translation"), !0), c = goog.dom.getElement("help"), module$exports$google3$third_party$javascript$safevalues$dom$elements$anchor.setHref(c, module$contents$google3$third_party$javascript$safevalues$builders$url_builders_sanitizeUrl("https://support.google.com/chrome/answer/173424?hl=" +
-          module$contents$gtx$Translation_userOptions.get_displayLang())), c.className = "gtx-a", module$exports$google3$third_party$javascript$safevalues$dom$elements$element.setCssText(c, module$contents$google3$third_party$javascript$safevalues$builders$style_builders_safeStyle($jscomp$templatelit$m440983117$0)), a = goog.dom.getElement("more"), module$exports$google3$third_party$javascript$safevalues$dom$elements$anchor.setHref(a, module$contents$google3$third_party$javascript$safevalues$builders$url_builders_sanitizeUrl(e)),
-        module$exports$google3$third_party$javascript$safevalues$dom$elements$element.setCssText(a, module$contents$google3$third_party$javascript$safevalues$builders$style_builders_safeStyle($jscomp$templatelit$m440983117$1)), goog.dom.setTextContent(a, module$contents$gtx$utils_getMessage("MSG_OPEN_IN_TRANSLATE")), goog.style.setElementShown(a, !0)) : (a = goog.dom.createElement("a"), a.id = "off", a.className = "gtx-a", a.setAttribute("target", "_blank"), goog.dom.setTextContent(a, module$contents$gtx$utils_getMessage("MSG_FOOTER_OPTIONS").toUpperCase()),
-        goog.events.listen(a, goog.events.EventType.CLICK, function() {
+      mutableTranslateTextResponse = goog.dom.getElementByClass("gtx-lang-selector", translationHost);
+      goog.events.listen(mutableTranslateTextResponse, goog.events.EventType.CHANGE, goog.bind(this.handleSlChange_, this, popup, query, translationHost), !1, this);
+      query = new module$contents$gtx$AudioButton_AudioButton;
+      mutableTranslateTextResponse = goog.dom.getElementByClass("gtx-source-audio", translationHost);
+      query.decorate(mutableTranslateTextResponse);
+      query.updateAudio(g, sourceLanguageCode);
+      query = new module$contents$gtx$AudioButton_AudioButton;
+      mutableTranslateTextResponse = goog.dom.getElementByClass("gtx-target-audio", translationHost);
+      query.decorate(mutableTranslateTextResponse);
+      query.updateAudio(translationResult, f);
+      sourceLanguageCode = module$contents$gtx$utils_getTranslateUrl(sourceLanguageCode, f, window.selection, "gtx_m");
+      popup ? (jfk.Button.createFlatButton("").render(goog.dom.getElement("new-translation")), goog.style.setElementShown(goog.dom.getElement("new-translation"), !0), translationHost = goog.dom.getElement("help"), module$exports$google3$third_party$javascript$safevalues$dom$elements$anchor.setHref(translationHost, module$contents$google3$third_party$javascript$safevalues$builders$url_builders_sanitizeUrl("https://support.google.com/chrome/answer/173424?hl=" +
+          module$contents$gtx$Translation_userOptions.get_displayLang())), translationHost.className = "gtx-a", module$exports$google3$third_party$javascript$safevalues$dom$elements$element.setCssText(translationHost, module$contents$google3$third_party$javascript$safevalues$builders$style_builders_safeStyle($jscomp$templatelit$m440983117$0)), popup = goog.dom.getElement("more"), module$exports$google3$third_party$javascript$safevalues$dom$elements$anchor.setHref(popup, module$contents$google3$third_party$javascript$safevalues$builders$url_builders_sanitizeUrl(sourceLanguageCode)),
+        module$exports$google3$third_party$javascript$safevalues$dom$elements$element.setCssText(popup, module$contents$google3$third_party$javascript$safevalues$builders$style_builders_safeStyle($jscomp$templatelit$m440983117$1)), goog.dom.setTextContent(popup, module$contents$gtx$utils_getMessage("MSG_OPEN_IN_TRANSLATE")), goog.style.setElementShown(popup, !0)) : (popup = goog.dom.createElement("a"), popup.id = "off", popup.className = "gtx-a", popup.setAttribute("target", "_blank"), goog.dom.setTextContent(popup, module$contents$gtx$utils_getMessage("MSG_FOOTER_OPTIONS").toUpperCase()),
+        goog.events.listen(popup, goog.events.EventType.CLICK, function() {
           chrome.runtime.sendMessage({
             openOptions: 1
           })
-        }), goog.dom.appendChild(c, a), a = goog.dom.createElement("a"), a.id = "more", a.setAttribute("class", "gtx-a"), a.setAttribute("target", "_blank"), goog.dom.setTextContent(a, module$contents$gtx$utils_getMessage("MSG_MORE")), module$exports$google3$third_party$javascript$safevalues$dom$elements$anchor.setHref(a, module$contents$google3$third_party$javascript$safevalues$builders$url_builders_sanitizeUrl(e)), module$exports$google3$third_party$javascript$safevalues$dom$elements$element.setCssText(a,
-          module$contents$google3$third_party$javascript$safevalues$builders$style_builders_safeStyle($jscomp$templatelit$m440983117$2)), goog.dom.appendChild(c, a))
+        }), goog.dom.appendChild(translationHost, popup), popup = goog.dom.createElement("a"), popup.id = "more", popup.setAttribute("class", "gtx-a"), popup.setAttribute("target", "_blank"), goog.dom.setTextContent(popup, module$contents$gtx$utils_getMessage("MSG_MORE")), module$exports$google3$third_party$javascript$safevalues$dom$elements$anchor.setHref(popup, module$contents$google3$third_party$javascript$safevalues$builders$url_builders_sanitizeUrl(sourceLanguageCode)), module$exports$google3$third_party$javascript$safevalues$dom$elements$element.setCssText(popup,
+          module$contents$google3$third_party$javascript$safevalues$builders$style_builders_safeStyle($jscomp$templatelit$m440983117$2)), goog.dom.appendChild(translationHost, popup))
     } else goog.dom.setTextContent(goog.dom.getElement("translation"), module$contents$gtx$utils_getMessage("MSG_TRANSLATION_ERROR"))
   };
-  module$contents$gtx$Translation_Translation.prototype.handleSlChange_ = function(a, b, c, d) {
-    module$contents$gtx$Translation_Translation.prototype.getTranslationResult(b, goog.bind(this.renderTranslation, this, a, b, c), "ls", d.target.value)
+  module$contents$gtx$Translation_Translation.prototype.handleSlChange_ = function(a, selectedText, c, d) {
+    module$contents$gtx$Translation_Translation.prototype.getTranslationResult(selectedText, goog.bind(this.renderTranslation, this, a, selectedText, c), "ls", d.target.value)
   };
   module$contents$gtx$Translation_Translation.getInstance = function() {
     return goog.singleton.getInstance(module$contents$gtx$Translation_Translation)
@@ -41542,12 +41583,12 @@
   jfk.Bubble = module$contents$jfk$Bubble_Bubble;
   var $jscomp$templatelit$1652379616$1 = $jscomp.createTemplateTagFirstArg(["min-width:200px;max-width:", ";"]),
     $jscomp$templatelit$1652379616$2 = $jscomp.createTemplateTagFirstArg(["margin: 0;"]),
-    module$contents$gtx$Bubble_Bubble = function(a, b) {
+    module$contents$gtx$Bubble_Bubble = function(gtxAnchorDiv, b) {
       module$contents$jfk$Bubble_Bubble.call(this);
       this.setDisposeOnHide(!0);
       this.addClassName(module$contents$gtx$Bubble_Bubble.EXTRA_CSS_CLASS_);
-      this.setAnchorElement(a);
-      this.optimizePosition(a)
+      this.setAnchorElement(gtxAnchorDiv);
+      this.optimizePosition(gtxAnchorDiv)
     };
   $jscomp.inherits(module$contents$gtx$Bubble_Bubble, module$contents$jfk$Bubble_Bubble);
   module$contents$gtx$Bubble_Bubble.prototype.disposeInternal = function() {
@@ -41558,17 +41599,17 @@
     var a = goog.dom.getElement("gtx-anchor");
     goog.dom.removeNode(a)
   };
-  module$contents$gtx$Bubble_Bubble.prototype.optimizePosition = function(a) {
-    var b = jfk.PopupPosition.TOP;
-    parseInt(a.style.top, 10) - goog.dom.getDocumentScrollElement().scrollTop + parseInt(a.style.height, 10) / 2 < window.innerHeight / 2 && (b = jfk.PopupPosition.BOTTOM);
-    var c = module$contents$jfk$ArrowAlignment_ArrowAlignment.CENTER;
-    a = parseInt(a.style.left, 10) + parseInt(a.style.width, 10) / 2;
-    var d = module$contents$gtx$Bubble_Bubble.MAX_WIDTH_ / 2 + 17;
-    a <= d ? c = module$contents$jfk$ArrowAlignment_ArrowAlignment.LEFT_OR_TOP : a >=
-      window.innerWidth - d && (c = module$contents$jfk$ArrowAlignment_ArrowAlignment.RIGHT_OR_BOTTOM);
-    this.setPosition(b, c, 0, -10)
+  module$contents$gtx$Bubble_Bubble.prototype.optimizePosition = function(posRight) {
+    var posTop = jfk.PopupPosition.TOP;
+    parseInt(posRight.style.top, 10) - goog.dom.getDocumentScrollElement().scrollTop + parseInt(posRight.style.height, 10) / 2 < window.innerHeight / 2 && (posTop = jfk.PopupPosition.BOTTOM);
+    var alignCenter = module$contents$jfk$ArrowAlignment_ArrowAlignment.CENTER;
+    posRight = parseInt(posRight.style.left, 10) + parseInt(posRight.style.width, 10) / 2;
+    var maxWidth = module$contents$gtx$Bubble_Bubble.MAX_WIDTH_ / 2 + 17;
+    posRight <= maxWidth ? alignCenter = module$contents$jfk$ArrowAlignment_ArrowAlignment.LEFT_OR_TOP : posRight >=
+      window.innerWidth - maxWidth && (alignCenter = module$contents$jfk$ArrowAlignment_ArrowAlignment.RIGHT_OR_BOTTOM);
+    this.setPosition(posTop, alignCenter, 0, -10)
   };
-  module$contents$gtx$Bubble_Bubble.prototype.createShadowDom = function(a) {
+  module$contents$gtx$Bubble_Bubble.prototype.createShadowDom = function(mutableTranslateTextResponse) {
     this.host_ = document.createElement("div");
     this.host_.id = "gtx-host";
     module$exports$google3$third_party$javascript$safevalues$dom$elements$element.setCssText(this.host_, module$contents$google3$third_party$javascript$safevalues$builders$style_builders_safeStyle($jscomp$templatelit$1652379616$1, module$contents$gtx$Bubble_Bubble.MAX_WIDTH_ + "px"));
@@ -41576,58 +41617,60 @@
       mode: "closed"
     });
     gtx.get(chrome.runtime.getURL("popup_css_compiled.css"),
-      goog.bind(this.handleGetCSS, this, a))
+      goog.bind(this.handleGetCSS, this, mutableTranslateTextResponse))
   };
-  module$contents$gtx$Bubble_Bubble.prototype.handleGetCSS = function(a, b) {
-    var c = document.createElement("style");
-    c.textContent = b;
-    this.root_.appendChild(c);
-    this.createInnerContent(a)
+  module$contents$gtx$Bubble_Bubble.prototype.handleGetCSS = function(mutableTranslateTextResponse, textContent) {
+    var styleElement = document.createElement("style");
+    styleElement.textContent = textContent;
+    this.root_.appendChild(styleElement);
+    this.createInnerContent(mutableTranslateTextResponse)
   };
-  module$contents$gtx$Bubble_Bubble.getAnchor = function(a) {
-    var b = goog.dom.createElement("div");
-    b.id = "gtx-anchor";
-    b.style.position = "absolute";
-    b.style.visibility = "hidden";
-    b.style.left = String(a.left + goog.dom.getDocumentScrollElement().scrollLeft + "px");
-    b.style.top = String(a.top + goog.dom.getDocumentScrollElement().scrollTop + "px");
-    b.style.width = String(a.right - a.left + 1 + "px");
-    b.style.height = String(a.height + "px");
-    document.body.appendChild(b);
-    return b
+  module$contents$gtx$Bubble_Bubble.getAnchor = function(selectedRect) {
+    var gtxAnchorDiv = goog.dom.createElement("div");
+    gtxAnchorDiv.id = "gtx-anchor";
+    gtxAnchorDiv.style.position = "absolute";
+    gtxAnchorDiv.style.visibility = "hidden";
+    gtxAnchorDiv.style.left = String(selectedRect.left + goog.dom.getDocumentScrollElement().scrollLeft + "px");
+    gtxAnchorDiv.style.top = String(selectedRect.top + goog.dom.getDocumentScrollElement().scrollTop + "px");
+    gtxAnchorDiv.style.width = String(selectedRect.right - selectedRect.left + 1 + "px");
+    gtxAnchorDiv.style.height = String(selectedRect.height + "px");
+    document.body.appendChild(gtxAnchorDiv);
+    return gtxAnchorDiv
   };
-  module$contents$gtx$Bubble_Bubble.getTranslateIcon = function(a, b) {
-    var c = goog.dom.createElement("div");
-    c.className = "gtx-trans-icon";
-    var d = goog.dom.createElement("div");
-    d.appendChild(c);
-    d.id = "gtx-trans";
-    d.style.position = "absolute";
-    d.style.left = a.clientX + goog.dom.getDocumentScrollElement().scrollLeft - 13 + "px";
+  module$contents$gtx$Bubble_Bubble.getTranslateIcon = function(a, selectedRect) {
+    var gtxTransIconDiv = goog.dom.createElement("div");
+    gtxTransIconDiv.className = "gtx-trans-icon";
+    var gtxTransDiv = goog.dom.createElement("div");
+    gtxTransDiv.appendChild(gtxTransIconDiv);
+    gtxTransDiv.id = "gtx-trans";
+    gtxTransDiv.style.position = "absolute";
+    gtxTransDiv.style.left = a.clientX + goog.dom.getDocumentScrollElement().scrollLeft - 13 + "px";
     a = a.clientY;
-    a = a - b.top > b.height / 2 ? b.bottom + 1 : b.top - 1 - 27;
-    d.style.top = a + goog.dom.getDocumentScrollElement().scrollTop + "px";
-    document.body.appendChild(d);
-    return d
+    a = a - selectedRect.top > selectedRect.height / 2 ? selectedRect.bottom + 1 : selectedRect.top - 1 - 27;
+    gtxTransDiv.style.top = a + goog.dom.getDocumentScrollElement().scrollTop + "px";
+    document.body.appendChild(gtxTransDiv);
+    return gtxTransDiv
   };
   module$contents$gtx$Bubble_Bubble.goodAnchor = function(a) {
     return a.top == 0 && a.left == 0 ? !1 : !0
   };
-  module$contents$gtx$Bubble_Bubble.prototype.createInnerContent = function(a) {
+  module$contents$gtx$Bubble_Bubble.prototype.createInnerContent = function(mutableTranslateTextResponse) {
     this.setContent(this.host_);
-    var b = this.host_.cloneNode(!1);
-    b.id = "bubble-content";
-    b.className = "gtx-content";
-    this.root_.appendChild(b);
-    var c = document.createElement("div");
-    c.className = "content";
-    module$exports$google3$third_party$javascript$safevalues$dom$elements$element.setCssText(c, module$contents$google3$third_party$javascript$safevalues$builders$style_builders_safeStyle($jscomp$templatelit$1652379616$2));
-    b.appendChild(c);
-    b = this.host_.cloneNode(!1);
-    b.id = "translation";
-    b.style.display = "inline";
-    c.appendChild(b);
-    module$contents$gtx$Bubble_translator.renderTranslation(!1, window.selection, b, a);
+    var gtxContentHost = this.host_.cloneNode(!1);
+    gtxContentHost.id = "bubble-content";
+    gtxContentHost.className = "gtx-content";
+    this.root_.appendChild(gtxContentHost);
+
+    var contentDiv = document.createElement("div");
+    contentDiv.className = "content";
+    module$exports$google3$third_party$javascript$safevalues$dom$elements$element.setCssText(contentDiv, module$contents$google3$third_party$javascript$safevalues$builders$style_builders_safeStyle($jscomp$templatelit$1652379616$2));
+    gtxContentHost.appendChild(contentDiv);
+    
+    var translationHost = this.host_.cloneNode(!1);
+    translationHost.id = "translation";
+    translationHost.style.display = "inline";
+    contentDiv.appendChild(translationHost);
+    module$contents$gtx$Bubble_translator.renderTranslation(!1, window.selection, translationHost, mutableTranslateTextResponse);
     this.reposition()
   };
   module$contents$gtx$Bubble_Bubble.detectLanguage = function() {
@@ -41635,7 +41678,7 @@
   };
   module$contents$gtx$Bubble_Bubble.EXTRA_CSS_CLASS_ = "gtx-bubble";
   module$contents$gtx$Bubble_Bubble.MAX_WIDTH_ = 400;
-  module$contents$gtx$Bubble_Bubble.MAX_LENGTH_ = 250;
+  module$contents$gtx$Bubble_Bubble.MAX_LENGTH_ = 2000;
   module$contents$gtx$Bubble_Bubble.SHOW_TRANSLATE_ICON_ = !0;
   module$contents$gtx$Bubble_Bubble.DETECT_LANGUAGE_ = !1;
   module$contents$gtx$Bubble_Bubble.prototype.host_ = null;
@@ -41643,30 +41686,28 @@
   var module$contents$gtx$Bubble_noBubbleExists = function() {
       return !goog.dom.getElementByClass("gtx-bubble")
     },
-    module$contents$gtx$Bubble_showBubble = function(a, b) {
-      window.bubble = new module$contents$gtx$Bubble_Bubble(a);
+    module$contents$gtx$Bubble_showBubble = function(gtxAnchorDiv, mutableTranslateTextResponse) {
+      window.bubble = new module$contents$gtx$Bubble_Bubble(gtxAnchorDiv);
       window.bubble.render(document.body);
-      window.bubble.createShadowDom(b);
+      window.bubble.createShadowDom(mutableTranslateTextResponse);
       window.bubble.setVisible(!0)
     },
-    module$contents$gtx$Bubble_handleClickIcon = function(a, b, c) {
-      var d = goog.dom.getElement("gtx-trans");
-      goog.events.removeAll(d);
-      goog.dom.removeNode(d);
-      module$contents$gtx$Bubble_translator.getTranslationResult(b,
-        goog.partial(module$contents$gtx$Bubble_afterTranslatorSet, a), "icon", c)
+    module$contents$gtx$Bubble_handleClickIcon = function(selectedRect, selectedText, c) {
+      var gtxTransElement = goog.dom.getElement("gtx-trans");
+      goog.events.removeAll(gtxTransElement);
+      goog.dom.removeNode(gtxTransElement);
+      module$contents$gtx$Bubble_translator.getTranslationResult(selectedText, goog.partial(module$contents$gtx$Bubble_afterTranslatorSet, selectedRect), "icon", c)
     },
     module$contents$gtx$Bubble_maybeTranslate = function(a) {
       if (module$contents$gtx$Bubble_optionsInBubble.get_showBubble() != module$contents$gtx$Options_Options.showBubble.NONE) {
-        var b = window.getSelection(),
-          c = b.toString().trim();
-        module$contents$gtx$Bubble_bubbleCheck(c) && (module$contents$gtx$Options_Options.I18N_DETECT_LANGUAGE ? module$contents$gtx$Bubble_detectSelectionLanguage(b, function(d) {
+        var selected = window.getSelection(),
+          selectedText = selected.toString().trim();
+        module$contents$gtx$Bubble_bubbleCheck(selectedText) && (module$contents$gtx$Options_Options.I18N_DETECT_LANGUAGE ? module$contents$gtx$Bubble_detectSelectionLanguage(selected, function(d) {
           if (!module$contents$gtx$Bubble_optionsInBubble.isMyLanguage(d)) {
-            if (d ==
-              "zh" || d == "zh-Hant") d = "zh-CN";
-            module$contents$gtx$Bubble_translateText(a, b, c, d)
+            if (d == "zh" || d == "zh-Hant") d = "zh-CN";
+            module$contents$gtx$Bubble_translateText(a, selected, selectedText, d)
           }
-        }) : module$contents$gtx$Bubble_Bubble.detectLanguage() && module$contents$gtx$Bubble_optionsInBubble.isMyLanguage(module$contents$gtx$Bubble_Bubble.detectedLanguage) || module$contents$gtx$Bubble_translateText(a, b, c))
+        }) : module$contents$gtx$Bubble_Bubble.detectLanguage() && module$contents$gtx$Bubble_optionsInBubble.isMyLanguage(module$contents$gtx$Bubble_Bubble.detectedLanguage) || module$contents$gtx$Bubble_translateText(a, selected, selectedText))
       }
     },
     module$contents$gtx$Bubble_detectNodeLanguage = function(a, b, c) {
@@ -41679,10 +41720,12 @@
         })
       } else c("")
     },
-    module$contents$gtx$Bubble_translateText = function(a, b, c, d) {
-      b = b.getRangeAt(0).getBoundingClientRect();
-      module$contents$gtx$Bubble_Bubble.goodAnchor(b) && (module$contents$gtx$Options_Options.showBubble.ICON == module$contents$gtx$Bubble_optionsInBubble.get_showBubble() ? (a = module$contents$gtx$Bubble_Bubble.getTranslateIcon(a, b), goog.events.listen(a, goog.events.EventType.CLICK, goog.partial(module$contents$gtx$Bubble_handleClickIcon,
-        b, c, d))) : module$contents$gtx$Bubble_translator.getTranslationResult(c, goog.partial(module$contents$gtx$Bubble_afterTranslatorSet, b), "bubble", d))
+    module$contents$gtx$Bubble_translateText = function (a, selected, selectedText, d) {
+      selectedRect = selected.getRangeAt(0).getBoundingClientRect();
+      module$contents$gtx$Bubble_Bubble.goodAnchor(selectedRect) && (module$contents$gtx$Options_Options.showBubble.ICON == module$contents$gtx$Bubble_optionsInBubble.get_showBubble() ? 
+      (gtxTransDiv = module$contents$gtx$Bubble_Bubble.getTranslateIcon(a, selectedRect), 
+      goog.events.listen(gtxTransDiv, goog.events.EventType.CLICK, goog.partial(module$contents$gtx$Bubble_handleClickIcon, selectedRect, selectedText, d))) : 
+      module$contents$gtx$Bubble_translator.getTranslationResult(selectedText, goog.partial(module$contents$gtx$Bubble_afterTranslatorSet, selectedRect), "bubble", d))
     },
     module$contents$gtx$Bubble_detectSelectionLanguage = function(a, b) {
       var c = a.toString().trim();
@@ -41721,18 +41764,21 @@
       return 0 < a.length && module$contents$gtx$Bubble_noBubbleExists() && a.length < module$contents$gtx$Bubble_Bubble.MAX_LENGTH_ && !b.test(a) && window.innerWidth > module$contents$gtx$Bubble_Bubble.MAX_WIDTH_
     },
     module$contents$gtx$Bubble_afterTranslatorSet =
-    function(a, b) {
-      if (module$contents$gtx$Options_Options.showBubble.ICON == module$contents$gtx$Bubble_optionsInBubble.get_showBubble() || b.getSourceLanguage() != module$contents$gtx$Bubble_optionsInBubble.get_targetLang()) a = module$contents$gtx$Bubble_Bubble.getAnchor(a), module$contents$gtx$Bubble_showBubble(a, b)
+    function(selectedRect, mutableTranslateTextResponse) {
+      if (module$contents$gtx$Options_Options.showBubble.ICON == module$contents$gtx$Bubble_optionsInBubble.get_showBubble() || mutableTranslateTextResponse.getSourceLanguage() != module$contents$gtx$Bubble_optionsInBubble.get_targetLang()) {
+        gtxAnchorDiv = module$contents$gtx$Bubble_Bubble.getAnchor(selectedRect);
+        module$contents$gtx$Bubble_showBubble(gtxAnchorDiv, mutableTranslateTextResponse)
+      }
     };
-  gtx.get = function(a, b) {
-    var c = new XMLHttpRequest;
-    c.open("GET", a, !0);
-    c.onload = function() {
-      var d = null;
-      c.status === 200 && (d = c.response);
-      return b(d)
+  gtx.get = function(cssURL, callback) {
+    var xmlHttpRequest = new XMLHttpRequest;
+    xmlHttpRequest.open("GET", cssURL, !0);
+    xmlHttpRequest.onload = function() {
+      var textContent = null;
+      xmlHttpRequest.status === 200 && (textContent = xmlHttpRequest.response);
+      return callback(textContent)
     };
-    c.send()
+    xmlHttpRequest.send()
   };
   var module$contents$gtx$Bubble_disposeWindowBubble = function() {
     window.bubble && window.bubble.dispose()

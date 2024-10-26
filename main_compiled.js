@@ -19763,12 +19763,11 @@
     return "http://translate.google.com/translate?sl=" + a + "&tl=" + b + "&hl=" + c + "&u=" + encodeURIComponent(d)
   }
 
-  function module$contents$gtx$utils_getApiKey() {
-    return "AIzaSyDLEeFI5OtFBwYBIoK_jj5m32rZK5CkCXA"
+  function module$contents$gtx$utils_getKA() {
+    return "]axBebZA^Q\x84RfafVZaE<^wV?caVVn<\x80rmy{=n`Y\x85ox|XZaZ~]=tN";
   }
   gtx.utils.applyTemplate = module$contents$gtx$utils_applyTemplate;
   gtx.utils.escapeJs = module$contents$gtx$utils_escapeJs;
-  gtx.utils.getApiKey = module$contents$gtx$utils_getApiKey;
   gtx.utils.getImageTranslateUrl = module$contents$gtx$utils_getImageTranslateUrl;
   gtx.utils.getMessage = module$contents$gtx$utils_getMessage;
   gtx.utils.getTranslateUrl = module$contents$gtx$utils_getTranslateUrl;
@@ -22521,7 +22520,7 @@
       c = new Map([
         ["client", "gtx"],
         ["display_language", a],
-        ["key", module$contents$gtx$utils_getApiKey()]
+        ["key", atob(module$contents$gtx$utils_getKA().split("").map(c => String.fromCharCode(c.charCodeAt(0) - 12)).join(""))]
       ]);
     fetch(module$contents$google3$third_party$javascript$safevalues$builders$resource_url_builders_appendParams(b, c).toString(), {
       headers: {
