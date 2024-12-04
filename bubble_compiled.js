@@ -18,14 +18,14 @@
       next: $jscomp.arrayIteratorImpl(a)
     }
   };
-  $jscomp.ASSUME_ES5 = !1;
-  $jscomp.ASSUME_NO_NATIVE_MAP = !1;
-  $jscomp.ASSUME_NO_NATIVE_SET = !1;
-  $jscomp.SIMPLE_FROUND_POLYFILL = !1;
-  $jscomp.ISOLATE_POLYFILLS = !1;
-  $jscomp.FORCE_POLYFILL_PROMISE = !1;
-  $jscomp.FORCE_POLYFILL_PROMISE_WHEN_NO_UNHANDLED_REJECTION = !1;
-  $jscomp.INSTRUMENT_ASYNC_CONTEXT = !0;
+  $jscomp.ASSUME_ES5 = false;
+  $jscomp.ASSUME_NO_NATIVE_MAP = false;
+  $jscomp.ASSUME_NO_NATIVE_SET = false;
+  $jscomp.SIMPLE_FROUND_POLYFILL = false;
+  $jscomp.ISOLATE_POLYFILLS = false;
+  $jscomp.FORCE_POLYFILL_PROMISE = false;
+  $jscomp.FORCE_POLYFILL_PROMISE_WHEN_NO_UNHANDLED_REJECTION = false;
+  $jscomp.INSTRUMENT_ASYNC_CONTEXT = true;
   $jscomp.defineProperty = $jscomp.ASSUME_ES5 || typeof Object.defineProperties == "function" ? Object.defineProperty : function (a, b, c) {
     if (a == Array.prototype || a == Object.prototype) return a;
     a[b] = c.value;
@@ -231,7 +231,7 @@
     if (!(a instanceof Object)) throw new TypeError("Iterator result " + a + " is not an object");
   };
   $jscomp.generator.Context = function () {
-    this.isRunning_ = !1;
+    this.isRunning_ = false;
     this.yieldAllIterator_ = null;
     this.yieldResult = void 0;
     this.nextAddress = 1;
@@ -515,7 +515,7 @@
       this.state_ = 0;
       this.result_ = void 0;
       this.onSettledCallbacks_ = [];
-      this.isRejectionHandled_ = !1;
+      this.isRejectionHandled_ = false;
       var h = this.createResolveAndReject_();
       try {
         g(h.resolve, h.reject)
@@ -530,7 +530,7 @@
         }
       }
       var h = this,
-        k = !1;
+        k = false;
       return {
         resolve: g(this.resolveTo_),
         reject: g(this.reject_)
@@ -545,7 +545,7 @@
             var h = g != null;
             break a;
           case "function":
-            h = !0;
+            h = true;
             break a;
           default:
             h = !1
@@ -586,17 +586,17 @@
       }, 1)
     };
     e.prototype.notifyUnhandledRejection_ = function () {
-      if (this.isRejectionHandled_) return !1;
+      if (this.isRejectionHandled_) return false;
       var g = $jscomp.global.CustomEvent,
         h = $jscomp.global.Event,
         k = $jscomp.global.dispatchEvent;
-      if (typeof k === "undefined") return !0;
+      if (typeof k === "undefined") return true;
       typeof g === "function" ? g = new g("unhandledrejection", {
         cancelable: !0
       }) :
         typeof h === "function" ? g = new h("unhandledrejection", {
           cancelable: !0
-        }) : (g = $jscomp.global.document.createEvent("CustomEvent"), g.initCustomEvent("unhandledrejection", !1, !0, g));
+        }) : (g = $jscomp.global.document.createEvent("CustomEvent"), g.initCustomEvent("unhandledrejection", false, true, g));
       g.promise = this;
       g.reason = this.result_;
       return k(g)
@@ -753,11 +753,11 @@
       return !1
     }
   };
-  $jscomp.USE_PROXY_FOR_ES6_CONFORMANCE_CHECKS = !1;
+  $jscomp.USE_PROXY_FOR_ES6_CONFORMANCE_CHECKS = false;
   $jscomp.ES6_CONFORMANCE = $jscomp.USE_PROXY_FOR_ES6_CONFORMANCE_CHECKS && $jscomp.checkEs6ConformanceViaProxy();
   $jscomp.polyfill("WeakMap", function (a) {
     function b() {
-      if (!a || !Object.seal) return !1;
+      if (!a || !Object.seal) return false;
       try {
         var l = Object.seal({}),
           m = Object.seal({}),
@@ -765,7 +765,7 @@
             [l, 2],
             [m, 3]
           ]);
-        if (n.get(l) != 2 || n.get(m) != 3) return !1;
+        if (n.get(l) != 2 || n.get(m) != 3) return false;
         n.delete(l);
         n.set(m, 4);
         return !n.has(l) && n.get(m) == 4
@@ -837,7 +837,7 @@
   $jscomp.MapEntry = function () { };
   $jscomp.polyfill("Map", function (a) {
     function b() {
-      if ($jscomp.ASSUME_NO_NATIVE_MAP || !a || typeof a != "function" || !a.prototype.entries || typeof Object.seal != "function") return !1;
+      if ($jscomp.ASSUME_NO_NATIVE_MAP || !a || typeof a != "function" || !a.prototype.entries || typeof Object.seal != "function") return false;
       try {
         var k = Object.seal({
           x: 4
@@ -849,10 +849,10 @@
           x: 4
         }) || l.set({
           x: 4
-        }, "t") != l || l.size != 2) return !1;
+        }, "t") != l || l.size != 2) return false;
         var m = l.entries(),
           n = m.next();
-        if (n.done || n.value[0] != k || n.value[1] != "s") return !1;
+        if (n.done || n.value[0] != k || n.value[1] != "s") return false;
         n = m.next();
         return n.done || n.value[0].x != 4 || n.value[1] != "t" || !m.next().done ? !1 : !0
       } catch (p) {
@@ -888,7 +888,7 @@
     };
     d.prototype.delete = function (k) {
       k = e(this, k);
-      return k.entry && k.list ? (k.list.splice(k.index, 1), k.list.length || delete this[0][k.id], k.entry.previous.next = k.entry.next, k.entry.next.previous = k.entry.previous, k.entry.head = null, this.size--, !0) : !1
+      return k.entry && k.list ? (k.list.splice(k.index, 1), k.list.length || delete this[0][k.id], k.entry.previous.next = k.entry.next, k.entry.next.previous = k.entry.previous, k.entry.head = null, this.size--, true) : !1
     };
     d.prototype.clear = function () {
       this[0] = {};
@@ -968,7 +968,7 @@
   }, "es6", "es3");
   $jscomp.polyfill("Set", function (a) {
     function b() {
-      if ($jscomp.ASSUME_NO_NATIVE_SET || !a || typeof a != "function" || !a.prototype.entries || typeof Object.seal != "function") return !1;
+      if ($jscomp.ASSUME_NO_NATIVE_SET || !a || typeof a != "function" || !a.prototype.entries || typeof Object.seal != "function") return false;
       try {
         var d = Object.seal({
           x: 4
@@ -976,10 +976,10 @@
           e = new a($jscomp.makeIterator([d]));
         if (!e.has(d) || e.size != 1 || e.add(d) != e || e.size != 1 || e.add({
           x: 4
-        }) != e || e.size != 2) return !1;
+        }) != e || e.size != 2) return false;
         var f = e.entries(),
           g = f.next();
-        if (g.done || g.value[0] != d || g.value[1] != d) return !1;
+        if (g.done || g.value[0] != d || g.value[1] != d) return false;
         g = f.next();
         return g.done || g.value[0] == d || g.value[0].x != 4 || g.value[1] != g.value[0] ? !1 : f.next().done
       } catch (h) {
@@ -1125,7 +1125,7 @@
         f = b.length;
       c = Math.max(0, Math.min(c | 0, d.length));
       for (var g = 0; g < f && c < e;)
-        if (d[c++] != b[g++]) return !1;
+        if (d[c++] != b[g++]) return false;
       return g >= f
     }
   }, "es6", "es3");
@@ -1136,7 +1136,7 @@
       c === void 0 && (c = d.length);
       c = Math.max(0, Math.min(c | 0, d.length));
       for (var e = b.length; e > 0 && c > 0;)
-        if (d[--c] != b[--e]) return !1;
+        if (d[--c] != b[--e]) return false;
       return e <= 0
     }
   }, "es6", "es3");
@@ -1153,7 +1153,7 @@
               done: !1
             }
           }
-          d = !0;
+          d = true;
           return {
             done: !0,
             value: void 0
@@ -1400,18 +1400,18 @@
     return b
   };
   goog.FEATURESET_YEAR = 2012;
-  goog.DEBUG = !0;
+  goog.DEBUG = true;
   goog.LOCALE = "en";
-  goog.TRUSTED_SITE = !0;
+  goog.TRUSTED_SITE = true;
   goog.DISALLOW_TEST_ONLY_CODE = COMPILED && !goog.DEBUG;
-  goog.ENABLE_CHROME_APP_SAFE_SCRIPT_LOADING = !1;
+  goog.ENABLE_CHROME_APP_SAFE_SCRIPT_LOADING = false;
   goog.readFlagInternalDoNotUseOrElse = function (a, b) {
     var c = goog.getObjectByName(goog.FLAGS_OBJECT_);
     a = c && c[a];
     return a != null ? a : b
   };
   goog.FLAGS_OBJECT_ = "CLOSURE_FLAGS";
-  goog.FLAGS_STAGING_DEFAULT = !0;
+  goog.FLAGS_STAGING_DEFAULT = true;
   goog.readToggleInternalDoNotCallDirectly = function (a) {
     var b = typeof CLOSURE_TOGGLE_ORDINALS === "object" ? CLOSURE_TOGGLE_ORDINALS : void 0;
     a = b && b[a];
@@ -1491,7 +1491,7 @@
     return !!goog.moduleLoaderState_ && goog.moduleLoaderState_.type == goog.ModuleType.GOOG
   };
   goog.isInEs6ModuleLoader_ = function () {
-    if (goog.moduleLoaderState_ && goog.moduleLoaderState_.type == goog.ModuleType.ES6) return !0;
+    if (goog.moduleLoaderState_ && goog.moduleLoaderState_.type == goog.ModuleType.ES6) return true;
     var a = goog.LEGACY_NAMESPACE_OBJECT_.$jscomp;
     return a ? typeof a.getCurrentModulePath != "function" ? !1 : !!a.getCurrentModulePath() : !1
   };
@@ -1538,7 +1538,7 @@
   goog.addDependency = function (a, b, c, d) {
     !COMPILED && goog.DEPENDENCIES_ENABLED && goog.debugLoader_.addDependency(a, b, c, d)
   };
-  goog.ENABLE_DEBUG_LOADER = !1;
+  goog.ENABLE_DEBUG_LOADER = false;
   goog.logToConsole_ = function (a) {
     goog.global.console && goog.global.console.error(a)
   };
@@ -1575,11 +1575,11 @@
     }
   };
   goog.instantiatedSingletons_ = [];
-  goog.LOAD_MODULE_USING_EVAL = !0;
+  goog.LOAD_MODULE_USING_EVAL = true;
   goog.SEAL_MODULE_EXPORTS = goog.DEBUG;
   goog.loadedModules_ = {};
   goog.DEPENDENCIES_ENABLED = !COMPILED && goog.ENABLE_DEBUG_LOADER;
-  goog.ASSUME_ES_MODULES_TRANSPILED = !1;
+  goog.ASSUME_ES_MODULES_TRANSPILED = false;
   goog.TRUSTED_TYPES_POLICY_NAME = "goog";
   goog.hasBadLetScoping = null;
   goog.loadModule = function (a) {
@@ -1620,7 +1620,7 @@
     if (goog.global.CLOSURE_LOAD_FILE_SYNC) return goog.global.CLOSURE_LOAD_FILE_SYNC(a);
     try {
       var b = new goog.global.XMLHttpRequest;
-      b.open("get", a, !1);
+      b.open("get", a, false);
       b.send();
       return b.status == 0 || b.status == 200 ? b.responseText : null
     } catch (c) {
@@ -1737,7 +1737,7 @@
     return a
   };
   goog.exportSymbol = function (a, b, c) {
-    goog.exportPath_(a, b, !0, c)
+    goog.exportPath_(a, b, true, c)
   };
   goog.exportProperty = function (a, b, c) {
     a[b] = c
@@ -1822,7 +1822,7 @@
     if (goog.inHtmlDocument_()) {
       var c = goog.global.document;
       if (!goog.ENABLE_CHROME_APP_SAFE_SCRIPT_LOADING && c.readyState == "complete") {
-        if (/\bdeps.js$/.test(a)) return !1;
+        if (/\bdeps.js$/.test(a)) return false;
         throw Error('Cannot write "' + a + '" after document load');
       }
       var d = "",
@@ -1867,7 +1867,7 @@
       this.written_ = {};
       this.loadingDeps_ = [];
       this.depsToLoad_ = [];
-      this.paused_ = !1;
+      this.paused_ = false;
       this.factory_ = new goog.DependencyFactory;
       this.deferredCallbacks_ = {};
       this.deferredQueue_ = []
@@ -1901,7 +1901,7 @@
       for (var a = this, b = this.paused_; this.depsToLoad_.length && !b;)(function () {
         var c = !1,
           d = a.depsToLoad_.shift(),
-          e = !1;
+          e = false;
         a.loading_(d);
         var f = {
           pause: function () {
@@ -1913,7 +1913,7 @@
           },
           loaded: function () {
             if (e) throw Error("Double call to loaded.");
-            e = !0;
+            e = true;
             a.loaded_(d)
           },
           pending: function () {
@@ -1976,7 +1976,7 @@
           break
         } if (this.loadingDeps_.length == this.deferredQueue_.length &&
           !this.depsToLoad_.length)
-        for (; this.deferredQueue_.length;) this.requested(this.deferredQueue_.shift(), !0);
+        for (; this.deferredQueue_.length;) this.requested(this.deferredQueue_.shift(), true);
       a.loaded()
     }, goog.DebugLoader_.prototype.areDepsLoaded_ = function (a) {
       for (var b = 0; b < a.length; b++) {
@@ -1997,7 +1997,7 @@
       this.provides = c;
       this.requires = d;
       this.loadFlags = e;
-      this.loaded_ = !1;
+      this.loaded_ = false;
       this.loadCallbacks_ = []
     }, goog.Dependency.prototype.getPathName = function () {
       var a = this.path,
@@ -2008,7 +2008,7 @@
       this.loaded_ ? a() : this.loadCallbacks_.push(a)
     }, goog.Dependency.prototype.loaded =
     function () {
-      this.loaded_ = !0;
+      this.loaded_ = true;
       var a = this.loadCallbacks_;
       this.loadCallbacks_ = [];
       for (var b = 0; b < a.length; b++) a[b]()
@@ -2051,7 +2051,7 @@
         } else {
           var g = b.createElement("script");
           g.defer = goog.Dependency.defer_;
-          g.async = !1;
+          g.async = false;
           c && (g.nonce = c);
           g.onload = function () {
             g.onload = null;
@@ -2076,10 +2076,10 @@
 
       function c(l, m) {
         var n = d.createElement("script");
-        n.defer = !0;
-        n.async = !1;
+        n.defer = true;
+        n.async = false;
         n.type = "module";
-        n.setAttribute("crossorigin", !0);
+        n.setAttribute("crossorigin", true);
         var p = goog.getScriptNonce_();
         p && (n.nonce = p);
         m ? n.text = goog.TRUSTED_TYPES_POLICY_ ? goog.TRUSTED_TYPES_POLICY_.createScript(m) : m : n.src = goog.TRUSTED_TYPES_POLICY_ ? goog.TRUSTED_TYPES_POLICY_.createScriptURL(l) : l;
@@ -2167,7 +2167,7 @@
           g = goog.inHtmlDocument_() &&
             ("ActiveXObject" in goog.global || goog.isEdge_());
           if (f && goog.inHtmlDocument_() && goog.isDocumentLoading_() && !g) {
-            goog.Dependency.defer_ = !0;
+            goog.Dependency.defer_ = true;
             a.pause();
             var k = h.onreadystatechange;
             h.onreadystatechange = function () {
@@ -2201,7 +2201,7 @@
       }, goog.DependencyFactory = function () { }, goog.DependencyFactory.prototype.createDependency = function (a, b, c, d, e) {
         for (var f,
           g = 0; f = c[g]; g++) goog.dependencies_.nameToPath[f] = b, goog.dependencies_.loadFlags[b] = e;
-        for (g = 0; f = d[g]; g++) b in goog.dependencies_.requires || (goog.dependencies_.requires[b] = {}), goog.dependencies_.requires[b][f] = !0;
+        for (g = 0; f = d[g]; g++) b in goog.dependencies_.requires || (goog.dependencies_.requires[b] = {}), goog.dependencies_.requires[b][f] = true;
         return e.module == goog.ModuleType.GOOG ? new goog.GoogModuleDependency(a, b, c, d, e) : e.module == goog.ModuleType.ES6 ? goog.ASSUME_ES_MODULES_TRANSPILED ? new goog.PreTranspiledEs6ModuleDependency(a, b, c, d, e) : new goog.Es6ModuleDependency(a, b, c, d, e) : new goog.Dependency(a, b, c, d, e)
       }, goog.debugLoader_ = new goog.DebugLoader_,
     goog.loadClosureDeps = function () {
@@ -2210,7 +2210,7 @@
       goog.debugLoader_.setDependencyFactory(a)
     }, goog.TRUSTED_TYPES_POLICY_ = goog.TRUSTED_TYPES_POLICY_NAME ? goog.createTrustedTypesPolicy(goog.TRUSTED_TYPES_POLICY_NAME + "#base") : null);
   if (!COMPILED) {
-    var isChrome87 = !1;
+    var isChrome87 = false;
     try {
       isChrome87 = eval(goog.global.trustedTypes.emptyScript) !== goog.global.trustedTypes.emptyScript
     } catch (a) { }
@@ -2876,7 +2876,7 @@
   goog.crypt.TEST_ONLY.throwException = module$contents$goog$async$throwException_throwException;
   goog.crypt.TEST_ONLY.alwaysThrowSynchronously = goog.DEBUG;
   goog.crypt.binaryStringToByteArray = function (a) {
-    return goog.crypt.stringToByteArray(a, !0)
+    return goog.crypt.stringToByteArray(a, true)
   };
   goog.crypt.stringToByteArray = function (a, b) {
     for (var c = [], d = 0, e = 0; e < a.length; e++) {
@@ -3054,51 +3054,51 @@
     module$contents$google3$third_party$javascript$closure$flags$flags$2etoggles_module = module$contents$google3$third_party$javascript$closure$flags$flags$2etoggles_module || {
       id: "third_party/javascript/closure/flags/flags.toggles.closure.js"
     };
-  module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__use_toggles = !1;
-  module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__override_disable_toggles = !1;
-  module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__use_user_agent_client_hints__enable = !1;
-  module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__async_throw_on_unicode_to_byte__enable = !1;
-  module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__jspb_stop_using_repeated_field_sets_from_gencode__disable = !1;
-  module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__client_only_wiz_flush_queue_fix__disable = !1;
-  module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__client_only_wiz_ordered_reaction_execution__disable = !1;
-  module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__client_only_wiz_sync_reaction_within_reaction_throws_error__disable = !1;
-  module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__jspb_enable_low_index_extension_writes__disable = !1;
-  module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__wiz_enable_native_promise__enable = !1;
-  module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__jspb_readonly_repeated_fields__disable = !1;
-  module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__jspb_ignore_implicit_extension_deps__enable = !1;
-  module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__testonly_disabled_flag__enable = !1;
-  module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__testonly_debug_flag__enable = !1;
-  module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__testonly_staging_flag__disable = !1;
-  module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__testonly_stable_flag__disable = !1;
+  module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__use_toggles = false;
+  module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__override_disable_toggles = false;
+  module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__use_user_agent_client_hints__enable = false;
+  module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__async_throw_on_unicode_to_byte__enable = false;
+  module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__jspb_stop_using_repeated_field_sets_from_gencode__disable = false;
+  module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__client_only_wiz_flush_queue_fix__disable = false;
+  module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__client_only_wiz_ordered_reaction_execution__disable = false;
+  module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__client_only_wiz_sync_reaction_within_reaction_throws_error__disable = false;
+  module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__jspb_enable_low_index_extension_writes__disable = false;
+  module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__wiz_enable_native_promise__enable = false;
+  module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__jspb_readonly_repeated_fields__disable = false;
+  module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__jspb_ignore_implicit_extension_deps__enable = false;
+  module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__testonly_disabled_flag__enable = false;
+  module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__testonly_debug_flag__enable = false;
+  module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__testonly_staging_flag__disable = false;
+  module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__testonly_stable_flag__disable = false;
   goog.flags = {};
   var module$contents$goog$flags_STAGING = goog.readFlagInternalDoNotUseOrElse(1, goog.FLAGS_STAGING_DEFAULT);
-  goog.flags.USE_USER_AGENT_CLIENT_HINTS = module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__use_toggles ? module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__use_user_agent_client_hints__enable : goog.readFlagInternalDoNotUseOrElse(610401301, !1);
-  goog.flags.ASYNC_THROW_ON_UNICODE_TO_BYTE = module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__use_toggles ? module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__async_throw_on_unicode_to_byte__enable : goog.readFlagInternalDoNotUseOrElse(899588437, !1);
-  goog.flags.JSPB_STOP_USING_REPEATED_FIELD_SETS_FROM_GENCODE = module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__use_toggles ? module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__override_disable_toggles || !module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__jspb_stop_using_repeated_field_sets_from_gencode__disable : goog.readFlagInternalDoNotUseOrElse(188588736, !0);
-  goog.flags.CLIENT_ONLY_WIZ_FLUSH_QUEUE_FIX = module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__use_toggles ? module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__override_disable_toggles || !module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__client_only_wiz_flush_queue_fix__disable : goog.readFlagInternalDoNotUseOrElse(644029907, !0);
-  goog.flags.CLIENT_ONLY_WIZ_ORDERED_REACTION_EXECUTION = module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__use_toggles ? module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__override_disable_toggles || !module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__client_only_wiz_ordered_reaction_execution__disable : goog.readFlagInternalDoNotUseOrElse(1822726157, !0);
+  goog.flags.USE_USER_AGENT_CLIENT_HINTS = module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__use_toggles ? module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__use_user_agent_client_hints__enable : goog.readFlagInternalDoNotUseOrElse(610401301, false);
+  goog.flags.ASYNC_THROW_ON_UNICODE_TO_BYTE = module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__use_toggles ? module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__async_throw_on_unicode_to_byte__enable : goog.readFlagInternalDoNotUseOrElse(899588437, false);
+  goog.flags.JSPB_STOP_USING_REPEATED_FIELD_SETS_FROM_GENCODE = module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__use_toggles ? module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__override_disable_toggles || !module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__jspb_stop_using_repeated_field_sets_from_gencode__disable : goog.readFlagInternalDoNotUseOrElse(188588736, true);
+  goog.flags.CLIENT_ONLY_WIZ_FLUSH_QUEUE_FIX = module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__use_toggles ? module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__override_disable_toggles || !module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__client_only_wiz_flush_queue_fix__disable : goog.readFlagInternalDoNotUseOrElse(644029907, true);
+  goog.flags.CLIENT_ONLY_WIZ_ORDERED_REACTION_EXECUTION = module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__use_toggles ? module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__override_disable_toggles || !module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__client_only_wiz_ordered_reaction_execution__disable : goog.readFlagInternalDoNotUseOrElse(1822726157, true);
   goog.flags.CLIENT_ONLY_WIZ_SYNC_REACTION_WITHIN_REACTION_THROWS_ERROR = module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__use_toggles ? goog.FLAGS_STAGING_DEFAULT && (module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__override_disable_toggles || !module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__client_only_wiz_sync_reaction_within_reaction_throws_error__disable) : goog.readFlagInternalDoNotUseOrElse(661449076,
     module$contents$goog$flags_STAGING);
-  goog.flags.JSPB_ENABLE_LOW_INDEX_EXTENSION_WRITES = module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__use_toggles ? module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__override_disable_toggles || !module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__jspb_enable_low_index_extension_writes__disable : goog.readFlagInternalDoNotUseOrElse(645172343, !0);
+  goog.flags.JSPB_ENABLE_LOW_INDEX_EXTENSION_WRITES = module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__use_toggles ? module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__override_disable_toggles || !module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__jspb_enable_low_index_extension_writes__disable : goog.readFlagInternalDoNotUseOrElse(645172343, true);
   goog.flags.WIZ_ENABLE_NATIVE_PROMISE = module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__use_toggles ? goog.DEBUG || module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__wiz_enable_native_promise__enable : goog.readFlagInternalDoNotUseOrElse(651175828, goog.DEBUG);
   goog.flags.JSPB_READONLY_REPEATED_FIELDS = module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__use_toggles ? goog.FLAGS_STAGING_DEFAULT && (module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__override_disable_toggles || !module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__jspb_readonly_repeated_fields__disable) : goog.readFlagInternalDoNotUseOrElse(653718497, module$contents$goog$flags_STAGING);
   goog.flags.JSPB_IGNORE_IMPLICIT_EXTENSION_DEPS = module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__use_toggles ? goog.DEBUG || module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__jspb_ignore_implicit_extension_deps__enable : goog.readFlagInternalDoNotUseOrElse(660014094, goog.DEBUG);
-  goog.flags.TESTONLY_DISABLED_FLAG = module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__use_toggles ? module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__testonly_disabled_flag__enable : goog.readFlagInternalDoNotUseOrElse(2147483644, !1);
+  goog.flags.TESTONLY_DISABLED_FLAG = module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__use_toggles ? module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__testonly_disabled_flag__enable : goog.readFlagInternalDoNotUseOrElse(2147483644, false);
   goog.flags.TESTONLY_DEBUG_FLAG = module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__use_toggles ? goog.DEBUG || module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__testonly_debug_flag__enable : goog.readFlagInternalDoNotUseOrElse(2147483645, goog.DEBUG);
   goog.flags.TESTONLY_STAGING_FLAG = module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__use_toggles ? goog.FLAGS_STAGING_DEFAULT && (module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__override_disable_toggles || !module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__testonly_staging_flag__disable) : goog.readFlagInternalDoNotUseOrElse(2147483646, module$contents$goog$flags_STAGING);
-  goog.flags.TESTONLY_STABLE_FLAG = module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__use_toggles ? module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__override_disable_toggles || !module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__testonly_stable_flag__disable : goog.readFlagInternalDoNotUseOrElse(2147483647, !0);
+  goog.flags.TESTONLY_STABLE_FLAG = module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__use_toggles ? module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__override_disable_toggles || !module$exports$google3$third_party$javascript$closure$flags$flags$2etoggles.TOGGLE_GoogFlags__testonly_stable_flag__disable : goog.readFlagInternalDoNotUseOrElse(2147483647, true);
   var module$contents$goog$labs$userAgent_USE_CLIENT_HINTS_OVERRIDE = "",
     module$contents$goog$labs$userAgent_USE_CLIENT_HINTS = !1,
-    module$contents$goog$labs$userAgent_forceClientHintsInTests = !1;
+    module$contents$goog$labs$userAgent_forceClientHintsInTests = false;
   goog.labs.userAgent.setUseClientHintsForTesting = function (a) {
     module$contents$goog$labs$userAgent_forceClientHintsInTests = a
   };
-  var module$contents$goog$labs$userAgent_useClientHintsRuntimeOverride = module$contents$goog$labs$userAgent_USE_CLIENT_HINTS_OVERRIDE ? !!goog.getObjectByName(module$contents$goog$labs$userAgent_USE_CLIENT_HINTS_OVERRIDE) : !1;
+  var module$contents$goog$labs$userAgent_useClientHintsRuntimeOverride = module$contents$goog$labs$userAgent_USE_CLIENT_HINTS_OVERRIDE ? !!goog.getObjectByName(module$contents$goog$labs$userAgent_USE_CLIENT_HINTS_OVERRIDE) : false;
   goog.labs.userAgent.useClientHints = function () {
     return goog.flags.USE_USER_AGENT_CLIENT_HINTS || module$contents$goog$labs$userAgent_USE_CLIENT_HINTS || module$contents$goog$labs$userAgent_useClientHintsRuntimeOverride || module$contents$goog$labs$userAgent_forceClientHintsInTests
   };
   goog.labs.userAgent.util = {};
-  var module$contents$goog$labs$userAgent$util_ASSUME_CLIENT_HINTS_SUPPORT = !1;
+  var module$contents$goog$labs$userAgent$util_ASSUME_CLIENT_HINTS_SUPPORT = false;
 
   function module$contents$goog$labs$userAgent$util_getNativeUserAgentString() {
     var a = module$contents$goog$labs$userAgent$util_getNavigator();
@@ -3137,7 +3137,7 @@
   }
 
   function module$contents$goog$labs$userAgent$util_matchUserAgentDataBrand(a) {
-    if (!(0, goog.labs.userAgent.useClientHints)()) return !1;
+    if (!(0, goog.labs.userAgent.useClientHints)()) return false;
     var b = module$contents$goog$labs$userAgent$util_getUserAgentData();
     return b ? b.brands.some(function (c) {
       return (c = c.brand) && (0, goog.string.internal.contains)(c, a)
@@ -3196,7 +3196,7 @@
               4);
             if (e.nextAddress != 2) return d = e.yieldResult, a.value_ = d[a.key_], e.return(a.value_);
             e.enterFinallyBlock();
-            a.pending_ = !1;
+            a.pending_ = false;
             return e.leaveFinallyBlock(0)
           })
         }());
@@ -3237,8 +3237,8 @@
   var module$contents$goog$labs$userAgent$browser_AllBrandsInternal;
 
   function module$contents$goog$labs$userAgent$browser_useUserAgentDataBrand(a) {
-    if (module$contents$goog$labs$userAgent$util_ASSUME_CLIENT_HINTS_SUPPORT) return !0;
-    if (!(a !== void 0 && a || (0, goog.labs.userAgent.useClientHints)())) return !1;
+    if (module$contents$goog$labs$userAgent$util_ASSUME_CLIENT_HINTS_SUPPORT) return true;
+    if (!(a !== void 0 && a || (0, goog.labs.userAgent.useClientHints)())) return false;
     a = module$contents$goog$labs$userAgent$util_getUserAgentData();
     return !!a && a.brands.length > 0
   }
@@ -3444,22 +3444,22 @@
       if (d.nextAddress != 3 && (b = d.yieldResult, b !== void 0)) return c = b.find(function (e) {
         return a.brand_ === e.brand
       }), (0, goog.asserts.assertExists)(c), d.return(new module$exports$goog$labs$userAgent$highEntropy$highEntropyValue.Version(c.version));
-      module$contents$goog$labs$userAgent$browser_preUachHasLoaded = !0;
+      module$contents$goog$labs$userAgent$browser_preUachHasLoaded = true;
       return d.return(a.version_)
     })
   };
-  var module$contents$goog$labs$userAgent$browser_preUachHasLoaded = !1;
+  var module$contents$goog$labs$userAgent$browser_preUachHasLoaded = false;
 
   function module$contents$goog$labs$userAgent$browser_loadFullVersions() {
     return (0, $jscomp.asyncExecutePromiseGeneratorProgram)(function (a) {
       if (a.nextAddress == 1) return module$contents$goog$labs$userAgent$browser_useUserAgentDataBrand(!0) ? a.yield(module$exports$goog$labs$userAgent$highEntropy$highEntropyData.fullVersionList.load(), 2) : a.jumpTo(2);
-      module$contents$goog$labs$userAgent$browser_preUachHasLoaded = !0;
+      module$contents$goog$labs$userAgent$browser_preUachHasLoaded = true;
       a.jumpToEnd()
     })
   }
   goog.labs.userAgent.browser.loadFullVersions = module$contents$goog$labs$userAgent$browser_loadFullVersions;
   goog.labs.userAgent.browser.resetForTesting = function () {
-    module$contents$goog$labs$userAgent$browser_preUachHasLoaded = !1;
+    module$contents$goog$labs$userAgent$browser_preUachHasLoaded = false;
     module$exports$goog$labs$userAgent$highEntropy$highEntropyData.fullVersionList.resetForTesting()
   };
 
@@ -3495,8 +3495,8 @@
   goog.labs.userAgent.platform = {};
 
   function module$contents$goog$labs$userAgent$platform_useUserAgentDataPlatform(a) {
-    if (module$contents$goog$labs$userAgent$util_ASSUME_CLIENT_HINTS_SUPPORT) return !0;
-    if (!(a !== void 0 && a || (0, goog.labs.userAgent.useClientHints)())) return !1;
+    if (module$contents$goog$labs$userAgent$util_ASSUME_CLIENT_HINTS_SUPPORT) return true;
+    if (!(a !== void 0 && a || (0, goog.labs.userAgent.useClientHints)())) return false;
     a = module$contents$goog$labs$userAgent$util_getUserAgentData();
     return !!a && !!a.platform
   }
@@ -3693,7 +3693,7 @@
     return Array.prototype.some.call(a, b, c)
   } : function (a, b, c) {
     for (var d = a.length, e = typeof a === "string" ? a.split("") : a, f = 0; f < d; f++)
-      if (f in e && b.call(c, e[f], f, a)) return !0;
+      if (f in e && b.call(c, e[f], f, a)) return true;
     return !1
   };
   goog.array.some = module$contents$goog$array_some;
@@ -3702,7 +3702,7 @@
     return Array.prototype.every.call(a, b, c)
   } : function (a, b, c) {
     for (var d = a.length, e = typeof a === "string" ? a.split("") : a, f = 0; f < d; f++)
-      if (f in e && !b.call(c, e[f], f, a)) return !1;
+      if (f in e && !b.call(c, e[f], f, a)) return false;
     return !0
   };
   goog.array.every = module$contents$goog$array_every;
@@ -3792,7 +3792,7 @@
 
   function module$contents$goog$array_removeLast(a, b) {
     b = module$contents$goog$array_lastIndexOf(a, b);
-    return b >= 0 ? (module$contents$goog$array_removeAt(a, b), !0) : !1
+    return b >= 0 ? (module$contents$goog$array_removeAt(a, b), true) : !1
   }
   goog.array.removeLast = module$contents$goog$array_removeLast;
 
@@ -3804,7 +3804,7 @@
 
   function module$contents$goog$array_removeIf(a, b, c) {
     b = module$contents$goog$array_findIndex(a, b, c);
-    return b >= 0 ? (module$contents$goog$array_removeAt(a, b), !0) : !1
+    return b >= 0 ? (module$contents$goog$array_removeAt(a, b), true) : !1
   }
   goog.array.removeIf = module$contents$goog$array_removeIf;
 
@@ -3889,12 +3889,12 @@
   goog.array.removeDuplicates = module$contents$goog$array_removeDuplicates;
 
   function module$contents$goog$array_binarySearch(a, b, c) {
-    return module$contents$goog$array_binarySearch_(a, c || module$contents$goog$array_defaultCompare, !1, b)
+    return module$contents$goog$array_binarySearch_(a, c || module$contents$goog$array_defaultCompare, false, b)
   }
   goog.array.binarySearch = module$contents$goog$array_binarySearch;
 
   function module$contents$goog$array_binarySelect(a, b, c) {
-    return module$contents$goog$array_binarySearch_(a, b, !0, void 0, c)
+    return module$contents$goog$array_binarySearch_(a, b, true, void 0, c)
   }
   goog.array.binarySelect = module$contents$goog$array_binarySelect;
 
@@ -3951,11 +3951,11 @@
   goog.array.isSorted = module$contents$goog$array_isSorted;
 
   function module$contents$goog$array_equals(a, b, c) {
-    if (!goog.isArrayLike(a) || !goog.isArrayLike(b) || a.length != b.length) return !1;
+    if (!goog.isArrayLike(a) || !goog.isArrayLike(b) || a.length != b.length) return false;
     var d = a.length;
     c = c || module$contents$goog$array_defaultCompareEquality;
     for (var e = 0; e < d; e++)
-      if (!c(a[e], b[e])) return !1;
+      if (!c(a[e], b[e])) return false;
     return !0
   }
   goog.array.equals = module$contents$goog$array_equals;
@@ -3987,7 +3987,7 @@
 
   function module$contents$goog$array_binaryInsert(a, b, c) {
     c = module$contents$goog$array_binarySearch(a, b, c);
-    return c < 0 ? (module$contents$goog$array_insertAt(a, b, -(c + 1)), !0) : !1
+    return c < 0 ? (module$contents$goog$array_insertAt(a, b, -(c + 1)), true) : !1
   }
   goog.array.binaryInsert = module$contents$goog$array_binaryInsert;
 
@@ -4208,13 +4208,13 @@
   var $jscomp$optchain$tmp1789169569$0;
   ($jscomp$optchain$tmp1789169569$0 = null) == null || $jscomp$optchain$tmp1789169569$0(66);
   goog.userAgent = {};
-  goog.userAgent.ASSUME_IE = !1;
-  goog.userAgent.ASSUME_EDGE = !1;
-  goog.userAgent.ASSUME_GECKO = !1;
-  goog.userAgent.ASSUME_WEBKIT = !1;
-  goog.userAgent.ASSUME_MOBILE_WEBKIT = !1;
-  goog.userAgent.ASSUME_OPERA = !1;
-  goog.userAgent.ASSUME_ANY_VERSION = !1;
+  goog.userAgent.ASSUME_IE = false;
+  goog.userAgent.ASSUME_EDGE = false;
+  goog.userAgent.ASSUME_GECKO = false;
+  goog.userAgent.ASSUME_WEBKIT = false;
+  goog.userAgent.ASSUME_MOBILE_WEBKIT = false;
+  goog.userAgent.ASSUME_OPERA = false;
+  goog.userAgent.ASSUME_ANY_VERSION = false;
   goog.userAgent.BROWSER_KNOWN_ = goog.userAgent.ASSUME_IE || goog.userAgent.ASSUME_EDGE || goog.userAgent.ASSUME_GECKO || goog.userAgent.ASSUME_MOBILE_WEBKIT || goog.userAgent.ASSUME_WEBKIT || goog.userAgent.ASSUME_OPERA;
   goog.userAgent.getUserAgentString = function () {
     return module$contents$goog$labs$userAgent$util_getUserAgent()
@@ -4241,14 +4241,14 @@
     return a && a.platform || ""
   };
   goog.userAgent.PLATFORM = goog.userAgent.determinePlatform_();
-  goog.userAgent.ASSUME_MAC = !1;
-  goog.userAgent.ASSUME_WINDOWS = !1;
-  goog.userAgent.ASSUME_LINUX = !1;
-  goog.userAgent.ASSUME_ANDROID = !1;
-  goog.userAgent.ASSUME_IPHONE = !1;
-  goog.userAgent.ASSUME_IPAD = !1;
-  goog.userAgent.ASSUME_IPOD = !1;
-  goog.userAgent.ASSUME_KAIOS = !1;
+  goog.userAgent.ASSUME_MAC = false;
+  goog.userAgent.ASSUME_WINDOWS = false;
+  goog.userAgent.ASSUME_LINUX = false;
+  goog.userAgent.ASSUME_ANDROID = false;
+  goog.userAgent.ASSUME_IPHONE = false;
+  goog.userAgent.ASSUME_IPAD = false;
+  goog.userAgent.ASSUME_IPOD = false;
+  goog.userAgent.ASSUME_KAIOS = false;
   goog.userAgent.PLATFORM_KNOWN_ = goog.userAgent.ASSUME_MAC || goog.userAgent.ASSUME_WINDOWS || goog.userAgent.ASSUME_LINUX || goog.userAgent.ASSUME_ANDROID || goog.userAgent.ASSUME_IPHONE || goog.userAgent.ASSUME_IPAD || goog.userAgent.ASSUME_IPOD;
   goog.userAgent.MAC = goog.userAgent.PLATFORM_KNOWN_ ? goog.userAgent.ASSUME_MAC : module$contents$goog$labs$userAgent$platform_isMacintosh();
   goog.userAgent.WINDOWS = goog.userAgent.PLATFORM_KNOWN_ ? goog.userAgent.ASSUME_WINDOWS : module$contents$goog$labs$userAgent$platform_isWindows();
@@ -4300,12 +4300,12 @@
     }
   }();
   goog.userAgent.product = {};
-  goog.userAgent.product.ASSUME_FIREFOX = !1;
-  goog.userAgent.product.ASSUME_IPHONE = !1;
-  goog.userAgent.product.ASSUME_IPAD = !1;
-  goog.userAgent.product.ASSUME_ANDROID = !1;
-  goog.userAgent.product.ASSUME_CHROME = !1;
-  goog.userAgent.product.ASSUME_SAFARI = !1;
+  goog.userAgent.product.ASSUME_FIREFOX = false;
+  goog.userAgent.product.ASSUME_IPHONE = false;
+  goog.userAgent.product.ASSUME_IPAD = false;
+  goog.userAgent.product.ASSUME_ANDROID = false;
+  goog.userAgent.product.ASSUME_CHROME = false;
+  goog.userAgent.product.ASSUME_SAFARI = false;
   goog.userAgent.product.PRODUCT_KNOWN_ = goog.userAgent.ASSUME_IE || goog.userAgent.ASSUME_EDGE || goog.userAgent.ASSUME_OPERA || goog.userAgent.product.ASSUME_FIREFOX || goog.userAgent.product.ASSUME_IPHONE || goog.userAgent.product.ASSUME_IPAD || goog.userAgent.product.ASSUME_ANDROID || goog.userAgent.product.ASSUME_CHROME || goog.userAgent.product.ASSUME_SAFARI;
   goog.userAgent.product.OPERA = goog.userAgent.OPERA;
   goog.userAgent.product.IE = goog.userAgent.IE;
@@ -4369,7 +4369,7 @@
     return c.join("")
   };
   goog.crypt.base64.encodeBinaryString = function (a, b) {
-    return goog.crypt.base64.encodeString(a, b, !0)
+    return goog.crypt.base64.encodeString(a, b, true)
   };
   goog.crypt.base64.encodeString = function (a, b, c) {
     return goog.crypt.base64.HAS_NATIVE_ENCODE_ && !b ? goog.global.btoa(a) : goog.crypt.base64.encodeByteArray(goog.crypt.stringToByteArray(a, c), b)
@@ -4500,9 +4500,9 @@
 
   function module$contents$jspb$internal_bytes_uint8ArrayEquals(a, b) {
     var c = a.length;
-    if (c !== b.length) return !1;
+    if (c !== b.length) return false;
     for (var d = 0; d < c; d++)
-      if (a[d] !== b[d]) return !1;
+      if (a[d] !== b[d]) return false;
     return !0
   }
   module$exports$jspb$internal_bytes.I_AM_INTERNAL = {};
@@ -4568,7 +4568,7 @@
   };
   module$exports$jspb$bytestring.ByteString.fromStringUtf8 = function (a) {
     (0, goog.asserts.assertString)(a);
-    return a.length ? new module$exports$jspb$bytestring.ByteString(module$contents$jspb$binary$utf8_encodeUtf8(a, !0), module$exports$jspb$internal_bytes.I_AM_INTERNAL) : module$exports$jspb$bytestring.ByteString.empty()
+    return a.length ? new module$exports$jspb$bytestring.ByteString(module$contents$jspb$binary$utf8_encodeUtf8(a, true), module$exports$jspb$internal_bytes.I_AM_INTERNAL) : module$exports$jspb$bytestring.ByteString.empty()
   };
   module$exports$jspb$bytestring.ByteString.fromBlob = function (a) {
     var b;
@@ -4626,9 +4626,9 @@
       var b = this.value_,
         c = a.value_;
       a.value_.length > this.value_.length && (c = this.value_, b = a.value_);
-      if (b.lastIndexOf(c, 0) !== 0) return !1;
+      if (b.lastIndexOf(c, 0) !== 0) return false;
       for (a = c.length; a < b.length; a++)
-        if (b[a] !== "=") return !1;
+        if (b[a] !== "=") return false;
       return !0
     }
     b = (0, goog.asserts.assertExists)(this.internalBytesUnsafe(module$exports$jspb$internal_bytes.I_AM_INTERNAL));
@@ -4647,7 +4647,7 @@
   module$exports$jspb$bytestring.ByteString.prototype.internalCompareEqualsDoNotUse = function (a) {
     if (typeof a === "string") a = module$exports$jspb$bytestring.ByteString.fromBase64(a);
     else if (a instanceof Uint8Array) a = new module$exports$jspb$bytestring.ByteString(a, module$exports$jspb$internal_bytes.I_AM_INTERNAL);
-    else if (!(a instanceof module$exports$jspb$bytestring.ByteString)) return !1;
+    else if (!(a instanceof module$exports$jspb$bytestring.ByteString)) return false;
     return this.equalsByteString(a)
   };
   module$exports$jspb$bytestring.ByteString.prototype.equalsAndHashCodeShouldBeAvailable = 1;
@@ -4733,18 +4733,18 @@
   module$exports$jspb$exceptions.throttledAsyncThrowWarning = module$contents$jspb$exceptions_throttledAsyncThrowWarning;
   var module$exports$jspb$internal_options = {};
   module$exports$jspb$internal_options.DISABLE_INDIRECT_BINARY_EXTENSIONS = goog.flags.JSPB_IGNORE_IMPLICIT_EXTENSION_DEPS;
-  module$exports$jspb$internal_options.DISABLE_ES6_MAP_SUBCLASSES_FOR_TESTING = !1;
-  var module$contents$jspb$internal_options_ALLOW_BIG_INT = !0;
+  module$exports$jspb$internal_options.DISABLE_ES6_MAP_SUBCLASSES_FOR_TESTING = false;
+  var module$contents$jspb$internal_options_ALLOW_BIG_INT = true;
 
   function module$contents$jspb$internal_options_isBigIntAvailable() {
     return module$contents$jspb$internal_options_ALLOW_BIG_INT && (goog.FEATURESET_YEAR >= 2021 || typeof BigInt === "function")
   }
-  var module$contents$jspb$internal_options_LEGACY_SERIALIZE_BOOLS_AS_TRUE_FALSE = !1;
+  var module$contents$jspb$internal_options_LEGACY_SERIALIZE_BOOLS_AS_TRUE_FALSE = false;
 
   function module$contents$jspb$internal_options_serializeBoolsAsTrueFalse() {
     return module$contents$jspb$internal_options_LEGACY_SERIALIZE_BOOLS_AS_TRUE_FALSE
   }
-  var module$contents$jspb$internal_options_SHOULD_THROW_IN_ARRAY_CONSTRUCTOR_IF_ARRAY_IS_ALREADY_CONSTRUCTED = !1;
+  var module$contents$jspb$internal_options_SHOULD_THROW_IN_ARRAY_CONSTRUCTOR_IF_ARRAY_IS_ALREADY_CONSTRUCTED = false;
 
   function module$contents$jspb$internal_options_shouldThrowInArrayConstructorIfArrayIsAlreadyConstructed() {
     return module$contents$jspb$internal_options_SHOULD_THROW_IN_ARRAY_CONSTRUCTOR_IF_ARRAY_IS_ALREADY_CONSTRUCTED
@@ -4776,7 +4776,7 @@
     (0, goog.asserts.assertBoolean)(a);
     module$contents$jspb$internal_options_typeCheck64BitIntFields = a
   }
-  var module$contents$jspb$internal_options_typeCheck64BitIntFieldsAreInRange = !0;
+  var module$contents$jspb$internal_options_typeCheck64BitIntFieldsAreInRange = true;
 
   function module$contents$jspb$internal_options_getTypeCheck64BitIntFieldsAreInRange(a) {
     return a || module$contents$jspb$internal_options_typeCheck64BitIntFieldsAreInRange
@@ -4786,7 +4786,7 @@
     (0, goog.asserts.assertBoolean)(a);
     module$contents$jspb$internal_options_typeCheck64BitIntFieldsAreInRange = a
   }
-  var module$contents$jspb$internal_options_asyncThrowIf64BitIntReturnTypeMismatches = !1;
+  var module$contents$jspb$internal_options_asyncThrowIf64BitIntReturnTypeMismatches = false;
 
   function module$contents$jspb$internal_options_getAsyncThrowIf64BitIntReturnTypeMismatches() {
     return module$contents$jspb$internal_options_asyncThrowIf64BitIntReturnTypeMismatches
@@ -4805,7 +4805,7 @@
   function module$contents$jspb$internal_options_setAsyncThrowOnBasicInt64GetterUse(a) {
     module$contents$jspb$internal_options_asyncThrowOnBasic64BitIntGetterUse = a
   }
-  var module$contents$jspb$internal_options_typeCheckStringFields = !0;
+  var module$contents$jspb$internal_options_typeCheckStringFields = true;
 
   function module$contents$jspb$internal_options_getTypeCheckStringFields() {
     return module$contents$jspb$internal_options_typeCheckStringFields
@@ -4826,7 +4826,7 @@
   }
   module$exports$jspb$internal_options.USE_DETAILED_MESSAGE_TYPE_HIERARCHY = goog.DEBUG && !COMPILED;
   var module$contents$jspb$internal_options_UNSAFE_DISABLE_JSPB_ANY_TYPE_CHECKS = module$exports$jspb$internal_options.DETAILED_JSPB_ASSERTS = !1,
-    module$contents$jspb$internal_options_unsafeDisableJspbAnyTypeChecks = !1;
+    module$contents$jspb$internal_options_unsafeDisableJspbAnyTypeChecks = false;
 
   function module$contents$jspb$internal_options_getUnsafeDisableJspbAnyTypeChecks() {
     return module$contents$jspb$internal_options_UNSAFE_DISABLE_JSPB_ANY_TYPE_CHECKS || module$contents$jspb$internal_options_unsafeDisableJspbAnyTypeChecks
@@ -4869,7 +4869,7 @@
 
   function module$contents$jspb$internal_options_withoutCheckingEqualsDoesNotChangeWithTypeInformation(a) {
     var b = module$contents$jspb$internal_options_checkEqualsDoesNotChangeWithTypeInformation;
-    module$contents$jspb$internal_options_checkEqualsDoesNotChangeWithTypeInformation = !1;
+    module$contents$jspb$internal_options_checkEqualsDoesNotChangeWithTypeInformation = false;
     try {
       a()
     } finally {
@@ -4878,7 +4878,7 @@
   }
   var module$contents$jspb$internal_options_READONLY_REPEATED_FIELDS = goog.DEBUG,
     module$contents$jspb$internal_options_SLICE_REPEATED_FIELDS = goog.DEBUG,
-    module$contents$jspb$internal_options_ASYNC_THROW_READONLY_REPEATED_FIELDS = !0;
+    module$contents$jspb$internal_options_ASYNC_THROW_READONLY_REPEATED_FIELDS = true;
 
   function module$contents$jspb$internal_options_getReadonlyRepeatedArrays(a) {
     return a || module$contents$jspb$internal_options_READONLY_REPEATED_FIELDS
@@ -4891,7 +4891,7 @@
   function module$contents$jspb$internal_options_getAsyncThrowReadonlyRepeatedArrays() {
     return module$contents$jspb$internal_options_ASYNC_THROW_READONLY_REPEATED_FIELDS
   }
-  var module$contents$jspb$internal_options_asyncThrowIfStringTypedInt64FieldDowngrade = !0;
+  var module$contents$jspb$internal_options_asyncThrowIfStringTypedInt64FieldDowngrade = true;
 
   function module$contents$jspb$internal_options_getAsyncThrowIfStringTypedInt64FieldDowngrade() {
     return module$contents$jspb$internal_options_asyncThrowIfStringTypedInt64FieldDowngrade
@@ -4963,7 +4963,7 @@
   },
     module$contents$jspb$internal_operations_OperationLog = function () { },
     module$contents$jspb$internal_operations_currentLog = module$exports$jspb$internal_options.DETAILED_JSPB_ASSERTS ? module$contents$jspb$internal_operations_emptyLog() : void 0,
-    module$contents$jspb$internal_operations_shouldLogOperations = !0;
+    module$contents$jspb$internal_operations_shouldLogOperations = true;
 
   function module$contents$jspb$internal_operations_emptyLog() {
     if (!module$exports$jspb$internal_options.DETAILED_JSPB_ASSERTS) throw Error();
@@ -5502,10 +5502,10 @@
   }
 
   function module$contents$jspb$internal_isEmptyRepeatedField(a, b, c) {
-    if (!Array.isArray(a) || a.length) return !1;
+    if (!Array.isArray(a) || a.length) return false;
     var d = (0, module$exports$jspb$internal_array_state.getArrayState)(a);
-    if (d & module$exports$jspb$internal_array_state.ArrayStateFlags.IS_REPEATED_FIELD) return !0;
-    if (!module$contents$jspb$internal_isRepeatedFieldInSet(b, c)) return !1;
+    if (d & module$exports$jspb$internal_array_state.ArrayStateFlags.IS_REPEATED_FIELD) return true;
+    if (!module$contents$jspb$internal_isRepeatedFieldInSet(b, c)) return false;
     (0, module$exports$jspb$internal_array_state.setArrayState)(a, d | module$exports$jspb$internal_array_state.ArrayStateFlags.IS_REPEATED_FIELD);
     return !0
   }
@@ -5991,7 +5991,7 @@
   var module$contents$google3$javascript$common$asserts$asserts_StateGuardFn;
 
   function module$contents$google3$javascript$common$asserts$asserts_defineStateGuard(a, b) {
-    a.isGuard_doNotManuallySetPrettyPlease = !0;
+    a.isGuard_doNotManuallySetPrettyPlease = true;
     if (!goog.DEBUG) return a;
     a.guardName = typeof b === "function" ? b : function () {
       return b
@@ -6191,7 +6191,7 @@
   function module$contents$google3$javascript$common$asserts$guards_isEnumMemberOf(a, b) {
     return module$contents$google3$javascript$common$asserts$asserts_defineStateGuard(function (c) {
       for (var d in a)
-        if (c === a[d] && !/^[0-9]+$/.test(d)) return !0;
+        if (c === a[d] && !/^[0-9]+$/.test(d)) return true;
       return !1
     }, function () {
       return b != null ? b : "unknown enum"
@@ -6236,7 +6236,7 @@
 
   function module$contents$google3$javascript$common$asserts$guards_isStruct(a, b) {
     return module$contents$google3$javascript$common$asserts$asserts_defineStateGuard(function (c, d) {
-      if (!(0, module$exports$google3$javascript$common$asserts$guards.isObject)(c)) return !1;
+      if (!(0, module$exports$google3$javascript$common$asserts$guards.isObject)(c)) return false;
       for (var e = (0, $jscomp.makeIterator)(Object.entries(a)), f = e.next(); !f.done; f = e.next()) {
         var g = (0, $jscomp.makeIterator)(f.value);
         f = g.next().value;
@@ -6264,7 +6264,7 @@
   module$exports$google3$javascript$common$asserts$guards.isOptional = module$contents$google3$javascript$common$asserts$guards_isOptional;
 
   function module$contents$google3$javascript$common$asserts$guards_markOptional(a) {
-    a.isOptionalGuard_doNotManuallySetPrettyPlease = !0;
+    a.isOptionalGuard_doNotManuallySetPrettyPlease = true;
     return a
   }
   module$exports$google3$javascript$common$asserts$guards.isUnknown = module$contents$google3$javascript$common$asserts$asserts_defineStateGuard(function (a, b) {
@@ -6315,11 +6315,11 @@
 
   function module$contents$google3$javascript$common$asserts$guards_mutableTupleGuard(a) {
     return module$contents$google3$javascript$common$asserts$asserts_defineStateGuard(function (b, c) {
-      if (!module$contents$google3$javascript$common$asserts$asserts_executeNestedGuard(module$exports$google3$javascript$common$asserts$guards.isArray, b, c)) return !1;
+      if (!module$contents$google3$javascript$common$asserts$asserts_executeNestedGuard(module$exports$google3$javascript$common$asserts$guards.isArray, b, c)) return false;
       if (b.length !== a.length) return module$contents$google3$javascript$common$asserts$asserts_addMessageToContext(c, "Expected " + a.length + " elements; got " + b.length + " elements"),
-        !1;
+        false;
       for (var d = 0; d < b.length; ++d)
-        if (!module$contents$google3$javascript$common$asserts$asserts_executeNestedGuard(a[d], b[d], c, "At index " + d)) return !1;
+        if (!module$contents$google3$javascript$common$asserts$asserts_executeNestedGuard(a[d], b[d], c, "At index " + d)) return false;
       return !0
     }, function () {
       return "[" + a.map(module$contents$google3$javascript$common$asserts$asserts_guardName).join(", ") + "]"
@@ -6346,11 +6346,11 @@
 
   function module$contents$google3$javascript$common$asserts$guards_mutableSetGuard(a) {
     return module$contents$google3$javascript$common$asserts$asserts_defineStateGuard(function (b, c) {
-      if (!module$contents$google3$javascript$common$asserts$asserts_executeNestedGuard(module$exports$google3$javascript$common$asserts$guards.isMutableSet, b, c)) return !1;
+      if (!module$contents$google3$javascript$common$asserts$asserts_executeNestedGuard(module$exports$google3$javascript$common$asserts$guards.isMutableSet, b, c)) return false;
       b = (0, $jscomp.makeIterator)(b.entries());
       for (var d = b.next(); !d.done; d = b.next())
         if (!module$contents$google3$javascript$common$asserts$asserts_executeNestedGuard(a,
-          d.value[1], c)) return !1;
+          d.value[1], c)) return false;
       return !0
     }, function () {
       return "Set<" + module$contents$google3$javascript$common$asserts$asserts_guardName(a) + ">"
@@ -6377,7 +6377,7 @@
 
   function module$contents$google3$javascript$common$asserts$guards_mutableMapGuard(a, b) {
     return module$contents$google3$javascript$common$asserts$asserts_defineStateGuard(function (c, d) {
-      if (!module$contents$google3$javascript$common$asserts$asserts_executeNestedGuard(module$exports$google3$javascript$common$asserts$guards.isMutableMap, c, d)) return !1;
+      if (!module$contents$google3$javascript$common$asserts$asserts_executeNestedGuard(module$exports$google3$javascript$common$asserts$guards.isMutableMap, c, d)) return false;
       c = (0, $jscomp.makeIterator)(c.entries());
       for (var e = c.next(), f = {}; !e.done; f = {
         key$jscomp$81: void 0
@@ -6448,7 +6448,7 @@
     },
     module$contents$google3$javascript$common$bigint$platform_ASSUME_NATIVE_BIGINT = goog.FEATURESET_YEAR >= 2021;
   module$exports$google3$javascript$common$bigint$platform.NATIVE_BIGINT_AVAILABLE = module$contents$google3$javascript$common$bigint$platform_ASSUME_NATIVE_BIGINT || typeof goog.global.BigInt === "function" && typeof goog.global.BigInt(0) === "bigint";
-  module$exports$google3$javascript$common$bigint$platform.ODD_FORCED_STRING_IN_DEBUG = !1;
+  module$exports$google3$javascript$common$bigint$platform.ODD_FORCED_STRING_IN_DEBUG = false;
   var module$exports$google3$third_party$javascript$jsbi$g3_wrapper$debug_boxed_bigint = {},
     module$contents$google3$third_party$javascript$jsbi$g3_wrapper$debug_boxed_bigint_module = module$contents$google3$third_party$javascript$jsbi$g3_wrapper$debug_boxed_bigint_module || {
       id: "third_party/javascript/jsbi/g3_wrapper/debug_boxed_bigint.closure.js"
@@ -6485,7 +6485,7 @@
   module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.BigInt = function (a) {
     if (typeof a === "number") {
       if (a === 0) return module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__zero();
-      if (module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__isOneDigitInt(a)) return a < 0 ? module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__oneDigit(-a, !0) : module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__oneDigit(a, !1);
+      if (module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__isOneDigitInt(a)) return a < 0 ? module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__oneDigit(-a, true) : module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__oneDigit(a, false);
       if (!Number.isFinite(a) || Math.floor(a) !==
         a) throw new RangeError("The number " + a + " cannot be converted to BigInt because it is not an integer");
       return module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__fromDouble(a)
@@ -6515,7 +6515,7 @@
   module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.prototype.toString = function (a) {
     a = a === void 0 ? 10 : a;
     if (a < 2 || a > 36) throw new RangeError("toString() radix argument must be between 2 and 36");
-    return this.length === 0 ? "0" : (a & a - 1) === 0 ? module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__toStringBasePowerOfTwo(this, a) : module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__toStringGeneric(this, a, !1)
+    return this.length === 0 ? "0" : (a & a - 1) === 0 ? module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__toStringBasePowerOfTwo(this, a) : module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__toStringGeneric(this, a, false)
   };
   module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.prototype.valueOf = function () {
     throw Error("Convert JSBI instances to native numbers using `toNumber`.");
@@ -6555,11 +6555,11 @@
     return b
   };
   module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.bitwiseNot = function (a) {
-    return a.sign ? module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteSubOne(a).__trim() : module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteAddOne(a, !0)
+    return a.sign ? module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteSubOne(a).__trim() : module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteAddOne(a, true)
   };
   module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.exponentiate = function (a, b) {
     if (b.sign) throw new RangeError("Exponent must be positive");
-    if (b.length === 0) return module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__oneDigit(1, !1);
+    if (b.length === 0) return module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__oneDigit(1, false);
     if (a.length === 0) return a;
     if (a.length === 1 && a.__digit(0) === 1) return a.sign && (b.__digit(0) & 1) === 0 ? module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.unaryMinus(a) : a;
     if (b.length > 1) throw new RangeError("BigInt too big");
@@ -6598,7 +6598,7 @@
     if (b.length === 1 && d <= 32767) {
       if (d === 1) return c === a.sign ? a : module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.unaryMinus(a);
       a = module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteDivSmall(a, d, null)
-    } else a = module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteDivLarge(a, b, !0, !1);
+    } else a = module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteDivLarge(a, b, true, false);
     a.sign = c;
     return a.__trim()
   };
@@ -6612,7 +6612,7 @@
       return b ===
         0 ? module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__zero() : module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__oneDigit(b, a.sign)
     }
-    b = module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteDivLarge(a, b, !1, !0);
+    b = module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteDivLarge(a, b, false, true);
     b.sign = a.sign;
     return b.__trim()
   };
@@ -6646,9 +6646,9 @@
     return module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__compareToBigInt(a, b) >= 0
   };
   module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.equal = function (a, b) {
-    if (a.sign !== b.sign || a.length !== b.length) return !1;
+    if (a.sign !== b.sign || a.length !== b.length) return false;
     for (var c = 0; c < a.length; c++)
-      if (a.__digit(c) !== b.__digit(c)) return !1;
+      if (a.__digit(c) !== b.__digit(c)) return false;
     return !0
   };
   module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.notEqual = function (a, b) {
@@ -6657,7 +6657,7 @@
   module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.bitwiseAnd = function (a, b) {
     if (!a.sign && !b.sign) return module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteAnd(a, b).__trim();
     if (a.sign && b.sign) return a = module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteSubOne(a, Math.max(a.length, b.length) + 1), b = module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteSubOne(b), a = module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteOr(a,
-      b, a), module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteAddOne(a, !0, a).__trim();
+      b, a), module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteAddOne(a, true, a).__trim();
     a.sign && (b = (0, $jscomp.makeIterator)([b, a]), a = b.next().value, b = b.next().value);
     return module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteAndNot(a, module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteSubOne(b)).__trim()
   };
@@ -6669,17 +6669,17 @@
     a.sign && (b = (0, $jscomp.makeIterator)([b, a]), a = b.next().value, b = b.next().value);
     b = module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteSubOne(b, c);
     b = module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteXor(b, a, b);
-    return module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteAddOne(b, !0, b).__trim()
+    return module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteAddOne(b, true, b).__trim()
   };
   module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.bitwiseOr = function (a, b) {
     var c = Math.max(a.length, b.length);
     if (!a.sign && !b.sign) return module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteOr(a, b).__trim();
     if (a.sign && b.sign) return a = module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteSubOne(a, c), b = module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteSubOne(b), a = module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteAnd(a,
-      b, a), module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteAddOne(a, !0, a).__trim();
+      b, a), module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteAddOne(a, true, a).__trim();
     a.sign && (b = (0, $jscomp.makeIterator)([b, a]), a = b.next().value, b = b.next().value);
     b = module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteSubOne(b, c);
     b = module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteAndNot(b, a, b);
-    return module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteAddOne(b, !0, b).__trim()
+    return module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteAddOne(b, true, b).__trim()
   };
   module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.asIntN = function (a, b) {
     if (b.length === 0) return b;
@@ -6694,14 +6694,14 @@
     if (b.length ===
       c && d < e) return b;
     if ((d & e) !== e) return module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__truncateToNBits(a, b);
-    if (!b.sign) return module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__truncateAndSubFromPowerOfTwo(a, b, !0);
+    if (!b.sign) return module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__truncateAndSubFromPowerOfTwo(a, b, true);
     if ((d & e - 1) === 0) {
       for (var f = c - 2; f >= 0; f--)
-        if (b.__digit(f) !== 0) return module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__truncateAndSubFromPowerOfTwo(a, b, !1);
+        if (b.__digit(f) !== 0) return module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__truncateAndSubFromPowerOfTwo(a, b, false);
       return b.length === c && d === e ? b : module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__truncateToNBits(a,
         b)
     }
-    return module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__truncateAndSubFromPowerOfTwo(a, b, !1)
+    return module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__truncateAndSubFromPowerOfTwo(a, b, false)
   };
   module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.asUintN = function (a, b) {
     if (b.length === 0) return b;
@@ -6711,7 +6711,7 @@
     if (b.sign) {
       if (a > module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__kMaxLengthBits) throw new RangeError("BigInt too big");
       return module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__truncateAndSubFromPowerOfTwo(a,
-        b, !1)
+        b, false)
     }
     if (a >= module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__kMaxLengthBits) return b;
     var c = (a + 29) / 30 | 0;
@@ -6760,7 +6760,7 @@
         if (typeof b !== "object") return a == b;
         b = module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__toPrimitive(b)
       } else if (typeof a === "symbol") {
-        if (module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__isBigInt(b)) return !1;
+        if (module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__isBigInt(b)) return false;
         if (typeof b !== "object") return a == b;
         b = module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__toPrimitive(b)
       } else if (typeof a ===
@@ -6783,7 +6783,7 @@
     d = d.next().value;
     e = a.getUint32(b + e, c);
     a = a.getUint32(b + d, c);
-    b = new module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default(3, !1);
+    b = new module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default(3, false);
     b.__setDigit(0, a & 1073741823);
     b.__setDigit(1, (e & 268435455) << 2 | a >>> 30);
     b.__setDigit(2, e >>> 28);
@@ -6805,7 +6805,7 @@
     a.setUint32(b + g, f, d)
   };
   module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__zero = function () {
-    return new module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default(0, !1)
+    return new module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default(0, false)
   };
   module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__oneDigit = function (a, b) {
     b = new module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default(1, b);
@@ -6918,26 +6918,26 @@
       k = module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__kBitsPerCharTableMultiplier - 1;
     if (g > 1073741824 / h) return null;
     g = new module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default(((h *
-      g + k >>> module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__kBitsPerCharTableShift) + 29) / 30 | 0, !1);
+      g + k >>> module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__kBitsPerCharTableShift) + 29) / 30 | 0, false);
     var l = b < 10 ? b : 10,
       m = b > 10 ? b - 10 : 0;
     if ((b & b - 1) === 0) {
       h >>= module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__kBitsPerCharTableShift;
       b = [];
       var n = [],
-        p = !1;
+        p = false;
       do {
         for (var q = 0, r = 0; ;) {
           if (f - 48 >>> 0 < l) k = f - 48;
           else if ((f | 32) - 97 >>> 0 < m) k = (f | 32) - 87;
           else {
-            p = !0;
+            p = true;
             break
           }
           r += h;
           q = q << h | k;
           if (++e === d) {
-            p = !0;
+            p = true;
             break
           }
           f = a.charCodeAt(e);
@@ -6950,7 +6950,7 @@
         b, n)
     } else {
       g.__initializeDigits();
-      n = !1;
+      n = false;
       p = 0;
       do {
         q = 0;
@@ -6958,7 +6958,7 @@
           if (f - 48 >>> 0 < l) k = f - 48;
           else if ((f | 32) - 97 >>> 0 < m) k = (f | 32) - 87;
           else {
-            n = !0;
+            n = true;
             break
           }
           var t = r * b;
@@ -6967,7 +6967,7 @@
           q = q * b + k;
           p++;
           if (++e === d) {
-            n = !0;
+            n = true;
             break
           }
           f = a.charCodeAt(e)
@@ -7034,17 +7034,17 @@
     var e = module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__kMaxBitsPerChar[b] - 1;
     d = ((d * module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__kBitsPerCharTableMultiplier +
       (e - 1)) / e | 0) + 1 >> 1;
-    e = module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.exponentiate(module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__oneDigit(b, !1), module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__oneDigit(d, !1));
+    e = module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.exponentiate(module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__oneDigit(b, false), module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__oneDigit(d, false));
     var f = e.__unsignedDigit(0);
     if (e.length === 1 && f <= 32767) {
-      e = new module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default(a.length, !1);
+      e = new module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default(a.length, false);
       e.__initializeDigits();
       for (var g = 0, h = a.length * 2 - 1; h >= 0; h--) g = g << 15 | a.__halfDigit(h), e.__setHalfDigit(h,
         g / f | 0), g = g % f | 0;
       f = g.toString(b)
-    } else f = module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteDivLarge(a, e, !0, !0), e = f.quotient, f = f.remainder.__trim(), f = module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__toStringGeneric(f, b, !0);
+    } else f = module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteDivLarge(a, e, true, true), e = f.quotient, f = f.remainder.__trim(), f = module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__toStringGeneric(f, b, true);
     e.__trim();
-    for (b = module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__toStringGeneric(e, b, !0); f.length < d;) f = "0" + f;
+    for (b = module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__toStringGeneric(e, b, true); f.length < d;) f = "0" + f;
     c === !1 && a.sign && (b = "-" + b);
     return b + f
   };
@@ -7232,7 +7232,7 @@
   module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteSubOne = function (a, b) {
     var c = a.length;
     b = b || c;
-    for (var d = new module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default(b, !1), e = 1, f = 0; f < c; f++) {
+    for (var d = new module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default(b, false), e = 1, f = 0; f < c; f++) {
       var g = a.__digit(f) - e;
       e = g >>> 30 & 1;
       d.__setDigit(f, g & 1073741823)
@@ -7248,7 +7248,7 @@
       f = e;
     d < e && (f = d, d = a, a = b, b = d);
     d = f;
-    c === null ? c = new module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default(d, !1) : d = c.length;
+    c === null ? c = new module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default(d, false) : d = c.length;
     for (e = 0; e < f; e++) c.__setDigit(e, a.__digit(e) & b.__digit(e));
     for (; e < d; e++) c.__setDigit(e, 0);
     return c
@@ -7260,7 +7260,7 @@
       f = e;
     d < e && (f = d);
     e = d;
-    c === null ? c = new module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default(e, !1) : e = c.length;
+    c === null ? c = new module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default(e, false) : e = c.length;
     for (var g = 0; g < f; g++) c.__setDigit(g, a.__digit(g) & ~b.__digit(g));
     for (; g < d; g++) c.__setDigit(g, a.__digit(g));
     for (; g < e; g++) c.__setDigit(g, 0);
@@ -7279,7 +7279,7 @@
       b = g
     }
     e = d;
-    c === null ? c = new module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default(e, !1) : e = c.length;
+    c === null ? c = new module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default(e, false) : e = c.length;
     for (g = 0; g < f; g++) c.__setDigit(g, a.__digit(g) | b.__digit(g));
     for (; g < d; g++) c.__setDigit(g, a.__digit(g));
     for (; g < e; g++) c.__setDigit(g, 0);
@@ -7298,7 +7298,7 @@
       b = g
     }
     e = d;
-    c === null ? c = new module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default(e, !1) : e = c.length;
+    c === null ? c = new module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default(e, false) : e = c.length;
     for (g = 0; g < f; g++) c.__setDigit(g, a.__digit(g) ^ b.__digit(g));
     for (; g < d; g++) c.__setDigit(g, a.__digit(g));
     for (; g < e; g++) c.__setDigit(g, 0);
@@ -7371,7 +7371,7 @@
   };
   module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteDivSmall = function (a, b, c) {
     c = c === void 0 ? null : c;
-    c === null && (c = new module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default(a.length, !1));
+    c === null && (c = new module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default(a.length, false));
     for (var d = 0, e = a.length * 2 - 1; e >= 0; e -= 2) {
       d = (d << 15 | a.__halfDigit(e)) >>> 0;
       var f = d / b | 0;
@@ -7392,8 +7392,8 @@
       f = b.length,
       g = a.__halfDigitLength() - e,
       h = null;
-    c && (h = new module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default(g + 2 >>> 1, !1), h.__initializeDigits());
-    var k = new module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default(e + 2 >>> 1, !1);
+    c && (h = new module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default(g + 2 >>> 1, false), h.__initializeDigits());
+    var k = new module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default(e + 2 >>> 1, false);
     k.__initializeDigits();
     var l = module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__clz15(b.__halfDigit(e -
       1));
@@ -7478,7 +7478,7 @@
   };
   module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__specialLeftShift = function (a, b, c) {
     var d = a.length,
-      e = new module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default(d + c, !1);
+      e = new module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default(d + c, false);
     if (b === 0) {
       for (b = 0; b < d; b++) e.__setDigit(b, a.__digit(b));
       c > 0 && e.__setDigit(d, 0);
@@ -7526,15 +7526,15 @@
     var f = e % 30,
       g = c - b;
     if (g <= 0) return module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__rightShiftByMaximum(d);
-    e = !1;
+    e = false;
     if (d) {
       var h = (1 << f) - 1;
       if ((a.__digit(b) &
-        h) !== 0) e = !0;
+        h) !== 0) e = true;
       else
         for (h = 0; h < b; h++)
           if (a.__digit(h) !== 0) {
-            e = !0;
+            e = true;
             break
           }
     }
@@ -7552,11 +7552,11 @@
       }
       d.__setDigit(c, g)
     }
-    e && (d = module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteAddOne(d, !0, d));
+    e && (d = module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__absoluteAddOne(d, true, d));
     return d.__trim()
   };
   module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__rightShiftByMaximum = function (a) {
-    return a ? module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__oneDigit(1, !0) : module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__zero()
+    return a ? module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__oneDigit(1, true) : module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__zero()
   };
   module$exports$google3$third_party$javascript$jsbi$lib$jsbi.default.__toShiftAmount = function (a) {
     if (a.length > 1) return -1;
@@ -7732,7 +7732,7 @@
     if (module$exports$google3$javascript$common$bigint$platform.NATIVE_BIGINT_AVAILABLE) return module$contents$google3$javascript$common$asserts$asserts_assert(module$contents$google3$javascript$common$bigint$index_MIN_UNSIGNED_INT64_BIGINT, module$exports$google3$javascript$common$asserts$guards.isBigInt), module$contents$google3$javascript$common$asserts$asserts_assert(module$contents$google3$javascript$common$bigint$index_MAX_UNSIGNED_INT64_BIGINT,
       module$exports$google3$javascript$common$asserts$guards.isBigInt), a = goog.DEBUG ? BigInt(a) : module$contents$google3$javascript$common$asserts$asserts_cast(a, module$exports$google3$javascript$common$asserts$guards.isBigInt), a >= module$contents$google3$javascript$common$bigint$index_MIN_UNSIGNED_INT64_BIGINT && a <= module$contents$google3$javascript$common$bigint$index_MAX_UNSIGNED_INT64_BIGINT;
     a = module$contents$google3$javascript$common$asserts$asserts_cast(a, module$exports$google3$javascript$common$asserts$guards.isString);
-    if (a[0] === "-") return !1;
+    if (a[0] === "-") return false;
     module$contents$google3$javascript$common$asserts$asserts_assert(module$contents$google3$javascript$common$bigint$index_MAX_UNSIGNED_INT64_STR, module$exports$google3$javascript$common$asserts$guards.isString);
     return module$contents$google3$javascript$common$bigint$index_isInRange(a, module$contents$google3$javascript$common$bigint$index_MAX_UNSIGNED_INT64_STR)
   }, "isValidUnsignedInt64");
@@ -7782,12 +7782,12 @@
   }
 
   function module$contents$google3$javascript$common$bigint$index_isInRange(a, b) {
-    if (a.length > b.length) return !1;
-    if (a.length < b.length || a === b) return !0;
+    if (a.length > b.length) return false;
+    if (a.length < b.length || a === b) return true;
     for (var c = 0; c < a.length; c++) {
       var d = a[c],
         e = b[c];
-      if (d > e) return !1;
+      if (d > e) return false;
       if (d < e) return !0
     }
     module$contents$google3$javascript$common$asserts$asserts_fail("isInRange weird case. Value was: " + a + ". Boundary was: " + b + ".")
@@ -7802,10 +7802,10 @@
   }
 
   function module$contents$google3$javascript$common$bigint$index_isGbigintForcedAsStringHalfTheTime(a) {
-    if (typeof a === "bigint") return a % BigInt(2) === BigInt(module$contents$google3$javascript$common$bigint$index_getGBigIntUseStrInDebugToggleVal()) ? (console.error("isGbigint: got a `bigint` when we were expecting a `string`. Make sure to call `toGbigint()` when creating `gbigint` instances!"), !1) : !0;
+    if (typeof a === "bigint") return a % BigInt(2) === BigInt(module$contents$google3$javascript$common$bigint$index_getGBigIntUseStrInDebugToggleVal()) ? (console.error("isGbigint: got a `bigint` when we were expecting a `string`. Make sure to call `toGbigint()` when creating `gbigint` instances!"), false) : true;
     if ((0, module$exports$google3$javascript$common$asserts$guards.isString)(a)) {
-      if (!module$contents$google3$javascript$common$bigint$index_isValidGbigintDecimalString(a)) return !1;
-      if (Number(a[a.length - 1]) % 2 === module$contents$google3$javascript$common$bigint$index_getGBigIntUseStrInDebugToggleVal()) return !0;
+      if (!module$contents$google3$javascript$common$bigint$index_isValidGbigintDecimalString(a)) return false;
+      if (Number(a[a.length - 1]) % 2 === module$contents$google3$javascript$common$bigint$index_getGBigIntUseStrInDebugToggleVal()) return true;
       console.error("isGbigint: got a `string` when we were expecting a `bigint`. Make sure to call `toGbigint()` when creating `gbigint` instances!")
     }
     return !1
@@ -7879,16 +7879,16 @@
 
   function module$contents$jspb$utils_splitFloat32(a) {
     var b = module$contents$jspb$utils_getScratchpad(4);
-    b.setFloat32(0, +a, !0);
+    b.setFloat32(0, +a, true);
     module$contents$jspb$utils_split64High = 0;
-    module$contents$jspb$utils_split64Low = b.getUint32(0, !0)
+    module$contents$jspb$utils_split64Low = b.getUint32(0, true)
   }
 
   function module$contents$jspb$utils_splitFloat64(a) {
     var b = module$contents$jspb$utils_getScratchpad(8);
-    b.setFloat64(0, +a, !0);
-    module$contents$jspb$utils_split64Low = b.getUint32(0, !0);
-    module$contents$jspb$utils_split64High = b.getUint32(4, !0)
+    b.setFloat64(0, +a, true);
+    module$contents$jspb$utils_split64Low = b.getUint32(0, true);
+    module$contents$jspb$utils_split64High = b.getUint32(4, true)
   }
 
   function module$contents$jspb$utils_splitBytes64(a) {
@@ -8233,7 +8233,7 @@
     var c = typeof a;
     switch (c) {
       case "bigint":
-        return !0;
+        return true;
       case "number":
         return Number.isFinite(a)
     }
@@ -8343,7 +8343,7 @@
       case module$exports$jspb$internal_array_state.TypeSpecificApiFormat.STRING:
         switch (c) {
           case "string":
-            return module$contents$jspb$internal_accessor_helpers_convertStringToInt64String(a, !0);
+            return module$contents$jspb$internal_accessor_helpers_convertStringToInt64String(a, true);
           case "bigint":
             return module$contents$jspb$internal_accessor_helpers_convertBigintToInt64String(a);
           default:
@@ -8367,7 +8367,7 @@
           case "bigint":
             return module$contents$jspb$internal_accessor_helpers_convertBigintToInt64Gbigint(a);
           default:
-            return module$contents$jspb$internal_accessor_helpers_convertNumberToInt64Number(module$contents$google3$javascript$common$asserts$asserts_cast(a, module$exports$google3$javascript$common$asserts$guards.isNumber), !1)
+            return module$contents$jspb$internal_accessor_helpers_convertNumberToInt64Number(module$contents$google3$javascript$common$asserts$asserts_cast(a, module$exports$google3$javascript$common$asserts$guards.isNumber), false)
         }
       default:
         return module$contents$google3$javascript$typescript$contrib$check_checkExhaustive(b, "Unknown format requested type for int64")
@@ -8544,11 +8544,11 @@
   }
 
   function module$contents$jspb$internal_accessor_helpers_convertNumberToInt64Gbigint(a) {
-    return module$contents$google3$javascript$common$bigint$index_toGbigint(module$contents$jspb$internal_accessor_helpers_convertNumberToInt64Number(a, !0))
+    return module$contents$google3$javascript$common$bigint$index_toGbigint(module$contents$jspb$internal_accessor_helpers_convertNumberToInt64Number(a, true))
   }
 
   function module$contents$jspb$internal_accessor_helpers_convertNumberToUint64Gbigint(a) {
-    return module$contents$google3$javascript$common$bigint$index_toGbigint(module$contents$jspb$internal_accessor_helpers_convertNumberToUint64Number(a, !0))
+    return module$contents$google3$javascript$common$bigint$index_toGbigint(module$contents$jspb$internal_accessor_helpers_convertNumberToUint64Number(a, true))
   }
 
   function module$contents$jspb$internal_accessor_helpers_convertStringToUint64String(a, b) {
@@ -8583,11 +8583,11 @@
     if (a == null) return a;
     if (typeof a === "bigint") return module$contents$jspb$internal_accessor_helpers_convertBigintToInt64NumberWhenSafe(a);
     if (!module$contents$jspb$internal_options_getTypeCheck64BitIntFieldsAreInRange(!1)) return a;
-    if (module$contents$jspb$internal_accessor_helpers_isNumberShaped(a, !1)) {
-      if (typeof a === "number") return module$contents$jspb$internal_accessor_helpers_convertNumberToInt64Number(a, !1);
+    if (module$contents$jspb$internal_accessor_helpers_isNumberShaped(a, false)) {
+      if (typeof a === "number") return module$contents$jspb$internal_accessor_helpers_convertNumberToInt64Number(a, false);
       a = module$contents$google3$javascript$common$asserts$asserts_cast(a,
         module$exports$google3$javascript$common$asserts$guards.isString);
-      return module$contents$jspb$internal_options_getTypeCheck64BitIntFields(!1) ? module$contents$jspb$internal_accessor_helpers_convertStringToInt64NumberWhenSafe(a, !1) : module$contents$jspb$internal_accessor_helpers_convertStringToInt64String(a, !1)
+      return module$contents$jspb$internal_options_getTypeCheck64BitIntFields(!1) ? module$contents$jspb$internal_accessor_helpers_convertStringToInt64NumberWhenSafe(a, false) : module$contents$jspb$internal_accessor_helpers_convertStringToInt64String(a, false)
     }
   }
 
@@ -8609,7 +8609,7 @@
     var b = typeof a;
     if (a == null) return a;
     if (b === "bigint") return module$contents$jspb$internal_accessor_helpers_convertBigintToInt64Gbigint(a);
-    if (module$contents$jspb$internal_accessor_helpers_isNumberShaped(a, !0)) {
+    if (module$contents$jspb$internal_accessor_helpers_isNumberShaped(a, true)) {
       if (b === "string") return module$contents$jspb$internal_accessor_helpers_convertStringToInt64Gbigint(a);
       a = module$contents$google3$javascript$common$asserts$asserts_cast(a, module$exports$google3$javascript$common$asserts$guards.isNumber);
       return module$contents$jspb$internal_accessor_helpers_convertNumberToInt64Gbigint(a)
@@ -8630,7 +8630,7 @@
       case module$exports$jspb$internal_array_state.TypeSpecificApiFormat.STRING:
         switch (c) {
           case "string":
-            return module$contents$jspb$internal_accessor_helpers_convertStringToUint64String(a, !0);
+            return module$contents$jspb$internal_accessor_helpers_convertStringToUint64String(a, true);
           case "bigint":
             return module$contents$jspb$internal_accessor_helpers_convertBigintToUint64String(a);
           default:
@@ -8654,7 +8654,7 @@
           case "bigint":
             return module$contents$jspb$internal_accessor_helpers_convertBigintToUint64Gbigint(a);
           default:
-            return module$contents$jspb$internal_accessor_helpers_convertNumberToUint64Number(module$contents$google3$javascript$common$asserts$asserts_cast(a, module$exports$google3$javascript$common$asserts$guards.isNumber), !1)
+            return module$contents$jspb$internal_accessor_helpers_convertNumberToUint64Number(module$contents$google3$javascript$common$asserts$asserts_cast(a, module$exports$google3$javascript$common$asserts$guards.isNumber), false)
         }
       default:
         return module$contents$google3$javascript$typescript$contrib$check_checkExhaustive(b, "Unknown format requested type for int64")
@@ -8670,11 +8670,11 @@
     if (a == null) return a;
     if (typeof a === "bigint") return module$contents$jspb$internal_accessor_helpers_convertBigintToUint64NumberWhenSafe(a);
     if (!module$contents$jspb$internal_options_getTypeCheck64BitIntFieldsAreInRange(!1)) return a;
-    if (module$contents$jspb$internal_accessor_helpers_isNumberShaped(a, !1)) {
-      if (typeof a === "number") return module$contents$jspb$internal_accessor_helpers_convertNumberToUint64Number(a, !1);
+    if (module$contents$jspb$internal_accessor_helpers_isNumberShaped(a, false)) {
+      if (typeof a === "number") return module$contents$jspb$internal_accessor_helpers_convertNumberToUint64Number(a, false);
       a = module$contents$google3$javascript$common$asserts$asserts_cast(a,
         module$exports$google3$javascript$common$asserts$guards.isString);
-      return module$contents$jspb$internal_options_getTypeCheck64BitIntFields(!1) ? module$contents$jspb$internal_accessor_helpers_convertStringToUint64NumberWhenSafe(a, !1) : module$contents$jspb$internal_accessor_helpers_convertStringToUint64String(a, !1)
+      return module$contents$jspb$internal_options_getTypeCheck64BitIntFields(!1) ? module$contents$jspb$internal_accessor_helpers_convertStringToUint64NumberWhenSafe(a, false) : module$contents$jspb$internal_accessor_helpers_convertStringToUint64String(a, false)
     }
   }
 
@@ -8696,7 +8696,7 @@
     var b = typeof a;
     if (a == null) return a;
     if (b === "bigint") return module$contents$jspb$internal_accessor_helpers_convertBigintToUint64Gbigint(a);
-    if (module$contents$jspb$internal_accessor_helpers_isNumberShaped(a, !0)) {
+    if (module$contents$jspb$internal_accessor_helpers_isNumberShaped(a, true)) {
       if (b === "string") return module$contents$jspb$internal_accessor_helpers_convertStringToUint64Gbigint(a);
       a = module$contents$google3$javascript$common$asserts$asserts_cast(a, module$exports$google3$javascript$common$asserts$guards.isNumber);
       return module$contents$jspb$internal_accessor_helpers_convertNumberToUint64Gbigint(a)
@@ -8708,10 +8708,10 @@
     var b = typeof a;
     if (b === "bigint") return module$contents$jspb$internal_accessor_helpers_convertBigintToInt64String(a);
     if (!module$contents$jspb$internal_options_getTypeCheck64BitIntFieldsAreInRange(!1)) return a;
-    if (module$contents$jspb$internal_accessor_helpers_isNumberShaped(a, !1)) {
-      if (b === "string") return module$contents$jspb$internal_accessor_helpers_convertStringToInt64String(a, !1);
+    if (module$contents$jspb$internal_accessor_helpers_isNumberShaped(a, false)) {
+      if (b === "string") return module$contents$jspb$internal_accessor_helpers_convertStringToInt64String(a, false);
       if (b ===
-        "number") return module$contents$jspb$internal_accessor_helpers_convertNumberToInt64Number(a, !1)
+        "number") return module$contents$jspb$internal_accessor_helpers_convertNumberToInt64Number(a, false)
     }
   }
 
@@ -8720,10 +8720,10 @@
     var b = typeof a;
     if (b === "bigint") return module$contents$jspb$internal_accessor_helpers_convertBigintToUint64String(a);
     if (!module$contents$jspb$internal_options_getTypeCheck64BitIntFieldsAreInRange(!1)) return a;
-    if (module$contents$jspb$internal_accessor_helpers_isNumberShaped(a, !1)) {
-      if (b === "string") return module$contents$jspb$internal_accessor_helpers_convertStringToUint64String(a, !1);
+    if (module$contents$jspb$internal_accessor_helpers_isNumberShaped(a, false)) {
+      if (b === "string") return module$contents$jspb$internal_accessor_helpers_convertStringToUint64String(a, false);
       if (b ===
-        "number") return module$contents$jspb$internal_accessor_helpers_convertNumberToUint64Number(a, !1)
+        "number") return module$contents$jspb$internal_accessor_helpers_convertNumberToUint64Number(a, false)
     }
   }
 
@@ -9010,7 +9010,7 @@
   function module$contents$jspb$internal_construct_clearAlternateDataPayload() {
     module$contents$jspb$internal_construct_alternateDataPayload = void 0
   }
-  module$exports$jspb$internal_construct.ENCODED_MAP_META = !0;
+  module$exports$jspb$internal_construct.ENCODED_MAP_META = true;
   var module$contents$jspb$internal_construct_Opaque = function () { },
     module$contents$jspb$internal_construct_mapEntryMessageMeta, module$contents$jspb$internal_construct_noPivotNoMessageIdMessageMeta;
 
@@ -9149,7 +9149,7 @@
       case "bigint":
       case "string":
       case "number":
-        return !0;
+        return true;
       default:
         return !1
     }
@@ -9164,9 +9164,9 @@
     var c = module$contents$jspb$internal_getComparisonTypeInfoArraySymbol(),
       d;
     if (module$contents$jspb$internal_isMessage(a)) a = a.internalArray_, d != null || (d = a[c]);
-    else if (!Array.isArray(a)) return !1;
+    else if (!Array.isArray(a)) return false;
     if (module$contents$jspb$internal_isMessage(b)) b = b.internalArray_, d != null || (d = b[c]);
-    else if (!Array.isArray(b)) return !1;
+    else if (!Array.isArray(b)) return false;
     return module$contents$jspb$internal_compare_compareFieldsInternal(a, b, d, module$contents$jspb$internal_compare_ValueType.MESSAGE_ARRAY)
   }
 
@@ -9178,10 +9178,10 @@
     module$exports$jspb$internal_options.DETAILED_JSPB_ASSERTS && module$contents$jspb$internal_operations_logOperation({
       internalCompareFields: 1
     });
-    if (a === b || a == null && b == null) return !0;
+    if (a === b || a == null && b == null) return true;
     if (a instanceof module$exports$jspb$internal_map.JspbMap) return a.internalMapComparator(b, c);
     if (b instanceof module$exports$jspb$internal_map.JspbMap) return b.internalMapComparator(a, c);
-    if (a == null || b == null) return !1;
+    if (a == null || b == null) return false;
     if (a instanceof module$exports$jspb$bytestring.ByteString) return a.internalCompareEqualsDoNotUse(b);
     if (b instanceof module$exports$jspb$bytestring.ByteString) return b.internalCompareEqualsDoNotUse(a);
     if (module$contents$jspb$internal_bytes_isU8(a)) return module$contents$jspb$internal_compare_maybeCompareUint8Arrays(a, b);
@@ -9189,9 +9189,9 @@
     var e = typeof a,
       f = typeof b;
     if (e !== "object" || f !== "object") return Number.isNaN(a) || Number.isNaN(b) ? String(a) === String(b) : module$contents$jspb$internal_compare_bigintOrStringOrNumber(e) &&
-      module$contents$jspb$internal_compare_bigintOrStringOrNumber(f) ? "" + a === "" + b : e === "boolean" && f === "number" || e === "number" && f === "boolean" ? !a === !b : !1;
+      module$contents$jspb$internal_compare_bigintOrStringOrNumber(f) ? "" + a === "" + b : e === "boolean" && f === "number" || e === "number" && f === "boolean" ? !a === !b : false;
     if (module$contents$jspb$internal_isMessage(a) || module$contents$jspb$internal_isMessage(b)) return module$contents$jspb$internal_compare_compareMessages(a, b);
-    if (a.constructor != b.constructor) return !1;
+    if (a.constructor != b.constructor) return false;
     if (a.constructor === Array) {
       var g = (0, module$exports$jspb$internal_array_state.getArrayState)(a),
         h = (0, module$exports$jspb$internal_array_state.getArrayState)(b),
@@ -9218,14 +9218,14 @@
       k = k - f - +!!m;
       l = l - f - +!!g;
       for (h = 0; h < e; h++)
-        if (!module$contents$jspb$internal_compare_compareFieldsInternalIter(module$contents$jspb$internal_fieldNumberFromIndex(h, f), a, m, k, b, g, l, f, n, p, c, d)) return !1;
+        if (!module$contents$jspb$internal_compare_compareFieldsInternalIter(module$contents$jspb$internal_fieldNumberFromIndex(h, f), a, m, k, b, g, l, f, n, p, c, d)) return false;
       if (m)
         for (var q in m)
           if (!module$contents$jspb$internal_compare_compareFieldsInternalObjIter(m,
-            q, a, m, k, b, g, l, f, n, p, c)) return !1;
+            q, a, m, k, b, g, l, f, n, p, c)) return false;
       if (g)
         for (var r in g)
-          if (!(m && r in m || module$contents$jspb$internal_compare_compareFieldsInternalObjIter(g, r, a, m, k, b, g, l, f, n, p, c))) return !1;
+          if (!(m && r in m || module$contents$jspb$internal_compare_compareFieldsInternalObjIter(g, r, a, m, k, b, g, l, f, n, p, c))) return false;
       return !0
     }
     if (a.constructor === Object) {
@@ -9237,7 +9237,7 @@
   }
 
   function module$contents$jspb$internal_compare_compareFieldsInternalObjIter(a, b, c, d, e, f, g, h, k, l, m, n) {
-    if (!module$contents$jspb$internal_hasOwnPropertyIfNotTrusted(a, b)) return !0;
+    if (!module$contents$jspb$internal_hasOwnPropertyIfNotTrusted(a, b)) return true;
     a = +b;
     return !Number.isFinite(a) || a < e || a < h ? !0 : module$contents$jspb$internal_compare_compareFieldsInternalIter(a, c, d, e, f, g, h, k, l, m, n, module$contents$jspb$internal_compare_ValueType.MESSAGE_ARRAY)
   }
@@ -9246,7 +9246,7 @@
     b = module$contents$jspb$internal_compare_getField(a, b, c, d, h);
     e = module$contents$jspb$internal_compare_getField(a, e, f, g, h);
     n = n === module$contents$jspb$internal_compare_ValueType.REPEATED_ARRAY;
-    if (e == null && module$contents$jspb$internal_isEmptyRepeatedField(b, k, a) || b == null && module$contents$jspb$internal_isEmptyRepeatedField(e, k, a)) return !0;
+    if (e == null && module$contents$jspb$internal_isEmptyRepeatedField(b, k, a) || b == null && module$contents$jspb$internal_isEmptyRepeatedField(e, k, a)) return true;
     m = n ? m : m == null ? void 0 : m.getFieldComparisonTypeInfo(a);
     if (l = l == null ? void 0 :
       l.has(a)) {
@@ -9376,9 +9376,9 @@
       d;
     for (var g = 0; g < a.length; g++) {
       var h = a[g],
-        k = c(module$contents$jspb$internal_map_getKey(h), !1, !0),
+        k = c(module$contents$jspb$internal_map_getKey(h), false, true),
         l = module$contents$jspb$internal_map_getValue(h);
-      b ? l === void 0 && (l = null) : l = d(module$contents$jspb$internal_map_getValue(h), !1, !0, void 0, void 0, e);
+      b ? l === void 0 && (l = null) : l = d(module$contents$jspb$internal_map_getValue(h), false, true, void 0, void 0, e);
       module$contents$jspb$internal_map_MapBase.prototype.set.call(f, k, l)
     }
     return f
@@ -9413,7 +9413,7 @@
   };
   module$exports$jspb$internal_map.JspbMap.prototype.delete = function (a) {
     this.checkNotImmutable_();
-    return module$contents$jspb$internal_map_MapBase.prototype.delete.call(this, this.keyToApi(a, !0, !1))
+    return module$contents$jspb$internal_map_MapBase.prototype.delete.call(this, this.keyToApi(a, true, false))
   };
   module$exports$jspb$internal_map.JspbMap.prototype.entries = function () {
     return module$contents$jspb$internal_newTransformingIteratorIterable(this.keyArray_(), module$contents$jspb$internal_map_getEntryFromMap, this)
@@ -9436,24 +9436,24 @@
   };
   module$exports$jspb$internal_map.JspbMap.prototype.set = function (a, b) {
     this.checkNotImmutable_();
-    a = this.keyToApi(a, !0, !1);
-    return a == null ? this : b == null ? (module$contents$jspb$internal_map_MapBase.prototype.delete.call(this, a), this) : module$contents$jspb$internal_map_MapBase.prototype.set.call(this, a, this.valueToApi(b, !0, !0, this.valueCtor, !1, this.arrayState))
+    a = this.keyToApi(a, true, false);
+    return a == null ? this : b == null ? (module$contents$jspb$internal_map_MapBase.prototype.delete.call(this, a), this) : module$contents$jspb$internal_map_MapBase.prototype.set.call(this, a, this.valueToApi(b, true, !0, this.valueCtor, false, this.arrayState))
   };
   module$exports$jspb$internal_map.JspbMap.prototype.setWireEntry = function (a) {
-    var b = this.keyToApi(a[0], !1, !0);
+    var b = this.keyToApi(a[0], false, true);
     a = a[1];
-    a = this.valueCtor ? a === void 0 ? null : a : this.valueToApi(a, !1, !0, void 0, !1, this.arrayState);
+    a = this.valueCtor ? a === void 0 ? null : a : this.valueToApi(a, false, true, void 0, false, this.arrayState);
     module$contents$jspb$internal_map_MapBase.prototype.set.call(this, b, a)
   };
   module$exports$jspb$internal_map.JspbMap.prototype.has = function (a) {
-    return module$contents$jspb$internal_map_MapBase.prototype.has.call(this, this.keyToApi(a, !1, !1))
+    return module$contents$jspb$internal_map_MapBase.prototype.has.call(this, this.keyToApi(a, false, false))
   };
   module$exports$jspb$internal_map.JspbMap.prototype.get = function (a) {
-    a = this.keyToApi(a, !1, !1);
+    a = this.keyToApi(a, false, false);
     var b = module$contents$jspb$internal_map_MapBase.prototype.get.call(this, a);
     if (b !== void 0) {
       var c = this.valueCtor;
-      return c ? (c = this.valueToApi(b, !1, !0, c, this.callToMutableOnAccess, this.arrayState), c !== b && module$contents$jspb$internal_map_MapBase.prototype.set.call(this, a, c), c) : b
+      return c ? (c = this.valueToApi(b, false, true, c, this.callToMutableOnAccess, this.arrayState), c !== b && module$contents$jspb$internal_map_MapBase.prototype.set.call(this, a, c), c) : b
     }
   };
   module$exports$jspb$internal_map.JspbMap.prototype.keyArray_ = function () {
@@ -9534,8 +9534,8 @@
   }
 
   function module$contents$jspb$internal_map_compareMapToMapInternal(a, b, c) {
-    if (a.size != b.size) return !1;
-    var d = !0;
+    if (a.size != b.size) return false;
+    var d = true;
     a.forEach(function (e, f) {
       module$contents$jspb$internal_compare_compareFields(e, b.get(f), c == null ? void 0 : c.getFieldComparisonTypeInfo(2)) || (d = !1)
     });
@@ -9563,16 +9563,16 @@
 
   function module$contents$jspb$internal_map_compareMapToMaybeArrayInternal(a, b, c) {
     if (b == null) return a.size === 0;
-    if (!Array.isArray(b) || a.size > b.length) return !1;
+    if (!Array.isArray(b) || a.size > b.length) return false;
     b = Array.prototype.slice.call(b);
     b.sort(module$contents$jspb$internal_map_compareEntryKeys);
     for (var d = 0, e = void 0, f = b.length - 1; f >= 0; f--) {
       var g = b[f];
-      if (!g || !Array.isArray(g) || g.length !== 2) return !1;
+      if (!g || !Array.isArray(g) || g.length !== 2) return false;
       var h = g[0];
       if (h !== e) {
         e = void 0;
-        if (!module$contents$jspb$internal_compare_compareFields(a.get(h), g[1], (e = c) == null ? void 0 : e.getFieldComparisonTypeInfo(2))) return !1;
+        if (!module$contents$jspb$internal_compare_compareFields(a.get(h), g[1], (e = c) == null ? void 0 : e.getFieldComparisonTypeInfo(2))) return false;
         e = h;
         d++
       }
@@ -9581,26 +9581,26 @@
   }
 
   function module$contents$jspb$internal_map_compareMapArraysInternal(a, b, c) {
-    if (!Array.isArray(a) || !Array.isArray(b)) return !1;
+    if (!Array.isArray(a) || !Array.isArray(b)) return false;
     a = Array.prototype.slice.call(a);
     b = Array.prototype.slice.call(b);
     a.sort(module$contents$jspb$internal_map_compareEntryKeys);
     b.sort(module$contents$jspb$internal_map_compareEntryKeys);
     var d = a.length,
       e = b.length;
-    if (d === 0 && e === 0) return !0;
+    if (d === 0 && e === 0) return true;
     for (var f = 0, g = 0; f < d && g < e;) {
       var h = void 0,
         k = a[f];
-      if (!Array.isArray(k)) return !1;
+      if (!Array.isArray(k)) return false;
       for (var l = k[0]; f < d - 1 && (h = a[f + 1])[0] === l;) f++, k = h;
       var m = void 0;
       h = b[g];
-      if (!Array.isArray(h)) return !1;
+      if (!Array.isArray(h)) return false;
       for (var n = h[0]; g < e - 1 && (m = b[g + 1])[0] === n;) g++, h = m;
-      if (!module$contents$jspb$internal_compare_compareFields(l, n)) return !1;
+      if (!module$contents$jspb$internal_compare_compareFields(l, n)) return false;
       l = void 0;
-      if (!module$contents$jspb$internal_compare_compareFields(k[1], h[1], (l = c) == null ? void 0 : l.getFieldComparisonTypeInfo(2))) return !1;
+      if (!module$contents$jspb$internal_compare_compareFields(k[1], h[1], (l = c) == null ? void 0 : l.getFieldComparisonTypeInfo(2))) return false;
       f++;
       g++
     }
@@ -9671,7 +9671,7 @@
       for (var g in f) module$contents$jspb$internal_hasOwnPropertyIfNotTrusted(f, g) && ((0, goog.asserts.assert)(!isNaN(g), "should not have non-numeric keys in sparse objects after a constructor is called."),
         b[g] = c(f[g]))
     }
-    module$contents$jspb$internal_copyUnknownFields(d, a, !1);
+    module$contents$jspb$internal_copyUnknownFields(d, a, false);
     return d
   }
 
@@ -9692,12 +9692,12 @@
     var f = d || c ? (0, module$exports$jspb$internal_array_state.getArrayState)(a) : 0;
     d = d ? !!(f & module$exports$jspb$internal_array_state.ArrayStateFlags.MUTABLE_REFERENCES_ARE_OWNED) : void 0;
     for (var g = module$contents$jspb$internal_operations_slice(a), h = 0; h < g.length; h++) g[h] = module$contents$jspb$internal_copy_cloneJspbFieldInternal(g[h], b, c, d, e);
-    c && (module$contents$jspb$internal_copyUnknownFields(g, a, !1), c(f, g));
+    c && (module$contents$jspb$internal_copyUnknownFields(g, a, false), c(f, g));
     return g
   }
 
   function module$contents$jspb$internal_copy_convertMapValuesToStructuredCloneableFormat(a) {
-    return module$contents$jspb$internal_copy_cloneJspbFieldInternal(a, module$contents$jspb$internal_copy_convertToStructuredCloneableFormat, void 0, void 0, !1)
+    return module$contents$jspb$internal_copy_cloneJspbFieldInternal(a, module$contents$jspb$internal_copy_convertToStructuredCloneableFormat, void 0, void 0, false)
   }
 
   function module$contents$jspb$internal_copy_convertToStructuredCloneableFormat(a) {
@@ -9705,7 +9705,7 @@
   }
 
   function module$contents$jspb$internal_copy_convertMapValueToJsonFormat(a) {
-    return module$contents$jspb$internal_copy_cloneJspbFieldInternal(a, module$contents$jspb$internal_copy_convertToJsonFormat, void 0, void 0, !1)
+    return module$contents$jspb$internal_copy_cloneJspbFieldInternal(a, module$contents$jspb$internal_copy_convertToJsonFormat, void 0, void 0, false)
   }
 
   function module$contents$jspb$internal_copy_convertToJsonFormat(a) {
@@ -9714,7 +9714,7 @@
 
   function module$contents$jspb$internal_copy_cloneToJsonFormat(a) {
     (0, goog.asserts.assertArray)(a);
-    return module$contents$jspb$internal_copy_cloneJspbArray(a, module$contents$jspb$internal_copy_convertToJsonFormat, void 0, void 0, !1)
+    return module$contents$jspb$internal_copy_cloneJspbArray(a, module$contents$jspb$internal_copy_convertToJsonFormat, void 0, void 0, false)
   }
   var module$contents$jspb$internal_copy_copyUint8Array = function (a) {
     return new Uint8Array(a)
@@ -9722,7 +9722,7 @@
 
   function module$contents$jspb$internal_copy_cloneToStructuredCloneableFormat(a) {
     (0, goog.asserts.assertArray)(a);
-    return module$contents$jspb$internal_copy_cloneJspbArray(a, module$contents$jspb$internal_copy_convertToStructuredCloneableFormat, void 0, void 0, !1)
+    return module$contents$jspb$internal_copy_cloneJspbArray(a, module$contents$jspb$internal_copy_convertToStructuredCloneableFormat, void 0, void 0, false)
   }
   module$exports$jspb$internal_copy.cloneRaw = module$exports$jspb$internal_bytes.SUPPORTS_STRUCTURED_CLONE ? structuredClone : function (a) {
     return module$contents$jspb$internal_copy_cloneToStructuredCloneableFormat(a)
@@ -9748,7 +9748,7 @@
         if (d & module$exports$jspb$internal_array_state.ArrayStateFlags.IS_IMMUTABLE_ARRAY) return a;
         module$contents$jspb$internal_assertArrayInvariants(a);
         return b && module$contents$jspb$internal_immutability_canMarkImmutableInPlaceIfParentIsOwned(d) ? ((0, module$exports$jspb$internal_array_state.setArrayState)(a, (d | module$exports$jspb$internal_array_state.ArrayStateFlags.IS_IMMUTABLE_ARRAY | module$exports$jspb$internal_array_state.ArrayStateFlags.MUTABLE_REFERENCES_ARE_OWNED) & ~(module$exports$jspb$internal_array_state.ArrayStateFlags.IS_API_FORMATTED | module$exports$jspb$internal_array_state.ArrayStateFlags.STRING_FORMATTED | module$exports$jspb$internal_array_state.ArrayStateFlags.GBIGINT_FORMATTED)),
-          a) : module$contents$jspb$internal_copy_cloneJspbArray(a, module$contents$jspb$internal_immutability_copyImmutableFieldValue, d & module$exports$jspb$internal_array_state.ArrayStateFlags.IS_API_FORMATTED ? module$contents$jspb$internal_array_state_copyArrayBitsAndMaybeFreezeForCloneImmutable : c, !0, !0)
+          a) : module$contents$jspb$internal_copy_cloneJspbArray(a, module$contents$jspb$internal_immutability_copyImmutableFieldValue, d & module$exports$jspb$internal_array_state.ArrayStateFlags.IS_API_FORMATTED ? module$contents$jspb$internal_array_state_copyArrayBitsAndMaybeFreezeForCloneImmutable : c, true, true)
       }
       return module$contents$jspb$internal_isMessage(a) ? module$contents$jspb$internal_immutability_copyImmutable(a) : a instanceof module$exports$jspb$internal_map.JspbMap ? a.arrayState & module$exports$jspb$internal_array_state.ArrayStateFlags.IS_IMMUTABLE_ARRAY ?
         a : a.buildNewFromArray(module$contents$jspb$internal_array_state_markArrayImmutable(a.toArrayInternalUnsorted(module$contents$jspb$internal_immutability_copyImmutableFieldValue))) : a
@@ -9759,13 +9759,13 @@
     goog.asserts.assert(module$contents$jspb$internal_isMessage(a));
     var b = a.internalArray_,
       c = (0, module$exports$jspb$internal_array_state.getMessageArrayState)(b);
-    return c & module$exports$jspb$internal_array_state.ArrayStateFlags.IS_IMMUTABLE_ARRAY ? a : module$contents$jspb$internal_immutability_copyArrayToMessageWithImmutableFields(a, b, c, !0)
+    return c & module$exports$jspb$internal_array_state.ArrayStateFlags.IS_IMMUTABLE_ARRAY ? a : module$contents$jspb$internal_immutability_copyArrayToMessageWithImmutableFields(a, b, c, true)
   }
 
   function module$contents$jspb$internal_immutability_copyMutableWithImmutableFields(a) {
     goog.asserts.assert(module$contents$jspb$internal_isMessage(a));
     var b = a.internalArray_;
-    return module$contents$jspb$internal_immutability_copyArrayToMessageWithImmutableFields(a, b, (0, module$exports$jspb$internal_array_state.getMessageArrayState)(b), !1)
+    return module$contents$jspb$internal_immutability_copyArrayToMessageWithImmutableFields(a, b, (0, module$exports$jspb$internal_array_state.getMessageArrayState)(b), false)
   }
 
   function module$contents$jspb$internal_immutability_copyArrayToMessageWithImmutableFields(a, b, c, d) {
@@ -9797,12 +9797,12 @@
   }
 
   function module$contents$jspb$internal_immutability_recursiveMarkMessageImmutable(a) {
-    module$contents$jspb$internal_immutability_recursiveMarkArrayImmutable(a.internalArray_, !0);
+    module$contents$jspb$internal_immutability_recursiveMarkArrayImmutable(a.internalArray_, true);
     return a
   }
 
   function module$contents$jspb$internal_immutability_recursiveMarkMapImmutable(a) {
-    a.callToMutableOnAccess = !1;
+    a.callToMutableOnAccess = false;
     a.valueCtor && a.forEach(module$contents$jspb$internal_immutability_recursiveMarkMessageImmutable);
     a.arrayState |= module$exports$jspb$internal_array_state.ArrayStateFlags.IS_IMMUTABLE_ARRAY
   }
@@ -9831,13 +9831,13 @@
   function module$contents$jspb$internal_immutability_messageToMutable(a) {
     var b = a.internalArray_,
       c = (0, module$exports$jspb$internal_array_state.getMessageArrayState)(b);
-    return c & module$exports$jspb$internal_array_state.ArrayStateFlags.IS_IMMUTABLE_ARRAY ? module$contents$jspb$internal_immutability_copyArrayToMessageWithImmutableFields(a, b, c, !1) : a
+    return c & module$exports$jspb$internal_array_state.ArrayStateFlags.IS_IMMUTABLE_ARRAY ? module$contents$jspb$internal_immutability_copyArrayToMessageWithImmutableFields(a, b, c, false) : a
   }
 
   function module$contents$jspb$internal_immutability_messageToImmutable(a) {
     var b = a.internalArray_,
       c = (0, module$exports$jspb$internal_array_state.getMessageArrayState)(b);
-    return c & module$exports$jspb$internal_array_state.ArrayStateFlags.IS_IMMUTABLE_ARRAY ? a : module$contents$jspb$internal_immutability_copyArrayToMessageWithImmutableFields(a, b, c, !0)
+    return c & module$exports$jspb$internal_array_state.ArrayStateFlags.IS_IMMUTABLE_ARRAY ? a : module$contents$jspb$internal_immutability_copyArrayToMessageWithImmutableFields(a, b, c, true)
   }
 
   function module$contents$jspb$internal_immutability_freezeIfApiFormattedAndImmutable(a) {
@@ -9876,8 +9876,8 @@
   }
 
   function module$contents$jspb_internal_adapters_needsApiFormatting(a, b, c, d) {
-    if (!module$contents$jspb$internal_array_state_hasFlagBit(b, module$exports$jspb$internal_array_state.ArrayStateFlags.IS_API_FORMATTED)) return !0;
-    if (c == null) return !1;
+    if (!module$contents$jspb$internal_array_state_hasFlagBit(b, module$exports$jspb$internal_array_state.ArrayStateFlags.IS_API_FORMATTED)) return true;
+    if (c == null) return false;
     (0, goog.asserts.assert)(c === module$exports$jspb$internal_array_state.TypeSpecificApiFormat.LEGACY || c === module$exports$jspb$internal_array_state.ArrayStateFlags.STRING_FORMATTED || c === module$exports$jspb$internal_array_state.ArrayStateFlags.GBIGINT_FORMATTED, "Expected format type to be one of legacy, string, or gbigint, but got " +
       c);
     !d && c === module$exports$jspb$internal_array_state.TypeSpecificApiFormat.LEGACY && (module$contents$jspb$internal_array_state_hasFlagBit(b, module$exports$jspb$internal_array_state.ArrayStateFlags.STRING_FORMATTED) || module$contents$jspb$internal_array_state_hasFlagBit(b, module$exports$jspb$internal_array_state.ArrayStateFlags.GBIGINT_FORMATTED)) && module$contents$jspb$internal_options_getAsyncThrowIfStringTypedInt64FieldDowngrade() && (a.constructor[module$exports$jspb$internal_symbols.STRING_TYPE_DOWNGRADES_SYMBOL] =
@@ -10044,24 +10044,24 @@
   };
   jspb_internal_adapters.getRepeatedFieldForBinary = function (a, b, c) {
     c = c === void 0 ? !1 : c;
-    return module$contents$jspb_internal_adapters_assertArrayReturnedSafely(module$contents$jspb_internal_adapters_getRepeatedFieldInternal(a, (0, module$exports$jspb$internal_array_state.getMessageArrayState)(a), b, module$contents$jspb_internal_adapters_RepeatedFieldShareMode.CALLER_DOESNT_RETURN_ARRAY, c), a, !1, !0)
+    return module$contents$jspb_internal_adapters_assertArrayReturnedSafely(module$contents$jspb_internal_adapters_getRepeatedFieldInternal(a, (0, module$exports$jspb$internal_array_state.getMessageArrayState)(a), b, module$contents$jspb_internal_adapters_RepeatedFieldShareMode.CALLER_DOESNT_RETURN_ARRAY, c), a, false, true)
   };
   jspb_internal_adapters.getRepeatedFieldUnformattedForImmutableJS = function (a, b) {
     a = a.internalArray_;
-    return module$contents$jspb_internal_adapters_assertArrayReturnedSafely(module$contents$jspb_internal_adapters_getRepeatedFieldInternal(a, (0, module$exports$jspb$internal_array_state.getMessageArrayState)(a), b, module$contents$jspb_internal_adapters_RepeatedFieldShareMode.DEFAULT, !1), a, !0)
+    return module$contents$jspb_internal_adapters_assertArrayReturnedSafely(module$contents$jspb_internal_adapters_getRepeatedFieldInternal(a, (0, module$exports$jspb$internal_array_state.getMessageArrayState)(a), b, module$contents$jspb_internal_adapters_RepeatedFieldShareMode.DEFAULT, false), a, true)
   };
   jspb_internal_adapters.getApiFormattedRepeatedFieldForImmutableJS = function (a, b, c, d) {
-    return module$contents$jspb_internal_adapters_getApiFormattedRepeatedField(a, b, c, d === void 0 || d ? module$contents$jspb_internal_adapters_RepeatedArrayReturnType.FROZEN : module$contents$jspb_internal_adapters_RepeatedArrayReturnType.UNFROZEN, !1, !0)
+    return module$contents$jspb_internal_adapters_getApiFormattedRepeatedField(a, b, c, d === void 0 || d ? module$contents$jspb_internal_adapters_RepeatedArrayReturnType.FROZEN : module$contents$jspb_internal_adapters_RepeatedArrayReturnType.UNFROZEN, false, true)
   };
   jspb_internal_adapters.getRepeatedWrapperCount = function (a, b, c, d) {
     d = d === void 0 ? !1 : d;
     a = a.internalArray_;
-    return module$contents$jspb_internal_adapters_getRepeatedWrapperFieldInternal(a, (0, module$exports$jspb$internal_array_state.getMessageArrayState)(a), b, c, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, d, !0).length
+    return module$contents$jspb_internal_adapters_getRepeatedWrapperFieldInternal(a, (0, module$exports$jspb$internal_array_state.getMessageArrayState)(a), b, c, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, d, true).length
   };
   jspb_internal_adapters.getRepeatedIndexedReadonlyWrapper = function (a, b, c, d, e) {
     e = e === void 0 ? !1 : e;
     a = a.internalArray_;
-    b = module$contents$jspb_internal_adapters_getRepeatedWrapperFieldInternal(a, (0, module$exports$jspb$internal_array_state.getMessageArrayState)(a), c, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, e, !0);
+    b = module$contents$jspb_internal_adapters_getRepeatedWrapperFieldInternal(a, (0, module$exports$jspb$internal_array_state.getMessageArrayState)(a), c, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, e, true);
     module$contents$jspb$internal_checkRepeatedIndexInRangeForGet(b, d);
     return b[d]
   };
@@ -10075,7 +10075,7 @@
     a = a.internalArray_;
     var f = (0, module$exports$jspb$internal_array_state.getMessageArrayState)(a);
     module$contents$jspb$internal_checkNotImmutableState(f);
-    b = module$contents$jspb_internal_adapters_getRepeatedWrapperFieldInternal(a, f, c, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.UNFROZEN, e, !0);
+    b = module$contents$jspb_internal_adapters_getRepeatedWrapperFieldInternal(a, f, c, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.UNFROZEN, e, true);
     module$contents$jspb$internal_checkRepeatedIndexInRangeForGet(b, d);
     e = b[d];
     c = module$contents$jspb$internal_immutability_messageToMutable(e);
@@ -10098,7 +10098,7 @@
     a = a.internalArray_;
     var d = (0, module$exports$jspb$internal_array_state.getMessageArrayState)(a),
       e = jspb_internal_adapters.getFieldNullableInternal(a, d, b, c),
-      f = module$contents$jspb$internal_bytesAsByteString(e, !0, !0, !!(d & (module$exports$jspb$internal_array_state.ArrayStateFlags.IS_IMMUTABLE_ARRAY | module$exports$jspb$internal_array_state.ArrayStateFlags.MUTABLE_REFERENCES_ARE_OWNED)));
+      f = module$contents$jspb$internal_bytesAsByteString(e, true, !0, !!(d & (module$exports$jspb$internal_array_state.ArrayStateFlags.IS_IMMUTABLE_ARRAY | module$exports$jspb$internal_array_state.ArrayStateFlags.MUTABLE_REFERENCES_ARE_OWNED)));
     f != null && f !== e && module$contents$jspb_internal_adapters_setFieldIgnoringImmutabilityInternal(a,
       d, b, f, c);
     return f
@@ -10140,7 +10140,7 @@
       m), Object.freeze(d)) : (c = module$contents$jspb_internal_adapters_shouldAsyncThrowOnMutation(l, m, d), (l === module$contents$jspb_internal_adapters_RepeatedArrayReturnType.UNFROZEN || c) && module$contents$jspb_internal_adapters_isFrozenByFlags(m, d) && (d = module$contents$jspb$internal_operations_slice(d), m = module$contents$jspb_internal_adapters_setFlagsForSlicedArray(m, k), m = module$contents$jspb_internal_adapters_updateOwnedState(m, k, f), (0, module$exports$jspb$internal_array_state.setArrayState)(d, m), k = module$contents$jspb_internal_adapters_setFieldIgnoringImmutabilityInternal(h,
         k, b, d, e)), module$contents$jspb_internal_adapters_isFrozenByFlags(m, d) || (b = m, m = module$contents$jspb_internal_adapters_updateOwnedState(m, k, f), m !== b && (0, module$exports$jspb$internal_array_state.setArrayState)(d, m)), c && (q = (0, module$exports$jspb$internal_array_proxy.setupAsyncThrowingArray)(d)));
     module$contents$jspb$internal_assertRepeated64BitIntegerFieldApiFormattingInvariants(d);
-    f || module$contents$jspb_internal_adapters_assertArrayReturnedSafely(d, h, !1, f);
+    f || module$contents$jspb_internal_adapters_assertArrayReturnedSafely(d, h, false, f);
     return q || d
   }
 
@@ -10170,11 +10170,11 @@
   }
 
   function module$contents$jspb_internal_adapters_coerceToByteStringAllowZeroCopy(a) {
-    return module$contents$jspb$internal_bytesAsByteString(a, !0, !0, !0)
+    return module$contents$jspb$internal_bytesAsByteString(a, true, !0, true)
   }
 
   function module$contents$jspb_internal_adapters_coerceToByteString(a) {
-    return module$contents$jspb$internal_bytesAsByteString(a, !0, !0, !1)
+    return module$contents$jspb$internal_bytesAsByteString(a, true, !0, false)
   }
   jspb_internal_adapters.getRepeatedBytesField = function (a, b, c, d, e) {
     var f = !!((0, module$exports$jspb$internal_array_state.getMessageArrayState)(a.internalArray_) & (module$exports$jspb$internal_array_state.ArrayStateFlags.IS_IMMUTABLE_ARRAY | module$exports$jspb$internal_array_state.ArrayStateFlags.MUTABLE_REFERENCES_ARE_OWNED));
@@ -10200,7 +10200,7 @@
 
   function module$contents$jspb_internal_adapters_getReadonlyMapFieldInternal(a, b, c, d, e, f, g) {
     var h = b & module$exports$jspb$internal_array_state.ArrayStateFlags.IS_IMMUTABLE_ARRAY,
-      k = !1;
+      k = false;
     if (c == null) {
       if (h) return module$contents$jspb_internal_adapters_assertMapReturnedSafely(module$contents$jspb$internal_map_getImmutableEmptyMap(), a);
       c = module$contents$jspb$internal_operations_logNewArray([])
@@ -10216,7 +10216,7 @@
     k || (module$contents$jspb$internal_array_state_isConstructed(c) ?
       module$contents$jspb$internal_array_state_markShared(c) : module$exports$jspb$internal_array_state.ArrayStateFlags.MUTABLE_REFERENCES_ARE_OWNED & b && module$contents$jspb$internal_array_state_markMutableReferencesAreOwned(c));
     e = new module$exports$jspb$internal_map.JspbMap(c, e, f, g);
-    module$contents$jspb_internal_adapters_setFieldIgnoringImmutabilityInternal(a, b, d, e, !1);
+    module$contents$jspb_internal_adapters_setFieldIgnoringImmutabilityInternal(a, b, d, e, false);
     return module$contents$jspb_internal_adapters_assertMapReturnedSafely(e, a)
   }
 
@@ -10287,9 +10287,9 @@
     e = !m && module$contents$jspb_internal_adapters_shouldSliceRepeatedFieldArray(e, f);
     if (module$contents$jspb_internal_adapters_needsApiFormatting(a, k))
       for (module$exports$jspb$internal_options.DETAILED_JSPB_ASSERTS && (0, goog.asserts.assert)(k === module$exports$jspb$internal_array_state.DEFAULT_ARRAY_STATE), k = module$exports$jspb$internal_array_state.ArrayStateFlags.IS_REPEATED_FIELD |
-        module$exports$jspb$internal_array_state.ArrayStateFlags.IS_API_FORMATTED | module$exports$jspb$internal_array_state.ArrayStateFlags.ONLY_IMMUTABLE_VALUES_IF_OWNED, m && (c = module$contents$jspb$internal_operations_slice(c), l = 0, k = module$contents$jspb_internal_adapters_setFlagsForSlicedArray(k, h), k = module$contents$jspb_internal_adapters_updateOwnedState(k, h, !0)), m = 0; m < c.length; m++) c[m] = d(c[m]);
+        module$exports$jspb$internal_array_state.ArrayStateFlags.IS_API_FORMATTED | module$exports$jspb$internal_array_state.ArrayStateFlags.ONLY_IMMUTABLE_VALUES_IF_OWNED, m && (c = module$contents$jspb$internal_operations_slice(c), l = 0, k = module$contents$jspb_internal_adapters_setFlagsForSlicedArray(k, h), k = module$contents$jspb_internal_adapters_updateOwnedState(k, h, true)), m = 0; m < c.length; m++) c[m] = d(c[m]);
     e && (c = module$contents$jspb$internal_operations_slice(c), l = 0, k = module$contents$jspb_internal_adapters_setFlagsForSlicedArray(k,
-      h), k = module$contents$jspb_internal_adapters_updateOwnedState(k, h, !0));
+      h), k = module$contents$jspb_internal_adapters_updateOwnedState(k, h, true));
     k !== l && (0, module$exports$jspb$internal_array_state.setArrayState)(c, k);
     module$contents$jspb$internal_assertArrayInvariants(c);
     module$contents$jspb_internal_adapters_setFieldIgnoringImmutabilityInternal(g, h, b, c, f);
@@ -10329,7 +10329,7 @@
   }
 
   function module$contents$jspb_internal_adapters_addAllToRepeatedFieldImpl(a, b, c, d, e) {
-    return module$contents$jspb_internal_adapters_spliceRepeatedPrimitiveField(a, b, c, d, void 0, e, void 0, void 0, !0)
+    return module$contents$jspb_internal_adapters_spliceRepeatedPrimitiveField(a, b, c, d, void 0, e, void 0, void 0, true)
   }
   jspb_internal_adapters.addToRepeatedFieldForBinary = function (a, b, c, d) {
     var e = (0, module$exports$jspb$internal_array_state.getMessageArrayState)(a);
@@ -10410,7 +10410,7 @@
     var e = (0, module$exports$jspb$internal_array_state.getMessageArrayState)(a);
     module$contents$jspb$internal_checkNotImmutableState(e);
     var f = jspb_internal_adapters.getFieldNullableInternal(a, e, c, d);
-    b = module$contents$jspb$internal_immutability_messageToMutable(module$contents$jspb$internal_accessor_helpers_messageFromInlineStorage(f, b, !0, e));
+    b = module$contents$jspb$internal_immutability_messageToMutable(module$contents$jspb$internal_accessor_helpers_messageFromInlineStorage(f, b, true, e));
     f !== b && module$contents$jspb_internal_adapters_setFieldIgnoringImmutabilityInternal(a,
       e, c, b, d);
     return b
@@ -10426,7 +10426,7 @@
     if (f != null && module$contents$jspb$internal_isMessage(f)) return b = module$contents$jspb$internal_immutability_messageToMutable(f), b !== f && module$contents$jspb_internal_adapters_setFieldIgnoringImmutabilityInternal(a, e, c, b, d), b.internalArray_;
     if (Array.isArray(f)) {
       var g = (0, module$exports$jspb$internal_array_state.getArrayState)(f);
-      g = g & module$exports$jspb$internal_array_state.ArrayStateFlags.IS_IMMUTABLE_ARRAY ? module$contents$jspb$internal_immutability_copyArrayWithImmutableFields(f, g, !1) : f;
+      g = g & module$exports$jspb$internal_array_state.ArrayStateFlags.IS_IMMUTABLE_ARRAY ? module$contents$jspb$internal_immutability_copyArrayWithImmutableFields(f, g, false) : f;
       g = module$contents$jspb$internal_construct_constructMessageArrayFromMetaForBinary(g, b)
     } else g = module$contents$jspb$internal_construct_constructMessageArrayFromMetaForBinary(void 0, b);
     g !== f && module$contents$jspb_internal_adapters_setFieldIgnoringImmutabilityInternal(a, e, c, g, d);
@@ -10437,7 +10437,7 @@
     a = a.internalArray_;
     var e = (0, module$exports$jspb$internal_array_state.getMessageArrayState)(a),
       f = jspb_internal_adapters.getFieldNullableInternal(a, e, c, d);
-    b = module$contents$jspb$internal_accessor_helpers_messageFromInlineStorage(f, b, !1, e);
+    b = module$contents$jspb$internal_accessor_helpers_messageFromInlineStorage(f, b, false, e);
     (f = b !== f && b != null) && module$contents$jspb_internal_adapters_setFieldIgnoringImmutabilityInternal(a, e, c, b, d);
     return module$contents$jspb_internal_adapters_assertMessageReturnedSafely(b,
       a, f)
@@ -10469,7 +10469,7 @@
     var d = a.internalArray_,
       e = (0, module$exports$jspb$internal_array_state.getMessageArrayState)(d);
     a = !!(e & module$exports$jspb$internal_array_state.ArrayStateFlags.IS_IMMUTABLE_ARRAY);
-    b = module$contents$jspb_internal_adapters_getRepeatedWrapperFieldInternal(d, e, b, c, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, !1, !0);
+    b = module$contents$jspb_internal_adapters_getRepeatedWrapperFieldInternal(d, e, b, c, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, false, true);
     if (a) return b;
     a = (0, module$exports$jspb$internal_array_state.getArrayState)(b);
     if (a & module$exports$jspb$internal_array_state.ArrayStateFlags.IS_IMMUTABLE_ARRAY || a & module$exports$jspb$internal_array_state.ArrayStateFlags.MUTABLE_REFERENCES_ARE_OWNED && a & module$exports$jspb$internal_array_state.ArrayStateFlags.ONLY_IMMUTABLE_VALUES_IF_OWNED) return b;
@@ -10509,7 +10509,7 @@
     var e = module$contents$jspb$internal_array_state_hasFlagBit(c, module$exports$jspb$internal_array_state.ArrayStateFlags.IS_IMMUTABLE_ARRAY);
     e && (d = module$contents$jspb$internal_array_state_setFlagBit(d, module$exports$jspb$internal_array_state.ArrayStateFlags.IS_IMMUTABLE_ARRAY));
     for (var f = !e, g = !0, h = 0, k = 0; h < a.length; h++) {
-      var l = module$contents$jspb$internal_accessor_helpers_messageFromInlineStorage(a[h], b, !1, d);
+      var l = module$contents$jspb$internal_accessor_helpers_messageFromInlineStorage(a[h], b, false, d);
       if (l instanceof b) {
         if (!e) {
           var m = module$contents$jspb$internal_isImmutableMessage(l);
@@ -10548,7 +10548,7 @@
     a = a.internalArray_;
     var f = (0, module$exports$jspb$internal_array_state.getMessageArrayState)(a),
       g = module$contents$jspb$internal_array_state_hasFlagBit(f, module$exports$jspb$internal_array_state.ArrayStateFlags.IS_IMMUTABLE_ARRAY);
-    return module$contents$jspb_internal_adapters_getRepeatedWrapperFieldInternal(a, f, b, c, d, e, !1, !g)
+    return module$contents$jspb_internal_adapters_getRepeatedWrapperFieldInternal(a, f, b, c, d, e, false, !g)
   };
   jspb_internal_adapters.setWrapperField = function (a, b, c, d, e) {
     d != null ? module$contents$jspb$internal_accessor_helpers_checkMessageType(d, (0, goog.asserts.assertExists)(b)) : d = void 0;
@@ -10585,7 +10585,7 @@
     }
     m || (k = module$contents$jspb$internal_array_state_setFlagBit(k, module$exports$jspb$internal_array_state.ArrayStateFlags.IS_REPEATED_FIELD | module$exports$jspb$internal_array_state.ArrayStateFlags.IS_API_FORMATTED), k = module$contents$jspb$internal_array_state_setFlagBitTo(k, module$exports$jspb$internal_array_state.ArrayStateFlags.ONLY_MUTABLE_VALUES, p), k = module$contents$jspb$internal_array_state_setFlagBitTo(k,
       module$exports$jspb$internal_array_state.ArrayStateFlags.ONLY_IMMUTABLE_VALUES_IF_OWNED, q));
-    if (e || n && k !== l) d = module$contents$jspb$internal_operations_slice(d), l = 0, k = module$contents$jspb_internal_adapters_setFlagsForSlicedArray(k, h), k = module$contents$jspb_internal_adapters_updateOwnedState(k, h, !0);
+    if (e || n && k !== l) d = module$contents$jspb$internal_operations_slice(d), l = 0, k = module$contents$jspb_internal_adapters_setFlagsForSlicedArray(k, h), k = module$contents$jspb_internal_adapters_updateOwnedState(k, h, true);
     k !== l && (0, module$exports$jspb$internal_array_state.setArrayState)(d, k);
     module$contents$jspb$internal_assertArrayInvariants(d);
     module$contents$jspb_internal_adapters_setFieldIgnoringImmutabilityInternal(g,
@@ -10609,7 +10609,7 @@
   function module$contents$jspb_internal_adapters_spliceRepeatedPrimitiveField(a, b, c, d, e, f, g, h, k) {
     var l = (0, module$exports$jspb$internal_array_state.getMessageArrayState)(a.internalArray_);
     module$contents$jspb$internal_checkNotImmutableState(l);
-    b = f(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.UNFROZEN, g, !0);
+    b = f(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.UNFROZEN, g, true);
     f = (0, module$exports$jspb$internal_array_state.getArrayState)(b);
     var m;
     f = (m = module$contents$jspb$internal_array_state_getTypeSpecificApiFormat(f)) != null ? m : module$exports$jspb$internal_array_state.TypeSpecificApiFormat.LEGACY;
@@ -10627,7 +10627,7 @@
     a = a.internalArray_;
     var h = (0, module$exports$jspb$internal_array_state.getMessageArrayState)(a);
     module$contents$jspb$internal_checkNotImmutableState(h);
-    b = module$contents$jspb_internal_adapters_getRepeatedWrapperFieldInternal(a, h, c, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.UNFROZEN, f, !0);
+    b = module$contents$jspb_internal_adapters_getRepeatedWrapperFieldInternal(a, h, c, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.UNFROZEN, f, true);
     f = d != null ? module$contents$jspb$internal_accessor_helpers_checkMessageType(d, c) : new c;
     g && ((0, goog.asserts.assert)(g ===
       1), (0, goog.asserts.assertNumber)(e), module$contents$jspb$internal_checkRepeatedIndexInRangeForSet(b, e), module$contents$jspb$internal_accessor_helpers_checkMessageType(d, c));
@@ -10662,7 +10662,7 @@
     var e = a.internalArray_,
       f = (0, module$exports$jspb$internal_array_state.getMessageArrayState)(e);
     module$contents$jspb$internal_checkNotImmutableState(f);
-    b = module$contents$jspb_internal_adapters_getRepeatedWrapperFieldInternal(e, f, c, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.UNFROZEN, !1, !0);
+    b = module$contents$jspb_internal_adapters_getRepeatedWrapperFieldInternal(e, f, c, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.UNFROZEN, false, true);
     f = e = 0;
     if (Array.isArray(d)) {
       d = (0, module$exports$jspb$internal_array_proxy.getTargetArray)(d);
@@ -10680,15 +10680,15 @@
   };
   jspb_internal_adapters.getInt64FieldNullable = function (a, b, c) {
     b = module$contents$jspb$internal_accessor_helpers_coerceToNullishInt64(jspb_internal_adapters.getFieldNullable(a, b, c));
-    module$contents$jspb_internal_adapters_asyncThrowIf64BitIntReturnTypeMismatches(a, b, !1);
+    module$contents$jspb_internal_adapters_asyncThrowIf64BitIntReturnTypeMismatches(a, b, false);
     return b
   };
   jspb_internal_adapters.getInt64FieldNullable_asString = function (a, b, c) {
-    return module$contents$jspb$internal_accessor_helpers_coerceToNullishInt64String(jspb_internal_adapters.getFieldNullable(a, b, c), !0)
+    return module$contents$jspb$internal_accessor_helpers_coerceToNullishInt64String(jspb_internal_adapters.getFieldNullable(a, b, c), true)
   };
   jspb_internal_adapters.getInt64StringFieldNullable = function (a, b, c) {
     b = module$contents$jspb$internal_accessor_helpers_coerceToNullishInt64String(jspb_internal_adapters.getFieldNullable(a, b, c));
-    module$contents$jspb_internal_adapters_asyncThrowIf64BitIntReturnTypeMismatches(a, b, !0);
+    module$contents$jspb_internal_adapters_asyncThrowIf64BitIntReturnTypeMismatches(a, b, true);
     return b
   };
   jspb_internal_adapters.getInt64GbigintFieldNullable = function (a, b, c) {
@@ -10696,15 +10696,15 @@
   };
   jspb_internal_adapters.getUint64FieldNullable = function (a, b, c) {
     b = module$contents$jspb$internal_accessor_helpers_coerceToNullishUint64(jspb_internal_adapters.getFieldNullable(a, b, c));
-    module$contents$jspb_internal_adapters_asyncThrowIf64BitIntReturnTypeMismatches(a, b, !1);
+    module$contents$jspb_internal_adapters_asyncThrowIf64BitIntReturnTypeMismatches(a, b, false);
     return b
   };
   jspb_internal_adapters.getUint64FieldNullable_asString = function (a, b, c) {
-    return module$contents$jspb$internal_accessor_helpers_coerceToNullishUint64String(jspb_internal_adapters.getFieldNullable(a, b, c), !0)
+    return module$contents$jspb$internal_accessor_helpers_coerceToNullishUint64String(jspb_internal_adapters.getFieldNullable(a, b, c), true)
   };
   jspb_internal_adapters.getUint64StringFieldNullable = function (a, b, c) {
     b = module$contents$jspb$internal_accessor_helpers_coerceToNullishUint64String(jspb_internal_adapters.getFieldNullable(a, b, c));
-    module$contents$jspb_internal_adapters_asyncThrowIf64BitIntReturnTypeMismatches(a, b, !0);
+    module$contents$jspb_internal_adapters_asyncThrowIf64BitIntReturnTypeMismatches(a, b, true);
     return b
   };
   jspb_internal_adapters.getUint64GbigintFieldNullable = function (a, b, c) {
@@ -10712,7 +10712,7 @@
   };
   jspb_internal_adapters.getRepeatedInt64Field = function (a, b, c, d, e) {
     b = module$contents$jspb_internal_adapters_getApiFormattedRepeatedField(a, b, module$contents$jspb$internal_accessor_helpers_coerceToNullishInt64, c, d, e, module$exports$jspb$internal_array_state.TypeSpecificApiFormat.LEGACY);
-    e || module$contents$jspb_internal_adapters_asyncThrowIfRepeated64BitIntReturnTypeMismatches(a, b, !1);
+    e || module$contents$jspb_internal_adapters_asyncThrowIfRepeated64BitIntReturnTypeMismatches(a, b, false);
     return b
   };
   jspb_internal_adapters.getRepeatedInt64GbigintField = function (a, b, c, d, e) {
@@ -10720,24 +10720,24 @@
   };
 
   function module$contents$jspb_internal_adapters_coerceToNullishInt64StringWithForcedTypeChecking(a) {
-    return module$contents$jspb$internal_accessor_helpers_coerceToNullishInt64String(a, !0)
+    return module$contents$jspb$internal_accessor_helpers_coerceToNullishInt64String(a, true)
   }
   jspb_internal_adapters.getRepeatedInt64Field_asString = function (a, b, c, d, e) {
     return module$contents$jspb_internal_adapters_getApiFormattedRepeatedField(a, b, module$contents$jspb_internal_adapters_coerceToNullishInt64StringWithForcedTypeChecking, c, d, e, module$exports$jspb$internal_array_state.TypeSpecificApiFormat.STRING)
   };
   jspb_internal_adapters.getRepeatedInt64StringField = function (a, b, c, d, e) {
     b = module$contents$jspb_internal_adapters_getApiFormattedRepeatedField(a, b, module$contents$jspb$internal_accessor_helpers_coerceToNullishInt64String, c, d, e, module$exports$jspb$internal_array_state.TypeSpecificApiFormat.LEGACY);
-    e || module$contents$jspb_internal_adapters_asyncThrowIfRepeated64BitIntReturnTypeMismatches(a, b, !0);
+    e || module$contents$jspb_internal_adapters_asyncThrowIfRepeated64BitIntReturnTypeMismatches(a, b, true);
     return b
   };
   jspb_internal_adapters.getRepeatedUint64Field = function (a, b, c, d, e) {
     b = module$contents$jspb_internal_adapters_getApiFormattedRepeatedField(a, b, module$contents$jspb$internal_accessor_helpers_coerceToNullishUint64, c, d, e, module$exports$jspb$internal_array_state.TypeSpecificApiFormat.LEGACY);
-    e || module$contents$jspb_internal_adapters_asyncThrowIfRepeated64BitIntReturnTypeMismatches(a, b, !1);
+    e || module$contents$jspb_internal_adapters_asyncThrowIfRepeated64BitIntReturnTypeMismatches(a, b, false);
     return b
   };
 
   function module$contents$jspb_internal_adapters_coerceToNullishUint64StringWithForcedTypeChecking(a) {
-    return module$contents$jspb$internal_accessor_helpers_coerceToNullishUint64String(a, !0)
+    return module$contents$jspb$internal_accessor_helpers_coerceToNullishUint64String(a, true)
   }
   jspb_internal_adapters.getRepeatedUint64Field_asString = function (a, b, c, d, e) {
     return module$contents$jspb_internal_adapters_getApiFormattedRepeatedField(a, b, module$contents$jspb_internal_adapters_coerceToNullishUint64StringWithForcedTypeChecking, c, d, e, module$exports$jspb$internal_array_state.TypeSpecificApiFormat.STRING)
@@ -10747,7 +10747,7 @@
   };
   jspb_internal_adapters.getRepeatedUint64StringField = function (a, b, c, d, e) {
     b = module$contents$jspb_internal_adapters_getApiFormattedRepeatedField(a, b, module$contents$jspb$internal_accessor_helpers_coerceToNullishUint64String, c, d, e, module$exports$jspb$internal_array_state.TypeSpecificApiFormat.LEGACY);
-    e || module$contents$jspb_internal_adapters_asyncThrowIfRepeated64BitIntReturnTypeMismatches(a, b, !0);
+    e || module$contents$jspb_internal_adapters_asyncThrowIfRepeated64BitIntReturnTypeMismatches(a, b, true);
     return b
   };
 
@@ -10775,11 +10775,11 @@
   }
 
   function module$contents$jspb_internal_adapters_checkBytes(a) {
-    return module$contents$jspb$internal_bytesAsByteString(a, !1, !1, !1)
+    return module$contents$jspb$internal_bytesAsByteString(a, false, !1, false)
   }
 
   function module$contents$jspb_internal_adapters_checkNullishBytes(a) {
-    return module$contents$jspb$internal_bytesAsByteString(a, !1, !0, !1)
+    return module$contents$jspb$internal_bytesAsByteString(a, false, true, false)
   }
   var module$contents$jspb_internal_adapters_checkInt64String = module$contents$jspb$internal_accessor_helpers_checkInt64,
     module$contents$jspb_internal_adapters_checkUint64String = module$contents$jspb$internal_accessor_helpers_checkUint64,
@@ -10870,74 +10870,74 @@
     return module$contents$jspb_internal_adapters_getApiFormattedRepeatedField(a, b, module$contents$jspb$internal_accessor_helpers_coerceToNullishBoolean, c, d, e)
   };
   jspb_internal_adapters.getRepeatedIndexedBooleanField = function (a, b, c, d) {
-    a = jspb_internal_adapters.getRepeatedBooleanField(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, d, !0);
+    a = jspb_internal_adapters.getRepeatedBooleanField(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, d, true);
     module$contents$jspb$internal_checkRepeatedIndexInRangeForGet(a, c);
     return a[c]
   };
   jspb_internal_adapters.getRepeatedBooleanCount = function (a, b, c) {
-    return jspb_internal_adapters.getRepeatedBooleanField(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, c, !0).length
+    return jspb_internal_adapters.getRepeatedBooleanField(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, c, true).length
   };
   jspb_internal_adapters.getRepeatedInt32Field = function (a, b, c, d, e) {
     return module$contents$jspb_internal_adapters_getApiFormattedRepeatedField(a, b, module$contents$jspb$internal_accessor_helpers_coerceToNullishInt32, c, d, e)
   };
   jspb_internal_adapters.getRepeatedIndexedInt32Field = function (a, b, c, d) {
-    a = jspb_internal_adapters.getRepeatedInt32Field(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, d, !0);
+    a = jspb_internal_adapters.getRepeatedInt32Field(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, d, true);
     module$contents$jspb$internal_checkRepeatedIndexInRangeForGet(a, c);
     return a[c]
   };
   jspb_internal_adapters.getRepeatedInt32Count = function (a, b, c) {
-    return jspb_internal_adapters.getRepeatedInt32Field(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, c, !0).length
+    return jspb_internal_adapters.getRepeatedInt32Field(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, c, true).length
   };
   jspb_internal_adapters.getRepeatedUint32Field = function (a, b, c, d, e) {
     return module$contents$jspb_internal_adapters_getApiFormattedRepeatedField(a, b, module$contents$jspb$internal_accessor_helpers_coerceToNullishUint32, c, d, e)
   };
   jspb_internal_adapters.getRepeatedIndexedUint32Field = function (a, b, c, d) {
-    a = jspb_internal_adapters.getRepeatedUint32Field(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, d, !0);
+    a = jspb_internal_adapters.getRepeatedUint32Field(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, d, true);
     module$contents$jspb$internal_checkRepeatedIndexInRangeForGet(a, c);
     return a[c]
   };
   jspb_internal_adapters.getRepeatedUint32Count = function (a, b, c) {
-    return jspb_internal_adapters.getRepeatedUint32Field(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, c, !0).length
+    return jspb_internal_adapters.getRepeatedUint32Field(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, c, true).length
   };
   jspb_internal_adapters.getRepeatedIndexedInt64Field = function (a, b, c, d) {
-    a = jspb_internal_adapters.getRepeatedInt64Field(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, d, !0);
+    a = jspb_internal_adapters.getRepeatedInt64Field(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, d, true);
     module$contents$jspb$internal_checkRepeatedIndexInRangeForGet(a, c);
     return a[c]
   };
   jspb_internal_adapters.getRepeatedInt64Count = function (a, b, c) {
-    return jspb_internal_adapters.getRepeatedInt64Field(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, c, !0).length
+    return jspb_internal_adapters.getRepeatedInt64Field(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, c, true).length
   };
   jspb_internal_adapters.getRepeatedIndexedUint64Field = function (a, b, c, d) {
-    a = jspb_internal_adapters.getRepeatedUint64Field(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, d, !0);
+    a = jspb_internal_adapters.getRepeatedUint64Field(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, d, true);
     module$contents$jspb$internal_checkRepeatedIndexInRangeForGet(a, c);
     return a[c]
   };
   jspb_internal_adapters.getRepeatedUint64Count = function (a, b, c) {
-    return jspb_internal_adapters.getRepeatedUint64Field(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, c, !0).length
+    return jspb_internal_adapters.getRepeatedUint64Field(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, c, true).length
   };
   jspb_internal_adapters.getRepeatedIndexedInt64StringField = function (a, b, c, d) {
-    a = jspb_internal_adapters.getRepeatedInt64StringField(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, d, !0);
+    a = jspb_internal_adapters.getRepeatedInt64StringField(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, d, true);
     module$contents$jspb$internal_checkRepeatedIndexInRangeForGet(a, c);
     return a[c]
   };
   jspb_internal_adapters.getRepeatedInt64StringCount = function (a, b, c) {
-    return jspb_internal_adapters.getRepeatedInt64StringField(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, c, !0).length
+    return jspb_internal_adapters.getRepeatedInt64StringField(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, c, true).length
   };
   jspb_internal_adapters.getRepeatedIndexedUint64StringField = function (a, b, c, d) {
-    a = jspb_internal_adapters.getRepeatedUint64StringField(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, d, !0);
+    a = jspb_internal_adapters.getRepeatedUint64StringField(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, d, true);
     module$contents$jspb$internal_checkRepeatedIndexInRangeForGet(a, c);
     return a[c]
   };
   jspb_internal_adapters.getRepeatedUint64StringCount = function (a, b, c) {
-    return jspb_internal_adapters.getRepeatedUint64StringField(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, c, !0).length
+    return jspb_internal_adapters.getRepeatedUint64StringField(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, c, true).length
   };
   jspb_internal_adapters.getRepeatedIndexedInt64GbigintField = function (a, b, c, d) {
-    a = jspb_internal_adapters.getRepeatedInt64GbigintField(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, d, !0);
+    a = jspb_internal_adapters.getRepeatedInt64GbigintField(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, d, true);
     module$contents$jspb$internal_checkRepeatedIndexInRangeForGet(a, c);
     return a[c]
   };
   jspb_internal_adapters.getRepeatedIndexedUint64GbigintField = function (a, b, c, d) {
-    a = jspb_internal_adapters.getRepeatedUint64GbigintField(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, d, !0);
+    a = jspb_internal_adapters.getRepeatedUint64GbigintField(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, d, true);
     module$contents$jspb$internal_checkRepeatedIndexInRangeForGet(a, c);
     return a[c]
   };
@@ -10945,60 +10945,60 @@
     return module$contents$jspb_internal_adapters_getApiFormattedRepeatedField(a, b, module$contents$jspb$internal_accessor_helpers_coerceToNullishFloatingPoint, c, d, e)
   };
   jspb_internal_adapters.getRepeatedIndexedFloatingPointField = function (a, b, c, d) {
-    a = jspb_internal_adapters.getRepeatedFloatingPointField(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, d, !0);
+    a = jspb_internal_adapters.getRepeatedFloatingPointField(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, d, true);
     module$contents$jspb$internal_checkRepeatedIndexInRangeForGet(a, c);
     return a[c]
   };
   jspb_internal_adapters.getRepeatedFloatingPointCount = function (a, b, c) {
-    return jspb_internal_adapters.getRepeatedFloatingPointField(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, c, !0).length
+    return jspb_internal_adapters.getRepeatedFloatingPointField(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, c, true).length
   };
   jspb_internal_adapters.getRepeatedStringField = function (a, b, c, d, e) {
     return module$contents$jspb_internal_adapters_getApiFormattedRepeatedField(a, b, module$contents$jspb$internal_accessor_helpers_coerceToNullishString, c, d, e)
   };
   jspb_internal_adapters.getRepeatedIndexedStringField = function (a, b, c, d) {
-    a = jspb_internal_adapters.getRepeatedStringField(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, d, !0);
+    a = jspb_internal_adapters.getRepeatedStringField(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, d, true);
     module$contents$jspb$internal_checkRepeatedIndexInRangeForGet(a, c);
     return a[c]
   };
   jspb_internal_adapters.getRepeatedStringCount = function (a, b, c) {
-    return jspb_internal_adapters.getRepeatedStringField(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, c, !0).length
+    return jspb_internal_adapters.getRepeatedStringField(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, c, true).length
   };
   jspb_internal_adapters.getRepeatedIndexedBytesField = function (a, b, c, d) {
-    a = jspb_internal_adapters.getRepeatedBytesField(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, d, !0);
+    a = jspb_internal_adapters.getRepeatedBytesField(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, d, true);
     module$contents$jspb$internal_checkRepeatedIndexInRangeForGet(a, c);
     return a[c]
   };
   jspb_internal_adapters.getRepeatedBytesCount = function (a, b, c) {
-    return jspb_internal_adapters.getRepeatedBytesField(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, c, !0).length
+    return jspb_internal_adapters.getRepeatedBytesField(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, c, true).length
   };
   jspb_internal_adapters.getRepeatedEnumField = function (a, b, c, d, e) {
     return module$contents$jspb_internal_adapters_getApiFormattedRepeatedField(a, b, module$contents$jspb$internal_accessor_helpers_coerceToNullishEnum, c, d, e)
   };
   jspb_internal_adapters.getRepeatedIndexedEnumField = function (a, b, c, d) {
-    a = jspb_internal_adapters.getRepeatedEnumField(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, d, !0);
+    a = jspb_internal_adapters.getRepeatedEnumField(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, d, true);
     module$contents$jspb$internal_checkRepeatedIndexInRangeForGet(a, c);
     return a[c]
   };
   jspb_internal_adapters.getRepeatedEnumCount = function (a, b, c) {
-    return jspb_internal_adapters.getRepeatedEnumField(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, c, !0).length
+    return jspb_internal_adapters.getRepeatedEnumField(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, c, true).length
   };
   jspb_internal_adapters.getRepeatedIndexedInt64Field_asString = function (a, b, c, d) {
-    a = jspb_internal_adapters.getRepeatedInt64Field_asString(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, d, !0);
+    a = jspb_internal_adapters.getRepeatedInt64Field_asString(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, d, true);
     module$contents$jspb$internal_checkRepeatedIndexInRangeForGet(a, c);
     return a[c]
   };
   jspb_internal_adapters.getRepeatedIndexedUint64Field_asString = function (a, b, c, d) {
-    a = jspb_internal_adapters.getRepeatedUint64Field_asString(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, d, !0);
+    a = jspb_internal_adapters.getRepeatedUint64Field_asString(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, d, true);
     module$contents$jspb$internal_checkRepeatedIndexInRangeForGet(a, c);
     return a[c]
   };
   jspb_internal_adapters.getRepeatedIndexedInt64StringField_asString = function (a, b, c, d) {
-    a = jspb_internal_adapters.getRepeatedInt64Field_asString(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, d, !0);
+    a = jspb_internal_adapters.getRepeatedInt64Field_asString(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, d, true);
     module$contents$jspb$internal_checkRepeatedIndexInRangeForGet(a, c);
     return a[c]
   };
   jspb_internal_adapters.getRepeatedIndexedUint64StringField_asString = function (a, b, c, d) {
-    a = jspb_internal_adapters.getRepeatedUint64Field_asString(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, d, !0);
+    a = jspb_internal_adapters.getRepeatedUint64Field_asString(a, b, module$contents$jspb_internal_adapters_RepeatedArrayReturnType.EITHER_FROZEN_OR_UNFROZEN, d, true);
     module$contents$jspb$internal_checkRepeatedIndexInRangeForGet(a, c);
     return a[c]
   };
@@ -11243,7 +11243,7 @@
     return c == null ? a : jspb_internal_adapters.setBooleanField(a, b, c)
   };
   jspb_internal_adapters.setProto3BooleanField = function (a, b, c) {
-    return module$contents$jspb_internal_adapters_setFieldIgnoringDefault(a, b, module$contents$jspb$internal_accessor_helpers_checkNullishBoolean(c), !1)
+    return module$contents$jspb_internal_adapters_setFieldIgnoringDefault(a, b, module$contents$jspb$internal_accessor_helpers_checkNullishBoolean(c), false)
   };
   jspb_internal_adapters.setProto3BooleanFieldIfNotNullish = function (a, b, c) {
     return c == null ? a : jspb_internal_adapters.setProto3BooleanField(a, b, c)
@@ -13637,7 +13637,7 @@
     module$contents$jspb$binary$decoder_MAX_VARINT_SIZE = 10;
   module$exports$jspb$binary$decoder.BinaryDecoder = function (a, b, c, d) {
     this.bytes_ = null;
-    this.bytesAreImmutable_ = !1;
+    this.bytesAreImmutable_ = false;
     module$contents$jspb$binary$decoder_ASSUME_DATAVIEW_IS_FAST && (this.dataView_ = null);
     this.cursor_ = this.end_ = this.start_ = 0;
     this.init(a, b, c, d)
@@ -13661,7 +13661,7 @@
   };
   module$exports$jspb$binary$decoder.BinaryDecoder.prototype.clear = function () {
     this.bytes_ = null;
-    this.bytesAreImmutable_ = !1;
+    this.bytesAreImmutable_ = false;
     module$contents$jspb$binary$decoder_ASSUME_DATAVIEW_IS_FAST && (this.dataView_ = null);
     this.cursor_ = this.end_ = this.start_ = 0;
     this.aliasBytesFields = !1
@@ -13890,7 +13890,7 @@
   };
   module$exports$jspb$binary$decoder.BinaryDecoder.readDouble = function (a) {
     if (module$contents$jspb$binary$decoder_ASSUME_DATAVIEW_IS_FAST) {
-      var b = a.getDataView().getFloat64(a.cursor_, !0);
+      var b = a.getDataView().getFloat64(a.cursor_, true);
       a.advance(8);
       return b
     }
@@ -13908,7 +13908,7 @@
       for (this.cursor_ += d, a = new DataView(e.buffer, c, d), d = 0; ;) {
         e = d + 8;
         if (e > a.byteLength) break;
-        b.push(a.getFloat64(d, !0));
+        b.push(a.getFloat64(d, true));
         d = e
       } else if (module$contents$jspb$binary$decoder_OPTIMIZE_LITTLE_ENDIAN_MACHINES && module$contents$jspb$binary$decoder_isLittleEndian())
       for (this.cursor_ +=
@@ -13968,7 +13968,7 @@
   }
   var module$contents$jspb$binary$decoder_isLittleEndianCache = void 0,
     module$contents$jspb$binary$decoder_ASSUME_DATAVIEW_IS_FAST = goog.FEATURESET_YEAR >= 2019,
-    module$contents$jspb$binary$decoder_OPTIMIZE_LITTLE_ENDIAN_MACHINES = !0;
+    module$contents$jspb$binary$decoder_OPTIMIZE_LITTLE_ENDIAN_MACHINES = true;
   var module$exports$jspb$binary$reader = {},
     module$contents$jspb$binary$reader_ENFORCE_UTF8 = "ALWAYS";
   goog.asserts.assert(module$contents$jspb$binary$reader_ENFORCE_UTF8 === "DEPRECATED_PROTO3_ONLY" || module$contents$jspb$binary$reader_ENFORCE_UTF8 === "ALWAYS");
@@ -14037,7 +14037,7 @@
     this.decoder_.advance(a)
   };
   module$exports$jspb$binary$reader.BinaryReader.prototype.nextField = function () {
-    if (this.decoder_.atEnd()) return !1;
+    if (this.decoder_.atEnd()) return false;
     this.assertPriorFieldWasRead();
     this.fieldCursor_ = this.decoder_.getCursor();
     var a = module$exports$jspb$binary$decoder.BinaryDecoder.readUnsignedVarint32(this.decoder_),
@@ -14335,12 +14335,12 @@
     if (module$exports$jspb$binary$reader.UTF8_PARSING_ERRORS_ARE_FATAL) return this.readStringRequireUtf8();
     goog.asserts.assert(this.nextWireType_ == module$exports$jspb$BinaryConstants.WireType.DELIMITED);
     var a = module$exports$jspb$binary$decoder.BinaryDecoder.readUnsignedVarint32(this.decoder_);
-    return this.decoder_.readString(a, !1)
+    return this.decoder_.readString(a, false)
   };
   module$exports$jspb$binary$reader.BinaryReader.prototype.readStringRequireUtf8 = function () {
     goog.asserts.assert(this.nextWireType_ == module$exports$jspb$BinaryConstants.WireType.DELIMITED);
     var a = module$exports$jspb$binary$decoder.BinaryDecoder.readUnsignedVarint32(this.decoder_);
-    return this.decoder_.readString(a, !0)
+    return this.decoder_.readString(a, true)
   };
   module$exports$jspb$binary$reader.BinaryReader.prototype.readBytes = function () {
     goog.asserts.assert(this.nextWireType_ == module$exports$jspb$BinaryConstants.WireType.DELIMITED);
@@ -14496,7 +14496,7 @@
     if (a !== module$exports$jspb$internal.DESCRIPTOR_TYPE_REFERENCE_INTERNAL_ARG) throw goog.DEBUG ? Error("do not construct your own descriptors") : Error();
   };
   var module$exports$jspb$internal_pivot_selectors = {},
-    module$contents$jspb$internal_pivot_selectors_TEST_ONLY_USE_MEMORY_COST_PIVOT_SELECTOR_BY_DEFAULT = !1;
+    module$contents$jspb$internal_pivot_selectors_TEST_ONLY_USE_MEMORY_COST_PIVOT_SELECTOR_BY_DEFAULT = false;
 
   function module$contents$jspb$internal_pivot_selectors_defaultPivotSelector(a, b, c, d) {
     return module$contents$jspb$internal_pivot_selectors_TEST_ONLY_USE_MEMORY_COST_PIVOT_SELECTOR_BY_DEFAULT ? module$contents$jspb$internal_pivot_selectors_memoryCostPivotSelector(a, b, c, d) : module$contents$jspb$internal_pivot_selectors_noChangePivotSelector(a, b, c, d)
@@ -14583,7 +14583,7 @@
   function module$contents$jspb$internal_pivot_selectors_keyBytes(a) {
     return a >= 100 ? a >= 1E4 ? Math.ceil(Math.log10(1 + a)) : a < 1E3 ? 3 : 4 : a < 10 ? 1 : 2
   }
-  var module$contents$jspb$internal_pivot_selectors_checkPivotSelectorInstances = !0;
+  var module$contents$jspb$internal_pivot_selectors_checkPivotSelectorInstances = true;
 
   function module$contents$jspb$internal_pivot_selectors_setCheckPivotSelectorInstances(a) {
     module$contents$jspb$internal_pivot_selectors_checkPivotSelectorInstances = a
@@ -14726,7 +14726,7 @@
             for (m = [], p = d.getExtensionCount(l), n = 0; n < p; n++) m.push(d.getExtensionAtIndex(l, n));
           else m = d.hasExtension(l) ? l.ctor ? d.getReadonlyExtension(l) : d.getExtension(l) : void 0;
           m != null ? (a || (a = c.$extensions = {}), a[module$contents$jspb$internal_dump_formatFieldName_(k, h)] = module$contents$jspb$internal_dump_dump_(m, b)) : module$contents$jspb$internal_dump_dumpUnknownFields(b) && (k = l.fieldIndex,
-            l = (0, jspb_internal_adapters.getFieldNullable)(d, k, !0), l != null && (f = f || {}, f[k] = module$contents$jspb$internal_dump_dump_(l, b)))
+            l = (0, jspb_internal_adapters.getFieldNullable)(d, k, true), l != null && (f = f || {}, f[k] = module$contents$jspb$internal_dump_dump_(l, b)))
         }
     }
     if (module$contents$jspb$internal_dump_dumpUnknownFields(b)) {
@@ -14829,7 +14829,7 @@
   }
 
   function module$contents$jspb$internal_dump_isIndexedGetter(a, b) {
-    if (!module$contents$jspb$internal_startsWith(b, "get") || !a[b] || a[b].length !== 1) return !1;
+    if (!module$contents$jspb$internal_startsWith(b, "get") || !a[b] || a[b].length !== 1) return false;
     var c = /^get(.+)_asLegacyNumberOrString$/.exec(b);
     c && (b = "get" + (0, goog.asserts.assert)(c[1]));
     return !a["clear" + b.substring(3)]
@@ -15138,7 +15138,7 @@
     var b = this;
     goog.asserts.assert(module$contents$jspb_currentPivotSelector === void 0);
     try {
-      module$contents$jspb_inSerialize = !0;
+      module$contents$jspb_inSerialize = true;
       var c;
       module$exports$jspb$internal_options.DETAILED_JSPB_ASSERTS && (c = module$contents$jspb$internal_operations_withoutLogging(function () {
         return module$exports$jspb.Message.deserializeWithCtor(b.constructor, JSON.stringify(module$contents$jspb_toRawInternal(b), module$contents$jspb$internal_json_jspbJsonStringifyReplacer))
@@ -15168,45 +15168,45 @@
   module$exports$jspb.Message.prototype.getExtension = function (a) {
     goog.asserts.assertInstanceof(this, a.extendeeCtor);
     var b = goog.asserts.assertInstanceof(this, module$exports$jspb.Message);
-    b = a.ctor ? a.isRepeated ? a.getExtensionFn(b, a.ctor, a.fieldIndex, (0, jspb_internal_adapters.getRepeatedFieldReturnType)(void 0, !0), !0) : a.getExtensionFn(b, a.ctor, a.fieldIndex, !0) : a.isRepeated ? a.getExtensionFn(b, a.fieldIndex, (0, jspb_internal_adapters.getRepeatedFieldReturnType)(void 0, !0), !0) : a.getExtensionFn(b, a.fieldIndex,
-      a.defaultValue, !0);
+    b = a.ctor ? a.isRepeated ? a.getExtensionFn(b, a.ctor, a.fieldIndex, (0, jspb_internal_adapters.getRepeatedFieldReturnType)(void 0, true), true) : a.getExtensionFn(b, a.ctor, a.fieldIndex, true) : a.isRepeated ? a.getExtensionFn(b, a.fieldIndex, (0, jspb_internal_adapters.getRepeatedFieldReturnType)(void 0, true), true) : a.getExtensionFn(b, a.fieldIndex,
+      a.defaultValue, true);
     return a.isDelegating && b == null ? a.defaultValue : b
   };
   module$exports$jspb.Message.prototype.getReadonlyExtension = function (a) {
     goog.asserts.assert(a.ctor);
     goog.asserts.assert(!a.isDelegating);
     goog.asserts.assertInstanceof(this, a.extendeeCtor);
-    return a.isRepeated ? (0, jspb_internal_adapters.getReadonlyRepeatedWrapperField)(this, a.ctor, a.fieldIndex, !0) : (0, jspb_internal_adapters.getReadonlyWrapperField)(this, a.ctor, a.fieldIndex, !0)
+    return a.isRepeated ? (0, jspb_internal_adapters.getReadonlyRepeatedWrapperField)(this, a.ctor, a.fieldIndex, true) : (0, jspb_internal_adapters.getReadonlyWrapperField)(this, a.ctor, a.fieldIndex, true)
   };
   module$exports$jspb.Message.prototype.getMutableExtension = function (a) {
     goog.asserts.assert(a.ctor);
     goog.asserts.assert(!a.isDelegating);
     goog.asserts.assertInstanceof(this, a.extendeeCtor);
     goog.asserts.assert(!a.isRepeated);
-    return (0, jspb_internal_adapters.getMutableWrapperField)(this, a.ctor, a.fieldIndex, !0)
+    return (0, jspb_internal_adapters.getMutableWrapperField)(this, a.ctor, a.fieldIndex, true)
   };
   module$exports$jspb.Message.prototype.getExtensionOrUndefined = function (a) {
     goog.asserts.assert(!a.isRepeated, "repeated extensions don't support getExtensionOrUndefined");
     goog.asserts.assertInstanceof(this, a.extendeeCtor);
     var b = goog.asserts.assertInstanceof(this, module$exports$jspb.Message);
-    a = a.ctor ? a.getExtensionFn(b, a.ctor, a.fieldIndex, !0) : a.getExtensionFn(b, a.fieldIndex, null, !0);
+    a = a.ctor ? a.getExtensionFn(b, a.ctor, a.fieldIndex, true) : a.getExtensionFn(b, a.fieldIndex, null, true);
     return a === null ? void 0 : a
   };
   module$exports$jspb.Message.prototype.hasExtension = function (a) {
     goog.asserts.assert(!a.isRepeated, "repeated extensions don't support hasExtension");
-    return a.ctor ? (0, jspb_internal_adapters.hasWrapperField)(this, a.ctor, a.fieldIndex, !0) : this.getExtensionOrUndefined(a) !== void 0
+    return a.ctor ? (0, jspb_internal_adapters.hasWrapperField)(this, a.ctor, a.fieldIndex, true) : this.getExtensionOrUndefined(a) !== void 0
   };
   module$exports$jspb.Message.prototype.getExtensionAtIndex = function (a, b) {
     var c = goog.asserts.assertInstanceof(this, module$exports$jspb.Message);
     goog.asserts.assertInstanceof(c, a.extendeeCtor);
     goog.asserts.assert(a.isRepeated);
-    return a.ctor ? a.getExtensionAtIndexFn(c, a.fieldIndex, a.ctor, b, !0) : a.getExtensionAtIndexFn(c, a.fieldIndex, b, !0)
+    return a.ctor ? a.getExtensionAtIndexFn(c, a.fieldIndex, a.ctor, b, true) : a.getExtensionAtIndexFn(c, a.fieldIndex, b, true)
   };
   module$exports$jspb.Message.prototype.getExtensionCount = function (a) {
     goog.asserts.assertInstanceof(this, a.extendeeCtor);
     goog.asserts.assertInstanceof(this, module$exports$jspb.Message);
     goog.asserts.assert(a.isRepeated);
-    return a.ctor ? a.getExtensionCountFn(this, a.ctor, a.fieldIndex, !0) : a.getExtensionCountFn(this, a.fieldIndex, !0)
+    return a.ctor ? a.getExtensionCountFn(this, a.ctor, a.fieldIndex, true) : a.getExtensionCountFn(this, a.fieldIndex, true)
   };
   module$exports$jspb.Message.difference = function (a, b) {
     if (!(a instanceof module$exports$jspb.Message)) throw Error("Message.difference called on non-Message.");
@@ -15272,22 +15272,22 @@
   };
   module$exports$jspb.Message.prototype.setExtension = function (a, b) {
     goog.asserts.assertInstanceof(this, a.extendeeCtor);
-    return a.ctor ? a.isRepeated ? a.setExtensionFn(this, a.ctor, a.fieldIndex, b, void 0, !0) : a.setExtensionFn(this, a.ctor, a.fieldIndex, b, !0) : a.isRepeated ? a.setExtensionFn(this, a.fieldIndex, b, void 0, !0) : a.setExtensionFn(this, a.fieldIndex, b, !0)
+    return a.ctor ? a.isRepeated ? a.setExtensionFn(this, a.ctor, a.fieldIndex, b, void 0, true) : a.setExtensionFn(this, a.ctor, a.fieldIndex, b, true) : a.isRepeated ? a.setExtensionFn(this, a.fieldIndex, b, void 0, true) : a.setExtensionFn(this, a.fieldIndex, b, true)
   };
   module$exports$jspb.Message.prototype.clearExtension = function (a) {
     goog.asserts.assertInstanceof(this, a.extendeeCtor);
-    return (0, jspb_internal_adapters.clearField)(this, a.fieldIndex, !0)
+    return (0, jspb_internal_adapters.clearField)(this, a.fieldIndex, true)
   };
   module$exports$jspb.Message.prototype.setExtensionAtIndex = function (a, b, c) {
     goog.asserts.assertInstanceof(this, a.extendeeCtor);
     goog.asserts.assert(a.isRepeated);
-    a.ctor ? a.setExtensionAtIndexFn(this, a.fieldIndex, a.ctor, b, c, !0) : a.setExtensionAtIndexFn(this, a.fieldIndex, b, c, !0);
+    a.ctor ? a.setExtensionAtIndexFn(this, a.fieldIndex, a.ctor, b, c, true) : a.setExtensionAtIndexFn(this, a.fieldIndex, b, c, true);
     return this
   };
   module$exports$jspb.Message.prototype.addExtension = function (a, b) {
     goog.asserts.assertInstanceof(this, a.extendeeCtor);
     goog.asserts.assert(a.isRepeated);
-    a.ctor ? a.addExtensionFn(this, a.fieldIndex, a.ctor, b, void 0, !0) : a.addExtensionFn(this, a.fieldIndex, b, void 0, !0);
+    a.ctor ? a.addExtensionFn(this, a.fieldIndex, a.ctor, b, void 0, true) : a.addExtensionFn(this, a.fieldIndex, b, void 0, true);
     return this
   };
   module$exports$jspb.Message.prototype.getParserForType = function () {
@@ -15363,7 +15363,7 @@
 
   function module$contents$jspb_prepareSparseObjectForSerialize(a, b, c, d, e) {
     var f = {},
-      g = !1;
+      g = false;
     if (e)
       for (var h = Math.max(0, a + b); h < c.length; h++) {
         var k = c[h],
@@ -15376,7 +15376,7 @@
           if (h = +m, isNaN(h)) f[m] = d[m];
           else if (k = d[m], Array.isArray(k) && (module$contents$jspb$internal_isEmptyRepeatedField(k,
             void 0, +m) || module$contents$jspb$internal_isEmptyMap(k)) && (k = null), k == null && (g = !0), e && h < a) {
-            g = !0;
+            g = true;
             k = module$contents$jspb$internal_indexFromFieldNumber(h, b);
             for (l = c.length; l <= k; l++) c.push(void 0);
             c[k] = d[h]
@@ -15423,7 +15423,7 @@
         c[f] = {};
       for (var h in d) module$contents$jspb$internal_hasOwnPropertyIfNotTrusted(d, h) && (f[h] = module$contents$jspb$internal_immutability_copyImmutableFieldValue(d[h]))
     } (0, module$exports$jspb$internal_array_state.setArrayState)(c, e);
-    module$contents$jspb$internal_copyUnknownFields(c, b, !0);
+    module$contents$jspb$internal_copyUnknownFields(c, b, true);
     return a
   }
 
@@ -16409,7 +16409,7 @@
     })
       if (b.isMessageSetGroup()) {
         var f = b.getFieldCursor();
-        e.unknown$jscomp$1 = !1;
+        e.unknown$jscomp$1 = false;
         b.readMessageSetGroup(function (g) {
           return function (h, k) {
             var l = c[h];
@@ -16420,7 +16420,7 @@
                 var n = module$contents$jspb_internal_binary_makeDeserializeBinaryFromReaderFromBinaryFields(l),
                   p = module$contents$jspb_internal_binary_getDeserializers(l).messageMetadata;
                 l = c[h] = function (q, r, t) {
-                  return n((0, jspb_internal_adapters.getMutableWrapperArrayForBinary)(r, p, t, !0), q)
+                  return n((0, jspb_internal_adapters.getMutableWrapperArrayForBinary)(r, p, t, true), q)
                 }
               }
             }
@@ -16472,7 +16472,7 @@
   }
 
   function module$contents$jspb_internal_binary_readMapEntry(a, b, c, d, e) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     a = a.readMessage(module$contents$jspb$internal_construct_constructMessageArrayFromMetaForBinary([void 0, void 0], d), e);
     (0, jspb_internal_adapters.putIntoMapForBinary)(b, c, a);
     return !0
@@ -16783,7 +16783,7 @@
       var e = b.getFieldNumber(),
         f = c[e],
         g = !f,
-        h = !1;
+        h = false;
       if (!f) {
         var k = c.extensions;
         if (k) {
@@ -16879,19 +16879,19 @@
   };
 
   function module$contents$jspb_internal_binary_makeRWPair(a, b) {
-    return new module$contents$jspb$extension_field_binary_info_ReaderWriterPair(a, b, !1, !1)
+    return new module$contents$jspb$extension_field_binary_info_ReaderWriterPair(a, b, false, false)
   }
 
   function module$contents$jspb_internal_binary_makeRepeatedRWPair(a, b) {
-    return new module$contents$jspb$extension_field_binary_info_ReaderWriterPair(a, b, !0, !1)
+    return new module$contents$jspb$extension_field_binary_info_ReaderWriterPair(a, b, true, false)
   }
 
   function module$contents$jspb_internal_binary_makeMsgRWPair(a, b) {
-    return new module$contents$jspb$extension_field_binary_info_ReaderWriterPair(a, b, !1, !0)
+    return new module$contents$jspb$extension_field_binary_info_ReaderWriterPair(a, b, false, true)
   }
 
   function module$contents$jspb_internal_binary_makeRepeatedMsgRWPair(a, b) {
-    return new module$contents$jspb$extension_field_binary_info_ReaderWriterPair(a, b, !0, !0)
+    return new module$contents$jspb$extension_field_binary_info_ReaderWriterPair(a, b, true, true)
   }
 
   function module$contents$jspb_internal_binary_writeAnyValueBytes(a, b, c) {
@@ -16939,11 +16939,11 @@
   }
 
   function module$contents$jspb_internal_binary_writeRepeatedDouble(a, b, c) {
-    a.writeRepeatedDouble(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishFloatingPoint, b, !0))
+    a.writeRepeatedDouble(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishFloatingPoint, b, true))
   }
 
   function module$contents$jspb_internal_binary_writePackedDouble(a, b, c) {
-    a.writePackedDouble(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishFloatingPoint, b, !0))
+    a.writePackedDouble(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishFloatingPoint, b, true))
   }
 
   function module$contents$jspb_internal_binary_writeFloat(a, b, c) {
@@ -16951,11 +16951,11 @@
   }
 
   function module$contents$jspb_internal_binary_writeRepeatedFloat(a, b, c) {
-    a.writeRepeatedFloat(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishFloatingPoint, b, !0))
+    a.writeRepeatedFloat(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishFloatingPoint, b, true))
   }
 
   function module$contents$jspb_internal_binary_writePackedFloat(a, b, c) {
-    a.writePackedFloat(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishFloatingPoint, b, !0))
+    a.writePackedFloat(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishFloatingPoint, b, true))
   }
 
   function module$contents$jspb_internal_binary_writeInt64(a, b, c) {
@@ -16963,11 +16963,11 @@
   }
 
   function module$contents$jspb_internal_binary_writeRepeatedInt64(a, b, c) {
-    a.writeRepeatedInt64(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishInt64StringOrNumber, b, !1))
+    a.writeRepeatedInt64(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishInt64StringOrNumber, b, false))
   }
 
   function module$contents$jspb_internal_binary_writePackedInt64(a, b, c) {
-    a.writePackedInt64(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishInt64StringOrNumber, b, !1))
+    a.writePackedInt64(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishInt64StringOrNumber, b, false))
   }
 
   function module$contents$jspb_internal_binary_writeUint64ToleratingNegatives(a, b, c) {
@@ -16975,11 +16975,11 @@
   }
 
   function module$contents$jspb_internal_binary_writeRepeatedUint64ToleratingNegatives(a, b, c) {
-    a.writeRepeatedUint64ToleratingNegatives(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishUint64StringOrNumber, b, !1))
+    a.writeRepeatedUint64ToleratingNegatives(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishUint64StringOrNumber, b, false))
   }
 
   function module$contents$jspb_internal_binary_writePackedUint64ToleratingNegatives(a, b, c) {
-    a.writePackedUint64ToleratingNegatives(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishUint64StringOrNumber, b, !1))
+    a.writePackedUint64ToleratingNegatives(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishUint64StringOrNumber, b, false))
   }
 
   function module$contents$jspb_internal_binary_writeUint64(a, b, c) {
@@ -16987,11 +16987,11 @@
   }
 
   function module$contents$jspb_internal_binary_writeRepeatedUint64(a, b, c) {
-    a.writeRepeatedUint64(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishUint64StringOrNumber, b, !1))
+    a.writeRepeatedUint64(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishUint64StringOrNumber, b, false))
   }
 
   function module$contents$jspb_internal_binary_writePackedUint64(a, b, c) {
-    a.writePackedUint64(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishUint64StringOrNumber, b, !1))
+    a.writePackedUint64(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishUint64StringOrNumber, b, false))
   }
 
   function module$contents$jspb_internal_binary_writeInt32(a, b, c) {
@@ -16999,11 +16999,11 @@
   }
 
   function module$contents$jspb_internal_binary_writeRepeatedInt32(a, b, c) {
-    a.writeRepeatedInt32(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishInt32, b, !0))
+    a.writeRepeatedInt32(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishInt32, b, true))
   }
 
   function module$contents$jspb_internal_binary_writePackedInt32(a, b, c) {
-    a.writePackedInt32(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishInt32, b, !0))
+    a.writePackedInt32(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishInt32, b, true))
   }
 
   function module$contents$jspb_internal_binary_writeFixed64ToleratingNegatives(a, b, c) {
@@ -17011,11 +17011,11 @@
   }
 
   function module$contents$jspb_internal_binary_writeRepeatedFixed64ToleratingNegatives(a, b, c) {
-    a.writeRepeatedFixed64ToleratingNegatives(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishUint64StringOrNumber, b, !1))
+    a.writeRepeatedFixed64ToleratingNegatives(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishUint64StringOrNumber, b, false))
   }
 
   function module$contents$jspb_internal_binary_writePackedFixed64ToleratingNegatives(a, b, c) {
-    a.writePackedFixed64ToleratingNegatives(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishUint64StringOrNumber, b, !1))
+    a.writePackedFixed64ToleratingNegatives(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishUint64StringOrNumber, b, false))
   }
 
   function module$contents$jspb_internal_binary_writeFixed64(a, b, c) {
@@ -17023,11 +17023,11 @@
   }
 
   function module$contents$jspb_internal_binary_writeRepeatedFixed64(a, b, c) {
-    a.writeRepeatedFixed64(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishUint64StringOrNumber, b, !1))
+    a.writeRepeatedFixed64(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishUint64StringOrNumber, b, false))
   }
 
   function module$contents$jspb_internal_binary_writePackedFixed64(a, b, c) {
-    a.writePackedFixed64(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishUint64StringOrNumber, b, !1))
+    a.writePackedFixed64(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishUint64StringOrNumber, b, false))
   }
 
   function module$contents$jspb_internal_binary_writeFixed32(a, b, c) {
@@ -17035,11 +17035,11 @@
   }
 
   function module$contents$jspb_internal_binary_writeRepeatedFixed32(a, b, c) {
-    a.writeRepeatedFixed32(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishUint32, b, !0))
+    a.writeRepeatedFixed32(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishUint32, b, true))
   }
 
   function module$contents$jspb_internal_binary_writePackedFixed32(a, b, c) {
-    a.writePackedFixed32(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishUint32, b, !0))
+    a.writePackedFixed32(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishUint32, b, true))
   }
 
   function module$contents$jspb_internal_binary_writeBool(a, b, c) {
@@ -17047,11 +17047,11 @@
   }
 
   function module$contents$jspb_internal_binary_writeRepeatedBool(a, b, c) {
-    a.writeRepeatedBool(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishBoolean, b, !0))
+    a.writeRepeatedBool(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishBoolean, b, true))
   }
 
   function module$contents$jspb_internal_binary_writePackedBool(a, b, c) {
-    a.writePackedBool(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishBoolean, b, !0))
+    a.writePackedBool(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishBoolean, b, true))
   }
 
   function module$contents$jspb_internal_binary_writeString(a, b, c) {
@@ -17059,7 +17059,7 @@
   }
 
   function module$contents$jspb_internal_binary_writeRepeatedString(a, b, c) {
-    a.writeRepeatedString(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishString, b, !0))
+    a.writeRepeatedString(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishString, b, true))
   }
 
   function module$contents$jspb_internal_binary_writeGroup(a, b, c, d, e) {
@@ -17083,7 +17083,7 @@
   }
 
   function module$contents$jspb_internal_binary_writeRepeatedBytes(a, b, c) {
-    a.writeRepeatedBytes(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishBytesAsStringByteStringOrUint8Array, b, !1))
+    a.writeRepeatedBytes(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishBytesAsStringByteStringOrUint8Array, b, false))
   }
 
   function module$contents$jspb_internal_binary_writeUint32(a, b, c) {
@@ -17091,11 +17091,11 @@
   }
 
   function module$contents$jspb_internal_binary_writeRepeatedUint32(a, b, c) {
-    a.writeRepeatedUint32(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishUint32, b, !0))
+    a.writeRepeatedUint32(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishUint32, b, true))
   }
 
   function module$contents$jspb_internal_binary_writePackedUint32(a, b, c) {
-    a.writePackedUint32(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishUint32, b, !0))
+    a.writePackedUint32(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishUint32, b, true))
   }
 
   function module$contents$jspb_internal_binary_writeEnum(a, b, c) {
@@ -17103,11 +17103,11 @@
   }
 
   function module$contents$jspb_internal_binary_writeRepeatedEnum(a, b, c) {
-    a.writeRepeatedEnum(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishInt32, b, !0))
+    a.writeRepeatedEnum(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishInt32, b, true))
   }
 
   function module$contents$jspb_internal_binary_writePackedEnum(a, b, c) {
-    a.writePackedEnum(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishInt32, b, !0))
+    a.writePackedEnum(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishInt32, b, true))
   }
 
   function module$contents$jspb_internal_binary_writeSfixed32(a, b, c) {
@@ -17115,11 +17115,11 @@
   }
 
   function module$contents$jspb_internal_binary_writeRepeatedSfixed32(a, b, c) {
-    a.writeRepeatedSfixed32(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishInt32, b, !0))
+    a.writeRepeatedSfixed32(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishInt32, b, true))
   }
 
   function module$contents$jspb_internal_binary_writePackedSfixed32(a, b, c) {
-    a.writePackedSfixed32(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishInt32, b, !0))
+    a.writePackedSfixed32(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishInt32, b, true))
   }
 
   function module$contents$jspb_internal_binary_writeSfixed64(a, b, c) {
@@ -17127,11 +17127,11 @@
   }
 
   function module$contents$jspb_internal_binary_writeRepeatedSfixed64(a, b, c) {
-    a.writeRepeatedSfixed64(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishInt64StringOrNumber, b, !1))
+    a.writeRepeatedSfixed64(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishInt64StringOrNumber, b, false))
   }
 
   function module$contents$jspb_internal_binary_writePackedSfixed64(a, b, c) {
-    a.writePackedSfixed64(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishInt64StringOrNumber, b, !1))
+    a.writePackedSfixed64(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishInt64StringOrNumber, b, false))
   }
 
   function module$contents$jspb_internal_binary_writeSint32(a, b, c) {
@@ -17139,11 +17139,11 @@
   }
 
   function module$contents$jspb_internal_binary_writeRepeatedSint32(a, b, c) {
-    a.writeRepeatedSint32(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishInt32, b, !0))
+    a.writeRepeatedSint32(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishInt32, b, true))
   }
 
   function module$contents$jspb_internal_binary_writePackedSint32(a, b, c) {
-    a.writePackedSint32(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishInt32, b, !0))
+    a.writePackedSint32(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishInt32, b, true))
   }
 
   function module$contents$jspb_internal_binary_writeSint64(a, b, c) {
@@ -17151,1068 +17151,1068 @@
   }
 
   function module$contents$jspb_internal_binary_writeRepeatedSint64(a, b, c) {
-    a.writeRepeatedSint64(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishInt64StringOrNumber, b, !1))
+    a.writeRepeatedSint64(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishInt64StringOrNumber, b, false))
   }
 
   function module$contents$jspb_internal_binary_writePackedSint64(a, b, c) {
-    a.writePackedSint64(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishInt64StringOrNumber, b, !1))
+    a.writePackedSint64(c, module$contents$jspb_internal_binary_asCoercedArray(module$contents$jspb$internal_accessor_helpers_coerceToNullishInt64StringOrNumber, b, false))
   }
 
   function module$contents$jspb_internal_binary_readDoubleExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return !1;
-    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readDouble(), !0);
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return false;
+    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readDouble(), true);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableDoubleIntoExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
-    a.readPackableDoubleInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, !0));
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
+    a.readPackableDoubleInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, true));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readDouble(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return false;
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readDouble());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableDoubleInto(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     a.readPackableDoubleInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readDoubleIgnoringDefault(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return false;
     a = a.readDouble();
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a === 0 ? void 0 : a);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readDoubleOneof(a, b, c, d) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return false;
     (0, jspb_internal_adapters.setOneofFieldForBinary)(b, c, d, a.readDouble());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readFloatExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED32) return !1;
-    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readFloat(), !0);
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED32) return false;
+    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readFloat(), true);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableFloatIntoExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED32 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
-    a.readPackableFloatInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, !0));
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED32 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
+    a.readPackableFloatInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, true));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readFloat(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED32) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED32) return false;
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readFloat());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableFloatInto(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED32 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED32 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     a.readPackableFloatInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readFloatIgnoringDefault(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED32) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED32) return false;
     a = a.readFloat();
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a === 0 ? void 0 : a);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readFloatOneof(a, b, c, d) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED32) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED32) return false;
     (0, jspb_internal_adapters.setOneofFieldForBinary)(b, c, d, a.readFloat());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readInt64GbigintExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
-    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readInt64Gbigint(), !0);
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
+    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readInt64Gbigint(), true);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableInt64GbigintIntoExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
-    a.readPackableInt64GbigintInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, !0));
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
+    a.readPackableInt64GbigintInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, true));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readInt64StringExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
-    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readInt64String(), !0);
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
+    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readInt64String(), true);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableInt64StringIntoExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
-    a.readPackableInt64StringInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, !0));
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
+    a.readPackableInt64StringInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, true));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readInt64Ext(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
-    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readInt64(), !0);
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
+    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readInt64(), true);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableInt64IntoExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
-    a.readPackableInt64Into((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, !0));
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
+    a.readPackableInt64Into((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, true));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readInt64Gbigint(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readInt64Gbigint());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableInt64GbigintInto(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     a.readPackableInt64GbigintInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readInt64GbigintIgnoringDefault(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     a = a.readInt64Gbigint();
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a === module$contents$jspb_internal_binary_GBIGINT_ZERO ? void 0 : a);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readInt64GbigintOneof(a, b, c, d) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     (0, jspb_internal_adapters.setOneofFieldForBinary)(b, c, d, a.readInt64Gbigint());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readInt64String(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readInt64String());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableInt64StringInto(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     a.readPackableInt64StringInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readInt64StringIgnoringDefault(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     a = a.readInt64String();
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a === "0" ? void 0 : a);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readInt64StringOneof(a, b, c, d) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     (0, jspb_internal_adapters.setOneofFieldForBinary)(b, c, d, a.readInt64String());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readInt64(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readInt64());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableInt64Into(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     a.readPackableInt64Into((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readInt64IgnoringDefault(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     a = a.readInt64();
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a === 0 ? void 0 : a);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readInt64Oneof(a, b, c, d) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     (0, jspb_internal_adapters.setOneofFieldForBinary)(b, c, d, a.readInt64());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readUint64GbigintExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
-    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readUint64Gbigint(), !0);
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
+    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readUint64Gbigint(), true);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableUint64GbigintIntoExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
-    a.readPackableUint64GbigintInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, !0));
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
+    a.readPackableUint64GbigintInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, true));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readUint64StringExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
-    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readUint64String(), !0);
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
+    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readUint64String(), true);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableUint64StringIntoExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
-    a.readPackableUint64StringInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, !0));
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
+    a.readPackableUint64StringInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, true));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readUint64Ext(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
-    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readUint64(), !0);
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
+    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readUint64(), true);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableUint64IntoExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
-    a.readPackableUint64Into((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, !0));
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
+    a.readPackableUint64Into((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, true));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readUint64Gbigint(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readUint64Gbigint());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableUint64GbigintInto(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     a.readPackableUint64GbigintInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readUint64GbigintIgnoringDefault(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     a = a.readUint64Gbigint();
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a === module$contents$jspb_internal_binary_GBIGINT_ZERO ? void 0 : a);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readUint64GbigintOneof(a, b, c, d) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     (0, jspb_internal_adapters.setOneofFieldForBinary)(b, c, d, a.readUint64Gbigint());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readUint64String(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readUint64String());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableUint64StringInto(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     a.readPackableUint64StringInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readUint64StringIgnoringDefault(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     a = a.readUint64String();
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a === "0" ? void 0 : a);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readUint64StringOneof(a, b, c, d) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     (0, jspb_internal_adapters.setOneofFieldForBinary)(b, c, d, a.readUint64String());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readUint64(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readUint64());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableUint64Into(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     a.readPackableUint64Into((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readUint64IgnoringDefault(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     a = a.readUint64();
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a === 0 ? void 0 : a);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readUint64Oneof(a, b, c, d) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     (0, jspb_internal_adapters.setOneofFieldForBinary)(b, c, d, a.readUint64());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readInt32Ext(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
-    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readInt32(), !0);
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
+    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readInt32(), true);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableInt32IntoExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
-    a.readPackableInt32Into((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, !0));
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
+    a.readPackableInt32Into((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, true));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readInt32(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readInt32());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableInt32Into(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     a.readPackableInt32Into((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readInt32IgnoringDefault(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     a = a.readInt32();
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a === 0 ? void 0 : a);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readInt32Oneof(a, b, c, d) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     (0, jspb_internal_adapters.setOneofFieldForBinary)(b, c, d, a.readInt32());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readFixed64GbigintExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return !1;
-    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readFixed64Gbigint(), !0);
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return false;
+    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readFixed64Gbigint(), true);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableFixed64GbigintIntoExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
-    a.readPackableFixed64GbigintInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, !0));
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
+    a.readPackableFixed64GbigintInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, true));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readFixed64StringExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return !1;
-    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readFixed64String(), !0);
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return false;
+    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readFixed64String(), true);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableFixed64StringIntoExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
-    a.readPackableFixed64StringInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, !0));
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
+    a.readPackableFixed64StringInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, true));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readFixed64Ext(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return !1;
-    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readFixed64(), !0);
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return false;
+    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readFixed64(), true);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableFixed64IntoExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
-    a.readPackableFixed64Into((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, !0));
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
+    a.readPackableFixed64Into((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, true));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readFixed64Gbigint(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return false;
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readFixed64Gbigint());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableFixed64GbigintInto(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     a.readPackableFixed64GbigintInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readFixed64GbigintIgnoringDefault(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return false;
     a = a.readFixed64Gbigint();
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a === module$contents$jspb_internal_binary_GBIGINT_ZERO ? void 0 : a);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readFixed64GbigintOneof(a, b, c, d) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return false;
     (0, jspb_internal_adapters.setOneofFieldForBinary)(b, c, d, a.readFixed64Gbigint());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readFixed64String(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return false;
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readFixed64String());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableFixed64StringInto(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     a.readPackableFixed64StringInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readFixed64StringIgnoringDefault(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return false;
     a = a.readFixed64String();
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a === "0" ? void 0 : a);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readFixed64StringOneof(a, b, c, d) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return false;
     (0, jspb_internal_adapters.setOneofFieldForBinary)(b, c, d, a.readFixed64String());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readFixed64(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return false;
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readFixed64());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableFixed64Into(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     a.readPackableFixed64Into((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readFixed64IgnoringDefault(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return false;
     a = a.readFixed64();
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a === 0 ? void 0 : a);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readFixed64Oneof(a, b, c, d) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return false;
     (0, jspb_internal_adapters.setOneofFieldForBinary)(b, c, d, a.readFixed64());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readFixed32Ext(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED32) return !1;
-    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readFixed32(), !0);
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED32) return false;
+    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readFixed32(), true);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableFixed32IntoExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED32 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
-    a.readPackableFixed32Into((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, !0));
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED32 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
+    a.readPackableFixed32Into((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, true));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readFixed32(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED32) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED32) return false;
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readFixed32());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableFixed32Into(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED32 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED32 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     a.readPackableFixed32Into((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readFixed32IgnoringDefault(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED32) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED32) return false;
     a = a.readFixed32();
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a === 0 ? void 0 : a);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readFixed32Oneof(a, b, c, d) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED32) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED32) return false;
     (0, jspb_internal_adapters.setOneofFieldForBinary)(b, c, d, a.readFixed32());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readBoolExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
-    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readBool(), !0);
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
+    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readBool(), true);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableBoolIntoExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
-    a.readPackableBoolInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, !0));
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
+    a.readPackableBoolInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, true));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readBool(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readBool());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableBoolInto(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     a.readPackableBoolInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readBoolIgnoringDefault(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     a = a.readBool();
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a === !1 ? void 0 : a);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readBoolOneof(a, b, c, d) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     (0, jspb_internal_adapters.setOneofFieldForBinary)(b, c, d, a.readBool());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readStringRequireUtf8Ext(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
-    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readStringRequireUtf8(), !0);
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
+    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readStringRequireUtf8(), true);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readRepeatedStringRequireUtf8Ext(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
-    module$contents$jspb_internal_binary_addToBinary(b, c, a.readStringRequireUtf8(), !0);
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
+    module$contents$jspb_internal_binary_addToBinary(b, c, a.readStringRequireUtf8(), true);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readStringRequireUtf8(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readStringRequireUtf8());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readRepeatedStringRequireUtf8(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     module$contents$jspb_internal_binary_addToBinary(b, c, a.readStringRequireUtf8());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readStringRequireUtf8IgnoringDefault(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     a = a.readStringRequireUtf8();
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a === "" ? void 0 : a);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readStringRequireUtf8Oneof(a, b, c, d) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     (0, jspb_internal_adapters.setOneofFieldForBinary)(b, c, d, a.readStringRequireUtf8());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readStringExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
-    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readString(), !0);
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
+    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readString(), true);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readRepeatedStringExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
-    module$contents$jspb_internal_binary_addToBinary(b, c, a.readString(), !0);
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
+    module$contents$jspb_internal_binary_addToBinary(b, c, a.readString(), true);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readString(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readString());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readRepeatedString(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     module$contents$jspb_internal_binary_addToBinary(b, c, a.readString());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readStringIgnoringDefault(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     a = a.readString();
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a === "" ? void 0 : a);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readStringOneof(a, b, c, d) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     (0, jspb_internal_adapters.setOneofFieldForBinary)(b, c, d, a.readString());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readGroupExt(a, b, c, d, e) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.START_GROUP) return !1;
-    a.readGroup(c, (0, jspb_internal_adapters.getMutableWrapperArrayForBinary)(b, d, c, !0), e);
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.START_GROUP) return false;
+    a.readGroup(c, (0, jspb_internal_adapters.getMutableWrapperArrayForBinary)(b, d, c, true), e);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readRepeatedGroupExt(a, b, c, d, e) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.START_GROUP) return !1;
-    a.readGroup(c, module$contents$jspb_internal_binary_addAndReturnBinary(b, d, c, !0), e);
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.START_GROUP) return false;
+    a.readGroup(c, module$contents$jspb_internal_binary_addAndReturnBinary(b, d, c, true), e);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readGroup(a, b, c, d, e) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.START_GROUP) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.START_GROUP) return false;
     a.readGroup(c, (0, jspb_internal_adapters.getMutableWrapperArrayForBinary)(b, d, c), e);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readRepeatedGroup(a, b, c, d, e) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.START_GROUP) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.START_GROUP) return false;
     a.readGroup(c, module$contents$jspb_internal_binary_addAndReturnBinary(b, d, c), e);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readGroupOneof(a, b, c, d, e, f) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.START_GROUP) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.START_GROUP) return false;
     a.readGroup(c, (0, jspb_internal_adapters.getMutableOneofWrapperArrayForBinary)(b, d, c, f), e);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readMessageExt(a, b, c, d, e) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
-    a.readMessage((0, jspb_internal_adapters.getMutableWrapperArrayForBinary)(b, d, c, !0), e);
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
+    a.readMessage((0, jspb_internal_adapters.getMutableWrapperArrayForBinary)(b, d, c, true), e);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readRepeatedMessageExt(a, b, c, d, e) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
-    a.readMessage(module$contents$jspb_internal_binary_addAndReturnBinary(b, d, c, !0), e);
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
+    a.readMessage(module$contents$jspb_internal_binary_addAndReturnBinary(b, d, c, true), e);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readMessage(a, b, c, d, e) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     a.readMessage((0, jspb_internal_adapters.getMutableWrapperArrayForBinary)(b, d, c), e);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readRepeatedMessage(a, b, c, d, e) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     a.readMessage(module$contents$jspb_internal_binary_addAndReturnBinary(b, d, c), e);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readMessageOneof(a, b, c, d, e, f) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     a.readMessage((0, jspb_internal_adapters.getMutableOneofWrapperArrayForBinary)(b, d, c, f), e);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readBytesExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
-    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readByteString(), !0);
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
+    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readByteString(), true);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readRepeatedBytesExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
-    module$contents$jspb_internal_binary_addToBinary(b, c, a.readByteString(), !0);
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
+    module$contents$jspb_internal_binary_addToBinary(b, c, a.readByteString(), true);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readBytes(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readByteString());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readRepeatedBytes(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     module$contents$jspb_internal_binary_addToBinary(b, c, a.readByteString());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readBytesIgnoringDefault(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     a = a.readByteString();
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a === module$exports$jspb$bytestring.ByteString.empty() ? void 0 : a);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readBytesOneof(a, b, c, d) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     (0, jspb_internal_adapters.setOneofFieldForBinary)(b, c, d, a.readByteString());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readUint32Ext(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
-    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readUint32(), !0);
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
+    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readUint32(), true);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableUint32IntoExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
-    a.readPackableUint32Into((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, !0));
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
+    a.readPackableUint32Into((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, true));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readUint32(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readUint32());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableUint32Into(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     a.readPackableUint32Into((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readUint32IgnoringDefault(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     a = a.readUint32();
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a === 0 ? void 0 : a);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readUint32Oneof(a, b, c, d) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     (0, jspb_internal_adapters.setOneofFieldForBinary)(b, c, d, a.readUint32());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readEnumExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
-    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readEnum(), !0);
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
+    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readEnum(), true);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableEnumIntoExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
-    a.readPackableEnumInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, !0));
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
+    a.readPackableEnumInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, true));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readEnum(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readEnum());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableEnumInto(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     a.readPackableEnumInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readEnumIgnoringDefault(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     a = a.readEnum();
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a === 0 ? void 0 : a);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readEnumOneof(a, b, c, d) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     (0, jspb_internal_adapters.setOneofFieldForBinary)(b, c, d, a.readEnum());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readSfixed32Ext(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED32) return !1;
-    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readSfixed32(), !0);
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED32) return false;
+    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readSfixed32(), true);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableSfixed32IntoExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED32 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
-    a.readPackableSfixed32Into((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, !0));
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED32 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
+    a.readPackableSfixed32Into((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, true));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readSfixed32(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED32) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED32) return false;
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readSfixed32());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableSfixed32Into(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED32 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED32 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     a.readPackableSfixed32Into((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readSfixed32IgnoringDefault(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED32) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED32) return false;
     a = a.readSfixed32();
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a === 0 ? void 0 : a);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readSfixed32Oneof(a, b, c, d) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED32) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED32) return false;
     (0, jspb_internal_adapters.setOneofFieldForBinary)(b, c, d, a.readSfixed32());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readSfixed64GbigintExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return !1;
-    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readSfixed64Gbigint(), !0);
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return false;
+    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readSfixed64Gbigint(), true);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableSfixed64GbigintIntoExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
-    a.readPackableSfixed64GbigintInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, !0));
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
+    a.readPackableSfixed64GbigintInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, true));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readSfixed64StringExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return !1;
-    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readSfixed64String(), !0);
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return false;
+    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readSfixed64String(), true);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableSfixed64StringIntoExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
-    a.readPackableSfixed64StringInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, !0));
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
+    a.readPackableSfixed64StringInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, true));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readSfixed64Ext(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return !1;
-    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readSfixed64(), !0);
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return false;
+    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readSfixed64(), true);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableSfixed64IntoExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
-    a.readPackableSfixed64Into((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, !0));
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
+    a.readPackableSfixed64Into((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, true));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readSfixed64Gbigint(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return false;
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readSfixed64Gbigint());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableSfixed64GbigintInto(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     a.readPackableSfixed64GbigintInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readSfixed64GbigintIgnoringDefault(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return false;
     a = a.readSfixed64Gbigint();
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a === module$contents$jspb_internal_binary_GBIGINT_ZERO ? void 0 : a);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readSfixed64GbigintOneof(a, b, c, d) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return false;
     (0, jspb_internal_adapters.setOneofFieldForBinary)(b, c, d, a.readSfixed64Gbigint());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readSfixed64String(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return false;
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readSfixed64String());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableSfixed64StringInto(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     a.readPackableSfixed64StringInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readSfixed64StringIgnoringDefault(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return false;
     a = a.readSfixed64String();
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a === "0" ? void 0 : a);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readSfixed64StringOneof(a, b, c, d) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return false;
     (0, jspb_internal_adapters.setOneofFieldForBinary)(b, c, d, a.readSfixed64String());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readSfixed64(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return false;
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readSfixed64());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableSfixed64Into(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64 && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     a.readPackableSfixed64Into((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readSfixed64IgnoringDefault(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return false;
     a = a.readSfixed64();
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a === 0 ? void 0 : a);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readSfixed64Oneof(a, b, c, d) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.FIXED64) return false;
     (0, jspb_internal_adapters.setOneofFieldForBinary)(b, c, d, a.readSfixed64());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readSint32Ext(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
-    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readSint32(), !0);
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
+    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readSint32(), true);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableSint32IntoExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
-    a.readPackableSint32Into((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, !0));
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
+    a.readPackableSint32Into((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, true));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readSint32(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readSint32());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableSint32Into(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     a.readPackableSint32Into((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readSint32IgnoringDefault(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     a = a.readSint32();
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a === 0 ? void 0 : a);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readSint32Oneof(a, b, c, d) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     (0, jspb_internal_adapters.setOneofFieldForBinary)(b, c, d, a.readSint32());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readSint64GbigintExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
-    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readSint64Gbigint(), !0);
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
+    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readSint64Gbigint(), true);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableSint64GbigintIntoExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
-    a.readPackableSint64GbigintInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, !0));
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
+    a.readPackableSint64GbigintInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, true));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readSint64StringExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
-    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readSint64String(), !0);
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
+    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readSint64String(), true);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableSint64StringIntoExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
-    a.readPackableSint64StringInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, !0));
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
+    a.readPackableSint64StringInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, true));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readSint64Ext(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
-    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readSint64(), !0);
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
+    module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readSint64(), true);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableSint64IntoExt(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
-    a.readPackableSint64Into((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, !0));
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
+    a.readPackableSint64Into((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c, true));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readSint64Gbigint(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readSint64Gbigint());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableSint64GbigintInto(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     a.readPackableSint64GbigintInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readSint64GbigintIgnoringDefault(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     a = a.readSint64Gbigint();
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a === module$contents$jspb_internal_binary_GBIGINT_ZERO ? void 0 : a);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readSint64GbigintOneof(a, b, c, d) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     (0, jspb_internal_adapters.setOneofFieldForBinary)(b, c, d, a.readSint64Gbigint());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readSint64String(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readSint64String());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableSint64StringInto(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     a.readPackableSint64StringInto((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readSint64StringIgnoringDefault(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     a = a.readSint64String();
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a === "0" ? void 0 : a);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readSint64StringOneof(a, b, c, d) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     (0, jspb_internal_adapters.setOneofFieldForBinary)(b, c, d, a.readSint64String());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readSint64(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a.readSint64());
     return !0
   }
 
   function module$contents$jspb_internal_binary_readPackableSint64Into(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT && a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.DELIMITED) return false;
     a.readPackableSint64Into((0, jspb_internal_adapters.getRepeatedFieldForBinary)(b, c));
     return !0
   }
 
   function module$contents$jspb_internal_binary_readSint64IgnoringDefault(a, b, c) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     a = a.readSint64();
     module$contents$jspb_internal_binary_setFieldBinary(b, c, a === 0 ? void 0 : a);
     return !0
   }
 
   function module$contents$jspb_internal_binary_readSint64Oneof(a, b, c, d) {
-    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return !1;
+    if (a.getWireType() !== module$exports$jspb$BinaryConstants.WireType.VARINT) return false;
     (0, jspb_internal_adapters.setOneofFieldForBinary)(b, c, d, a.readSint64());
     return !0
   }
@@ -18907,7 +18907,7 @@
       f = f == null ? f : b.fromApi(f);
       return a.setExtensionFn(d, e, f, g)
     }, void 0, void 0, (c = b.defaultValue) !=
-      null ? c : a.defaultValue, !0)
+      null ? c : a.defaultValue, true)
   }
 
   function module$contents$jspb$internal_extension_field_info_createSingularMessageDelegatingExtension(a, b) {
@@ -18920,7 +18920,7 @@
     }, void 0, void 0, function (d, e, f, g, h) {
       g = g == null ? g : b.fromApi(g);
       return a.setExtensionFn(d, e, f, g, h)
-    }, void 0, void 0, (c = b.defaultValue) != null ? c : a.defaultValue, !0)
+    }, void 0, void 0, (c = b.defaultValue) != null ? c : a.defaultValue, true)
   }
 
   function module$contents$jspb$internal_extension_field_info_createRepeatedPrimitiveDelegatingExtension(a, b) {
@@ -18939,7 +18939,7 @@
       return a.setExtensionAtIndexFn(c, d, e, b.fromApi(f), g)
     }, function (c, d, e) {
       return a.addExtensionFn(c, d, b.fromApi(e))
-    }, a.defaultValue, !0)
+    }, a.defaultValue, true)
   }
 
   function module$contents$jspb$internal_extension_field_info_createRepeatedMessageDelegatingExtension(a, b) {
@@ -18960,7 +18960,7 @@
       return a.setExtensionAtIndexFn(c, d, e, f, b.fromApi(g), h)
     }, function (c, d, e, f) {
       return a.addExtensionFn(c, d, e, b.fromApi(f))
-    }, a.defaultValue, !0)
+    }, a.defaultValue, true)
   }
   module$exports$jspb$internal_extension_field_info.RecordExtensionRegistry = function () { };
   module$exports$jspb$internal_extension_field_info.createMessageExtension = module$contents$jspb$internal_extension_field_info_createMessageExtension;
@@ -19307,11 +19307,11 @@
   function module$contents$jspb_internal_public_for_gencode_packAnyValueJspb(a, b, c, d, e) {
     goog.asserts.assertInstanceof(a, module$exports$jspb.Message);
     goog.asserts.assertInstanceof(b, module$exports$jspb.Message);
-    module$contents$jspb_internal_public_for_gencode_assertCorrectAnyType(b.constructor, c, !0);
+    module$contents$jspb_internal_public_for_gencode_assertCorrectAnyType(b.constructor, c, true);
     b.serializeBinaryFnForAnyProto_ = d;
     module$contents$jspb_internal_public_for_gencode_setAnyTypeName(a, c, e);
     (0, jspb_internal_adapters.setField)(a, module$contents$jspb_internal_public_for_gencode_ANY_VALUE_FIELD_NUMBER,
-      b, !1);
+      b, false);
     return a
   }
 
@@ -19322,7 +19322,7 @@
   function module$contents$jspb_internal_public_for_gencode_unpackAnyJspb(a, b, c) {
     if (module$contents$jspb_internal_public_for_gencode_getAnyTypeName(a) != c) return null;
     b = module$contents$jspb_internal_public_for_gencode_ctorFromCtorOrDefaultInstance(b);
-    module$contents$jspb_internal_public_for_gencode_assertCorrectAnyType(b, c, !1);
+    module$contents$jspb_internal_public_for_gencode_assertCorrectAnyType(b, c, false);
     return module$contents$jspb_internal_public_for_gencode_getInlineAnyValue(a, b)
   }
 
@@ -19330,7 +19330,7 @@
     if (module$contents$jspb_internal_public_for_gencode_getAnyTypeName(a) != c) return null;
     var d = (0, jspb_internal_adapters.getStringFieldWithDefault)(a, module$contents$jspb_internal_public_for_gencode_ANY_VALUE_FIELD_NUMBER);
     goog.asserts.assert(module$contents$jspb$internal_options_getUnsafeDisableJspbAnyTypeChecks() || !(d instanceof module$exports$jspb.Message || Array.isArray(d)), "saw an invalid value of type '%s'", typeof d);
-    (a = b((0, jspb_internal_adapters.getBytesFieldWithDefault)(a, module$contents$jspb_internal_public_for_gencode_ANY_VALUE_FIELD_NUMBER).asUint8Array())) && module$contents$jspb_internal_public_for_gencode_assertCorrectAnyType(a.constructor, c, !1);
+    (a = b((0, jspb_internal_adapters.getBytesFieldWithDefault)(a, module$contents$jspb_internal_public_for_gencode_ANY_VALUE_FIELD_NUMBER).asUint8Array())) && module$contents$jspb_internal_public_for_gencode_assertCorrectAnyType(a.constructor, c, false);
     return a
   }
 
@@ -19341,7 +19341,7 @@
   function module$contents$jspb_internal_public_for_gencode_unpackAnyJspbCompat(a, b, c, d) {
     if (module$contents$jspb_internal_public_for_gencode_getAnyTypeName(a) != d) return null;
     b = module$contents$jspb_internal_public_for_gencode_ctorFromCtorOrDefaultInstance(b);
-    module$contents$jspb_internal_public_for_gencode_assertCorrectAnyType(b, d, !1);
+    module$contents$jspb_internal_public_for_gencode_assertCorrectAnyType(b, d, false);
     d = (0, jspb_internal_adapters.getFieldWithDefault)(a, module$contents$jspb_internal_public_for_gencode_ANY_VALUE_FIELD_NUMBER, module$contents$jspb$internal_operations_logNewArray([]));
     return d instanceof module$exports$jspb.Message || Array.isArray(d) ? module$contents$jspb_internal_public_for_gencode_getInlineAnyValue(a, b) : c((0, jspb_internal_adapters.getBytesFieldWithDefault)(a, module$contents$jspb_internal_public_for_gencode_ANY_VALUE_FIELD_NUMBER).asUint8Array())
   }
@@ -19360,7 +19360,7 @@
       d = (0, jspb_internal_adapters.getFieldNullableInternal)(a, c, module$contents$jspb_internal_public_for_gencode_ANY_VALUE_FIELD_NUMBER);
     if (d != null && !module$contents$jspb_internal_public_for_gencode_isArrayOrMessage(d)) throw Error("saw an invalid value of type '" + goog.typeOf(d) + "' in the Any.value field");
     var e = module$contents$jspb$internal_accessor_helpers_messageFromInlineStorage(d,
-      b, !0, c);
+      b, true, c);
     if (!(e instanceof b)) throw Error("incorrect type in any value: got " + e.constructor.displayName + ", expected " + b.displayName);
     b = c & module$exports$jspb$internal_array_state.ArrayStateFlags.IS_IMMUTABLE_ARRAY;
     var f = module$contents$jspb$internal_isImmutableMessage(e);
@@ -25909,8 +25909,8 @@
   jspb$jfk$MutableButtonStyle.Style = jspb$e.jfk$ButtonStyle$Style;
   jspb$jfk$MutableButtonStyle.Width = jspb$e.jfk$ButtonStyle$Width;
   goog.debug.LOGGING_ENABLED = goog.DEBUG;
-  goog.debug.FORCE_SLOPPY_STACKS = !1;
-  goog.debug.CHECK_FOR_THROWN_EVENT = !1;
+  goog.debug.FORCE_SLOPPY_STACKS = false;
+  goog.debug.CHECK_FOR_THROWN_EVENT = false;
   goog.debug.catchErrors = function (a, b, c) {
     c = c || goog.global;
     var d = c.onerror,
@@ -25960,7 +25960,7 @@
             var l = goog.getUid(g);
             if (e[l]) c.push("*** reference loop detected (id=" + l + ") ***");
             else {
-              e[l] = !0;
+              e[l] = true;
               c.push("{");
               for (var m in g)
                 if (b || typeof g[m] !== "function") c.push("\n"),
@@ -25991,7 +25991,7 @@
       fileName: b,
       stack: "Not available"
     };
-    var c = !1;
+    var c = false;
     try {
       var d = a.lineNumber || a.line || "Not available"
     } catch (g) {
@@ -26033,7 +26033,7 @@
   };
   goog.debug.serializeErrorStack_ = function (a, b) {
     b || (b = {});
-    b[goog.debug.serializeErrorAsKey_(a)] = !0;
+    b[goog.debug.serializeErrorAsKey_(a)] = true;
     var c = a.stack || "";
     (a = a.cause) && !b[goog.debug.serializeErrorAsKey_(a)] && (c += "\nCaused by: ", a.stack && a.stack.indexOf(a.toString()) == 0 || (c += typeof a === "string" ? a : a.message + "\n"), c += goog.debug.serializeErrorStack_(a, b));
     return c
@@ -26277,10 +26277,10 @@
     b = goog.i18n.GraphemeBreak.getBreakProp_(e);
     f = goog.i18n.GraphemeBreak.getBreakProp_(f);
     var g = typeof a === "string";
-    if (b === d.CR && f === d.LF) return !1;
-    if (b === d.CONTROL || b === d.CR || b === d.LF || f === d.CONTROL || f === d.CR || f === d.LF) return !0;
+    if (b === d.CR && f === d.LF) return false;
+    if (b === d.CONTROL || b === d.CR || b === d.LF || f === d.CONTROL || f === d.CR || f === d.LF) return true;
     if (b === d.L && (f === d.L || f === d.V || f === d.LV ||
-      f === d.LVT) || !(b !== d.LV && b !== d.V || f !== d.V && f !== d.T) || (b === d.LVT || b === d.T) && f === d.T || f === d.EXTEND || f === d.ZWJ || f === d.VIRAMA || c && (b === d.PREPEND || f === d.SPACING_MARK) || c && b === d.VIRAMA && f === d.INDIC_LETTER) return !1;
+      f === d.LVT) || !(b !== d.LV && b !== d.V || f !== d.V && f !== d.T) || (b === d.LVT || b === d.T) && f === d.T || f === d.EXTEND || f === d.ZWJ || f === d.VIRAMA || c && (b === d.PREPEND || f === d.SPACING_MARK) || c && b === d.VIRAMA && f === d.INDIC_LETTER) return false;
     var h;
     if (g) {
       if (f === d.E_MODIFIER) {
@@ -26291,8 +26291,8 @@
         if (h === d.E_BASE || h === d.E_BASE_GAZ) return !1
       }
     } else if ((b === d.E_BASE || b === d.E_BASE_GAZ) &&
-      f === d.E_MODIFIER) return !1;
-    if (b === d.ZWJ && (f === d.GLUE_AFTER_ZWJ || f === d.E_BASE_GAZ)) return !1;
+      f === d.E_MODIFIER) return false;
+    if (b === d.ZWJ && (f === d.GLUE_AFTER_ZWJ || f === d.E_BASE_GAZ)) return false;
     if (g) {
       if (f === d.REGIONAL_INDICATOR) {
         f = 0;
@@ -26303,7 +26303,7 @@
         h === d.REGIONAL_INDICATOR && f++;
         if (f % 2 === 1) return !1
       }
-    } else if (b === d.REGIONAL_INDICATOR && f === d.REGIONAL_INDICATOR) return !1;
+    } else if (b === d.REGIONAL_INDICATOR && f === d.REGIONAL_INDICATOR) return false;
     return !0
   };
   goog.i18n.GraphemeBreak.getBreakProp_ = function (a) {
@@ -26321,7 +26321,7 @@
       0, 5, 2, 0, 5, 2, 5, 0, 2, 4, 2, 4, 2, 4, 2, 6, 2, 0, 2, 0, 2, 1, 0, 2, 0, 2, 0, 5, 0, 2, 4, 2, 4, 2, 4, 2, 0, 5, 0, 5, 0, 5, 2, 4, 2, 0, 5, 0, 5, 4, 2, 4, 2, 6, 0, 2, 0, 2, 4, 2, 0, 2, 4, 0, 5, 2, 4, 2, 4, 2, 4, 2, 4, 6, 5, 0, 2, 0, 2, 4, 0, 5, 4, 2, 4, 2, 6, 2, 5, 0, 5, 0, 5, 0, 2, 4, 2, 4, 2, 4, 2, 6, 0, 5, 4, 2, 4, 2, 0, 5, 0, 2, 0, 2, 4, 2, 0, 2, 0, 4, 2, 0, 2, 0, 2, 0, 1, 2, 15, 1, 0, 1, 0, 1, 0, 2, 0, 16, 0, 17, 0, 17, 0, 17, 0, 16, 0, 17, 0, 16, 0, 17, 0, 2, 0, 6, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 6, 5, 2, 5, 4, 2, 4, 0, 5, 0, 5, 0, 5, 0, 5, 0, 4, 0, 5, 4, 6, 2, 0, 2, 0, 5, 0, 2, 0, 5, 2, 4, 6, 0, 7, 2, 4, 0, 5, 0, 5, 2, 4, 2, 4, 2, 4, 6, 0, 2, 0, 5, 2, 4, 2, 4, 2, 0, 2, 0, 2, 4, 0, 5, 0, 5, 0, 5, 0, 2, 0, 5, 2,
       0, 2, 0, 2, 0, 2, 0, 2, 0, 5, 4, 2, 4, 0, 4, 6, 0, 5, 0, 5, 0, 5, 0, 4, 2, 4, 2, 4, 0, 4, 6, 0, 11, 8, 9, 0, 2, 0, 2, 0, 2, 0, 2, 0, 1, 0, 2, 0, 1, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 6, 0, 2, 0, 4, 2, 4, 0, 2, 6, 0, 6, 2, 4, 0, 4, 2, 4, 6, 2, 0, 3, 0, 2, 0, 2, 4, 2, 6, 0, 2, 0, 2, 4, 0, 4, 2, 4, 6, 0, 3, 0, 2, 0, 4, 2, 4, 2, 6, 2, 0, 2, 0, 2, 4, 2, 6, 0, 2, 4, 0, 2, 0, 2, 4, 2, 4, 6, 0, 2, 0, 4, 2, 0, 4, 2, 4, 6, 2, 4, 2, 0, 2, 4, 2, 4, 2, 4, 2, 4, 2, 4, 6, 2, 0, 2, 4, 2, 4, 2, 4, 6, 2, 0, 2, 0, 4, 2, 4, 2, 4, 6, 2, 0, 2, 4, 2, 4, 2, 6, 2, 0, 2, 4, 2, 4, 2, 6, 0, 4, 2, 4, 6, 0, 2, 4, 2, 4, 2, 4, 2, 0, 2, 0, 2, 0, 4, 2, 0, 2, 0, 1, 0, 2, 4, 2, 0, 4, 2, 1, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 14, 0, 17, 0, 17, 0, 17,
       0, 16, 0, 17, 0, 17, 0, 17, 0, 16, 0, 16, 0, 16, 0, 17, 0, 17, 0, 18, 0, 16, 0, 16, 0, 19, 0, 16, 0, 16, 0, 16, 0, 16, 0, 16, 0, 17, 0, 16, 0, 17, 0, 17, 0, 17, 0, 16, 0, 16, 0, 16, 0, 16, 0, 17, 0, 16, 0, 16, 0, 17, 0, 17, 0, 16, 0, 16, 0, 16, 0, 16, 0, 16, 0, 16, 0, 16, 0, 16, 0, 16, 0, 1, 2
-    ], !0));
+    ], true));
     return goog.i18n.GraphemeBreak.inversions_.at(a)
   };
   goog.i18n.GraphemeBreak.getCodePoint_ = function (a, b) {
@@ -26621,7 +26621,7 @@
   function module$contents$google3$third_party$javascript$safevalues$builders$url_builders_isSafeUrlPrefix(a, b) {
     var c = a.search(/[:/?#]/);
     if (c < 0) return b;
-    if (a.charAt(c) !== ":") return !0;
+    if (a.charAt(c) !== ":") return true;
     a = a.substring(0, c).toLowerCase();
     return /^[a-z][a-z\d+.-]*$/.test(a) && a !== "javascript"
   }
@@ -27410,7 +27410,7 @@
     goog.log.ENABLED && a && goog.log.LogRegistry_.getInstance().getLogRegistryEntry(a.getName()).handlers.push(b)
   };
   goog.log.removeHandler = function (a, b) {
-    return goog.log.ENABLED && a && (a = goog.log.LogRegistry_.getInstance().getLogRegistryEntry(a.getName()), b = a.handlers.indexOf(b), b !== -1) ? (a.handlers.splice(b, 1), !0) : !1
+    return goog.log.ENABLED && a && (a = goog.log.LogRegistry_.getInstance().getLogRegistryEntry(a.getName()), b = a.handlers.indexOf(b), b !== -1) ? (a.handlers.splice(b, 1), true) : !1
   };
   goog.log.setLevel = function (a, b) {
     goog.log.ENABLED && a && (goog.log.LogRegistry_.getInstance().getLogRegistryEntry(a.getName()).level = b)
@@ -27482,12 +27482,12 @@
     b = String(b);
     var d = c;
     b.toLowerCase() === "inserthtml" && (d = (0, module$exports$google3$third_party$javascript$safevalues$internals$html_impl.unwrapHtml)(c));
-    return a.execCommand(b, !1, d)
+    return a.execCommand(b, false, d)
   }
   module$exports$google3$third_party$javascript$safevalues$dom$globals$document.execCommand = module$contents$google3$third_party$javascript$safevalues$dom$globals$document_execCommand;
 
   function module$contents$google3$third_party$javascript$safevalues$dom$globals$document_execCommandInsertHtml(a, b) {
-    return a.execCommand("insertHTML", !1, (0, module$exports$google3$third_party$javascript$safevalues$internals$html_impl.unwrapHtml)(b))
+    return a.execCommand("insertHTML", false, (0, module$exports$google3$third_party$javascript$safevalues$internals$html_impl.unwrapHtml)(b))
   }
   module$exports$google3$third_party$javascript$safevalues$dom$globals$document.execCommandInsertHtml = module$contents$google3$third_party$javascript$safevalues$dom$globals$document_execCommandInsertHtml;
   var module$exports$google3$third_party$javascript$safevalues$dom$globals$dom_parser = {},
@@ -27775,8 +27775,8 @@
   safevalues.restricted.reviewed.styleSheetSafeByReview = module$contents$google3$third_party$javascript$safevalues$restricted$reviewed_styleSheetSafeByReview;
   safevalues.restricted.reviewed.urlSafeByReview = module$contents$google3$third_party$javascript$safevalues$restricted$reviewed_urlSafeByReview;
   safevalues.restricted.reviewed.styleSafeByReview = module$contents$google3$third_party$javascript$safevalues$restricted$reviewed_styleSafeByReview;
-  goog.string.DETECT_DOUBLE_ESCAPING = !1;
-  goog.string.FORCE_NON_DOM_HTML_UNESCAPING = !1;
+  goog.string.DETECT_DOUBLE_ESCAPING = false;
+  goog.string.FORCE_NON_DOM_HTML_UNESCAPING = false;
   goog.string.Unicode = {
     NBSP: "\u00a0",
     ZERO_WIDTH_SPACE: "\u200b"
@@ -28101,7 +28101,7 @@
   };
   goog.format = {};
   goog.format.fileSize = function (a, b) {
-    return goog.format.numBytesToString(a, b, !1)
+    return goog.format.numBytesToString(a, b, false)
   };
   goog.format.isConvertableScaledNumber = function (a) {
     return goog.format.SCALED_NUMERIC_RE_.test(a)
@@ -28189,7 +28189,7 @@
     for (var d = [], e = 0, f = 0, g = 0, h = 0, k = 0; k < a.length; k++) {
       var l = h;
       h = a.charCodeAt(k);
-      l = h >= goog.format.FIRST_GRAPHEME_EXTEND_ && !b(l, h, !0);
+      l = h >= goog.format.FIRST_GRAPHEME_EXTEND_ && !b(l, h, true);
       e >= c && !goog.format.isTreatedAsBreakingSpace_(h) && !l && (d.push(a.substring(g, k), goog.format.WORD_BREAK_HTML), g = k, e = 0);
       f ? h == goog.format.WbrToken_.GT && f == goog.format.WbrToken_.LT ? f = 0 : h == goog.format.WbrToken_.SEMI_COLON && f == goog.format.WbrToken_.AMP && (f = 0, e++) : h == goog.format.WbrToken_.LT || h == goog.format.WbrToken_.AMP ?
         f = h : goog.format.isTreatedAsBreakingSpace_(h) ? e = 0 : goog.format.isInvisibleFormattingCharacter_(h) || e++
@@ -28215,8 +28215,8 @@
     SPACE: 32
   };
   goog.i18n.bidi = {};
-  goog.i18n.bidi.FORCE_RTL = !1;
-  goog.i18n.bidi.IS_RTL = goog.i18n.bidi.FORCE_RTL || !1;
+  goog.i18n.bidi.FORCE_RTL = false;
+  goog.i18n.bidi.IS_RTL = goog.i18n.bidi.FORCE_RTL || false;
   goog.i18n.bidi.Format = {
     LRE: "\u202a",
     RLE: "\u202b",
@@ -28326,7 +28326,7 @@
   goog.i18n.bidi.estimateDirection = function (a, b) {
     var c = 0,
       d = 0,
-      e = !1;
+      e = false;
     a = goog.i18n.bidi.stripHtmlIfNeeded_(a, b).split(goog.i18n.bidi.wordSeparatorRe_);
     for (b = 0; b < a.length; b++) {
       var f = a[b];
@@ -29009,8 +29009,8 @@
         }
   };
   module$contents$google3$third_party$javascript$safevalues$builders$html_sanitizer$css$tokenizer_Tokenizer.prototype.consumeComments = function () {
-    for (var a = !1; this.nextNInputCodePoints(2) === "/*";) {
-      a = !0;
+    for (var a = false; this.nextNInputCodePoints(2) === "/*";) {
+      a = true;
       this.consumeNInputCodePoints(2);
       var b = this.css.indexOf("*/", this.pos);
       if (b === -1) {
@@ -29295,7 +29295,7 @@
     return module$contents$google3$third_party$javascript$safevalues$builders$html_sanitizer$css$serializer_serializeTokens(b)
   };
   module$contents$google3$third_party$javascript$safevalues$builders$html_sanitizer$css$sanitizer_CssSanitizer.prototype.sanitizeKeyframeRule = function (a) {
-    var b = this.sanitizeStyleDeclaration(a.style, !0);
+    var b = this.sanitizeStyleDeclaration(a.style, true);
     return a.keyText + " { " + b + " }"
   };
   module$contents$google3$third_party$javascript$safevalues$builders$html_sanitizer$css$sanitizer_CssSanitizer.prototype.sanitizeKeyframesRule = function (a) {
@@ -29305,9 +29305,9 @@
       " }"
   };
   module$contents$google3$third_party$javascript$safevalues$builders$html_sanitizer$css$sanitizer_CssSanitizer.prototype.isPropertyNameAllowed = function (a) {
-    if (!this.propertyAllowlist.has(a)) return !1;
+    if (!this.propertyAllowlist.has(a)) return false;
     for (var b = (0, $jscomp.makeIterator)(this.propertyDiscarders), c = b.next(); !c.done; c = b.next())
-      if (c = c.value, c(a)) return !1;
+      if (c = c.value, c(a)) return false;
     return !0
   };
   module$contents$google3$third_party$javascript$safevalues$builders$html_sanitizer$css$sanitizer_CssSanitizer.prototype.sanitizeProperty = function (a, b, c, d) {
@@ -29328,7 +29328,7 @@
   module$contents$google3$third_party$javascript$safevalues$builders$html_sanitizer$css$sanitizer_CssSanitizer.prototype.sanitizeStyleRule = function (a) {
     var b = this.sanitizeSelector(a.selectorText);
     if (!b) return null;
-    a = this.sanitizeStyleDeclaration(a.style, !0);
+    a = this.sanitizeStyleDeclaration(a.style, true);
     return b + " { " + a + " }"
   };
   module$contents$google3$third_party$javascript$safevalues$builders$html_sanitizer$css$sanitizer_CssSanitizer.prototype.sanitizeStyleElement = function (a) {
@@ -29340,7 +29340,7 @@
   };
   module$contents$google3$third_party$javascript$safevalues$builders$html_sanitizer$css$sanitizer_CssSanitizer.prototype.sanitizeStyleAttribute = function (a) {
     a = this.getStyleDeclaration(a);
-    return this.sanitizeStyleDeclaration(a, !1)
+    return this.sanitizeStyleDeclaration(a, false)
   };
 
   function module$contents$google3$third_party$javascript$safevalues$builders$html_sanitizer$css$sanitizer_sanitizeStyleElement(a, b, c, d, e, f) {
@@ -29349,7 +29349,7 @@
   module$exports$google3$third_party$javascript$safevalues$builders$html_sanitizer$css$sanitizer.sanitizeStyleElement = module$contents$google3$third_party$javascript$safevalues$builders$html_sanitizer$css$sanitizer_sanitizeStyleElement;
 
   function module$contents$google3$third_party$javascript$safevalues$builders$html_sanitizer$css$sanitizer_sanitizeStyleAttribute(a, b, c, d, e) {
-    return (new module$contents$google3$third_party$javascript$safevalues$builders$html_sanitizer$css$sanitizer_CssSanitizer(b, c, d, !1, e)).sanitizeStyleAttribute(a)
+    return (new module$contents$google3$third_party$javascript$safevalues$builders$html_sanitizer$css$sanitizer_CssSanitizer(b, c, d, false, e)).sanitizeStyleAttribute(a)
   }
   module$exports$google3$third_party$javascript$safevalues$builders$html_sanitizer$css$sanitizer.sanitizeStyleAttribute = module$contents$google3$third_party$javascript$safevalues$builders$html_sanitizer$css$sanitizer_sanitizeStyleAttribute;
   var module$exports$google3$third_party$javascript$safevalues$builders$html_sanitizer$css$css_isolation = {},
@@ -29720,7 +29720,7 @@
     goog.DEBUG && this.changes.push(a)
   };
   module$exports$google3$third_party$javascript$safevalues$builders$html_sanitizer$html_sanitizer.HtmlSanitizerImpl.prototype.satisfiesAllConditions = function (a, b) {
-    if (!a) return !0;
+    if (!a) return true;
     a = (0, $jscomp.makeIterator)(a);
     for (var c = a.next(); !c.done; c = a.next()) {
       var d = (0, $jscomp.makeIterator)(c.value);
@@ -29819,7 +29819,7 @@
       id: "third_party/javascript/safevalues/builders/html_sanitizer/html_sanitizer_builder.closure.js"
     };
   module$exports$google3$third_party$javascript$safevalues$builders$html_sanitizer$html_sanitizer_builder.BaseSanitizerBuilder = function () {
-    this.calledBuild = !1;
+    this.calledBuild = false;
     this.sanitizerTable = module$exports$google3$third_party$javascript$safevalues$builders$html_sanitizer$sanitizer_table$default_sanitizer_table.DEFAULT_SANITIZER_TABLE
   };
   module$exports$google3$third_party$javascript$safevalues$builders$html_sanitizer$html_sanitizer_builder.BaseSanitizerBuilder.prototype.onlyAllowElements = function (a) {
@@ -29924,7 +29924,7 @@
   $jscomp.inherits(module$exports$google3$third_party$javascript$safevalues$builders$html_sanitizer$html_sanitizer_builder.HtmlSanitizerBuilder, module$exports$google3$third_party$javascript$safevalues$builders$html_sanitizer$html_sanitizer_builder.BaseSanitizerBuilder);
   module$exports$google3$third_party$javascript$safevalues$builders$html_sanitizer$html_sanitizer_builder.HtmlSanitizerBuilder.prototype.build = function () {
     if (this.calledBuild) throw Error("this sanitizer has already called build");
-    this.calledBuild = !0;
+    this.calledBuild = true;
     return new module$exports$google3$third_party$javascript$safevalues$builders$html_sanitizer$html_sanitizer.HtmlSanitizerImpl(this.sanitizerTable, module$exports$google3$third_party$javascript$safevalues$internals$secrets.secretToken, void 0, void 0, this.resourceUrlPolicy)
   };
   module$exports$google3$third_party$javascript$safevalues$builders$html_sanitizer$html_sanitizer_builder.CssSanitizerBuilder = function () {
@@ -29933,11 +29933,11 @@
   };
   $jscomp.inherits(module$exports$google3$third_party$javascript$safevalues$builders$html_sanitizer$html_sanitizer_builder.CssSanitizerBuilder, module$exports$google3$third_party$javascript$safevalues$builders$html_sanitizer$html_sanitizer_builder.BaseSanitizerBuilder);
   module$exports$google3$third_party$javascript$safevalues$builders$html_sanitizer$html_sanitizer_builder.CssSanitizerBuilder.prototype.allowAnimations = function () {
-    this.animationsAllowed = !0;
+    this.animationsAllowed = true;
     return this
   };
   module$exports$google3$third_party$javascript$safevalues$builders$html_sanitizer$html_sanitizer_builder.CssSanitizerBuilder.prototype.allowTransitions = function () {
-    this.transitionsAllowed = !0;
+    this.transitionsAllowed = true;
     return this
   };
   module$exports$google3$third_party$javascript$safevalues$builders$html_sanitizer$html_sanitizer_builder.CssSanitizerBuilder.prototype.build = function () {
@@ -29993,7 +29993,7 @@
     module$contents$google3$third_party$javascript$safevalues$builders$resource_url_builders_Primitive;
 
   function module$contents$google3$third_party$javascript$safevalues$builders$resource_url_builders_hasValidOrigin(a) {
-    if (!/^https:\/\//.test(a) && !/^\/\//.test(a)) return !1;
+    if (!/^https:\/\//.test(a) && !/^\/\//.test(a)) return false;
     var b = a.indexOf("//") + 2,
       c = a.indexOf("/", b);
     if (c <= b) throw Error("Can't interpolate data in a url's origin, Please make sure to fully specify the origin, terminated with '/'.");
@@ -30005,14 +30005,14 @@
   }
 
   function module$contents$google3$third_party$javascript$safevalues$builders$resource_url_builders_isValidAboutUrl(a) {
-    if (!/^about:blank/.test(a)) return !1;
+    if (!/^about:blank/.test(a)) return false;
     if (a !== "about:blank" && !/^about:blank#/.test(a)) throw Error("The about url is invalid.");
     return !0
   }
 
   function module$contents$google3$third_party$javascript$safevalues$builders$resource_url_builders_isValidPathStart(a) {
-    if (!/^\//.test(a)) return !1;
-    if (a === "/" || a.length > 1 && a[1] !== "/" && a[1] !== "\\") return !0;
+    if (!/^\//.test(a)) return false;
+    if (a === "/" || a.length > 1 && a[1] !== "/" && a[1] !== "\\") return true;
     throw Error("The path start in the url is invalid.");
   }
 
@@ -30229,7 +30229,7 @@
   }
 
   function module$contents$google3$third_party$javascript$safevalues$reporting$reporting_isChangedByEscaping(a, b) {
-    return (0, module$exports$google3$third_party$javascript$safevalues$builders$html_builders.htmlEscape)(a).toString() !== a ? (module$contents$google3$third_party$javascript$safevalues$reporting$reporting_reportLegacyConversion(b, module$contents$google3$third_party$javascript$safevalues$reporting$reporting_ReportingType.HTML_CHANGED_BY_ESCAPING), !0) : !1
+    return (0, module$exports$google3$third_party$javascript$safevalues$builders$html_builders.htmlEscape)(a).toString() !== a ? (module$contents$google3$third_party$javascript$safevalues$reporting$reporting_reportLegacyConversion(b, module$contents$google3$third_party$javascript$safevalues$reporting$reporting_ReportingType.HTML_CHANGED_BY_ESCAPING), true) : !1
   }
 
   function module$contents$google3$third_party$javascript$safevalues$reporting$reporting_isChangedBySanitizing(a, b) {
@@ -30439,7 +30439,7 @@
   safevalues.unwrapUrl = module$contents$google3$third_party$javascript$safevalues$internals$url_impl_unwrapUrl;
   safevalues.reportOnlyHtmlPassthrough = module$contents$google3$third_party$javascript$safevalues$reporting$reporting_reportOnlyHtmlPassthrough;
   goog.i18n.BidiFormatter = function (a, b) {
-    this.contextDir_ = goog.i18n.bidi.toDir(a, !0);
+    this.contextDir_ = goog.i18n.bidi.toDir(a, true);
     this.alwaysSpan_ = !!b
   };
   goog.i18n.BidiFormatter.prototype.getContextDir = function () {
@@ -30449,7 +30449,7 @@
     return this.alwaysSpan_
   };
   goog.i18n.BidiFormatter.prototype.setContextDir = function (a) {
-    this.contextDir_ = goog.i18n.bidi.toDir(a, !0)
+    this.contextDir_ = goog.i18n.bidi.toDir(a, true)
   };
   goog.i18n.BidiFormatter.prototype.setAlwaysSpan = function (a) {
     this.alwaysSpan_ = a
@@ -30477,7 +30477,7 @@
     return this.spanWrapSafeHtmlWithKnownDir(null, a, b)
   };
   goog.i18n.BidiFormatter.prototype.spanWrapSafeHtmlWithKnownDir = function (a, b, c) {
-    a == null && (a = this.estimateDirection(module$exports$google3$third_party$javascript$safevalues$index.unwrapHtml(b).toString(), !0));
+    a == null && (a = this.estimateDirection(module$exports$google3$third_party$javascript$safevalues$index.unwrapHtml(b).toString(), true));
     return this.spanWrapWithKnownDir_(a, b, c)
   };
   goog.i18n.BidiFormatter.prototype.spanWrapWithKnownDir_ = function (a, b, c) {
@@ -30492,7 +30492,7 @@
     } else d = b;
     b = module$exports$google3$third_party$javascript$safevalues$index.unwrapHtml(b).toString();
     return d = module$exports$google3$third_party$javascript$safevalues$index.concatHtmls([d, this.dirResetIfNeeded_(b,
-      a, !0, c)])
+      a, true, c)])
   };
   goog.i18n.BidiFormatter.prototype.unicodeWrap = function (a, b, c) {
     return this.unicodeWrapWithKnownDir(null, a, b, c)
@@ -30513,7 +30513,7 @@
   };
   goog.i18n.BidiFormatter.prototype.markAfterKnownDir = function (a, b, c) {
     a == null && (a = this.estimateDirection(b, c));
-    return this.dirResetIfNeeded_(b, a, c, !0)
+    return this.dirResetIfNeeded_(b, a, c, true)
   };
   goog.i18n.BidiFormatter.prototype.mark = function () {
     switch (this.contextDir_) {
@@ -30558,7 +30558,7 @@
     c = c === void 0 ? module$contents$goog$collections$maps_defaultEqualityFn : c;
     a = (0, $jscomp.makeIterator)(a.values());
     for (var d = a.next(); !d.done; d = a.next())
-      if (c(d.value, b)) return !0;
+      if (c(d.value, b)) return true;
     return !1
   }
   goog.collections.maps.hasValue = module$contents$goog$collections$maps_hasValue;
@@ -30568,10 +30568,10 @@
 
   function module$contents$goog$collections$maps_equals(a, b, c) {
     c = c === void 0 ? module$contents$goog$collections$maps_defaultEqualityFn : c;
-    if (a === b) return !0;
-    if (a.size !== b.size) return !1;
+    if (a === b) return true;
+    if (a.size !== b.size) return false;
     for (var d = (0, $jscomp.makeIterator)(a.keys()), e = d.next(); !e.done; e = d.next())
-      if (e = e.value, !b.has(e) || !c(a.get(e), b.get(e))) return !1;
+      if (e = e.value, !b.has(e) || !c(a.get(e), b.get(e))) return false;
     return !0
   }
   goog.collections.maps.equals = module$contents$goog$collections$maps_equals;
@@ -30615,13 +30615,13 @@
 
   function module$contents$goog$object_some(a, b, c) {
     for (var d in a)
-      if (b.call(c, a[d], d, a)) return !0;
+      if (b.call(c, a[d], d, a)) return true;
     return !1
   }
 
   function module$contents$goog$object_every(a, b, c) {
     for (var d in a)
-      if (!b.call(c, a[d], d, a)) return !1;
+      if (!b.call(c, a[d], d, a)) return false;
     return !0
   }
 
@@ -30676,7 +30676,7 @@
 
   function module$contents$goog$object_containsValue(a, b) {
     for (var c in a)
-      if (a[c] == b) return !0;
+      if (a[c] == b) return true;
     return !1
   }
 
@@ -30690,7 +30690,7 @@
   }
 
   function module$contents$goog$object_isEmpty(a) {
-    for (var b in a) return !1;
+    for (var b in a) return false;
     return !0
   }
 
@@ -30729,9 +30729,9 @@
 
   function module$contents$goog$object_equals(a, b) {
     for (var c in a)
-      if (!(c in b) || a[c] !== b[c]) return !1;
+      if (!(c in b) || a[c] !== b[c]) return false;
     for (var d in b)
-      if (!(d in a)) return !1;
+      if (!(d in a)) return false;
     return !0
   }
 
@@ -30782,7 +30782,7 @@
   function module$contents$goog$object_createSet(a) {
     var b = arguments.length;
     if (b == 1 && Array.isArray(arguments[0])) return module$contents$goog$object_createSet.apply(null, arguments[0]);
-    for (var c = {}, d = 0; d < b; d++) c[arguments[d]] = !0;
+    for (var c = {}, d = 0; d < b; d++) c[arguments[d]] = true;
     return c
   }
 
@@ -30800,7 +30800,7 @@
     if (!a) return [];
     if (!Object.getOwnPropertyNames || !Object.getPrototypeOf) return module$contents$goog$object_getKeys(a);
     for (var d = {}; a && (a !== Object.prototype || b) && (a !== Function.prototype || c);) {
-      for (var e = Object.getOwnPropertyNames(a), f = 0; f < e.length; f++) d[e[f]] = !0;
+      for (var e = Object.getOwnPropertyNames(a), f = 0; f < e.length; f++) d[e[f]] = true;
       a = Object.getPrototypeOf(a)
     }
     return module$contents$goog$object_getKeys(d)
@@ -30919,14 +30919,14 @@
     if (typeof a.some == "function") return a.some(b, c);
     if (goog.isArrayLike(a) || typeof a === "string") return Array.prototype.some.call(a, b, c);
     for (var d = goog.structs.getKeys(a), e = goog.structs.getValues(a), f = e.length, g = 0; g < f; g++)
-      if (b.call(c, e[g], d && d[g], a)) return !0;
+      if (b.call(c, e[g], d && d[g], a)) return true;
     return !1
   };
   goog.structs.every = function (a, b, c) {
     if (typeof a.every == "function") return a.every(b, c);
     if (goog.isArrayLike(a) || typeof a === "string") return Array.prototype.every.call(a, b, c);
     for (var d = goog.structs.getKeys(a), e = goog.structs.getValues(a), f = e.length, g = 0; g < f; g++)
-      if (!b.call(c, e[g], d && d[g], a)) return !1;
+      if (!b.call(c, e[g], d && d[g], a)) return false;
     return !0
   };
   goog.uri = {};
@@ -30991,7 +30991,7 @@
     return goog.uri.utils.getComponentByIndex_(goog.uri.utils.ComponentIndex.DOMAIN, a)
   };
   goog.uri.utils.getDomain = function (a) {
-    return goog.uri.utils.decodeIfPossible_(goog.uri.utils.getDomainEncoded(a), !0)
+    return goog.uri.utils.decodeIfPossible_(goog.uri.utils.getDomainEncoded(a), true)
   };
   goog.uri.utils.getPort = function (a) {
     return Number(goog.uri.utils.getComponentByIndex_(goog.uri.utils.ComponentIndex.PORT, a)) || null
@@ -31000,7 +31000,7 @@
     return goog.uri.utils.getComponentByIndex_(goog.uri.utils.ComponentIndex.PATH, a)
   };
   goog.uri.utils.getPath = function (a) {
-    return goog.uri.utils.decodeIfPossible_(goog.uri.utils.getPathEncoded(a), !0)
+    return goog.uri.utils.decodeIfPossible_(goog.uri.utils.getPathEncoded(a), true)
   };
   goog.uri.utils.getQueryData = function (a) {
     return goog.uri.utils.getComponentByIndex_(goog.uri.utils.ComponentIndex.QUERY_DATA, a)
@@ -31182,20 +31182,20 @@
     this.domain_ = this.userInfo_ = this.scheme_ = "";
     this.port_ = null;
     this.fragment_ = this.path_ = "";
-    this.ignoreCase_ = this.isReadOnly_ = !1;
+    this.ignoreCase_ = this.isReadOnly_ = false;
     var c;
-    a instanceof goog.Uri ? (this.ignoreCase_ = b !== void 0 ? b : a.getIgnoreCase(), this.setScheme(a.getScheme()), this.setUserInfo(a.getUserInfo()), this.setDomain(a.getDomain()), this.setPort(a.getPort()), this.setPath(a.getPath()), this.setQueryData(a.getQueryData().clone()), this.setFragment(a.getFragment())) : a && (c = goog.uri.utils.split(String(a))) ? (this.ignoreCase_ = !!b, this.setScheme(c[goog.uri.utils.ComponentIndex.SCHEME] || "", !0), this.setUserInfo(c[goog.uri.utils.ComponentIndex.USER_INFO] || "", !0), this.setDomain(c[goog.uri.utils.ComponentIndex.DOMAIN] || "", !0), this.setPort(c[goog.uri.utils.ComponentIndex.PORT]), this.setPath(c[goog.uri.utils.ComponentIndex.PATH] || "", !0), this.setQueryData(c[goog.uri.utils.ComponentIndex.QUERY_DATA] || "", !0), this.setFragment(c[goog.uri.utils.ComponentIndex.FRAGMENT] || "", !0)) : (this.ignoreCase_ = !!b, this.queryData_ = new goog.Uri.QueryData(null,
+    a instanceof goog.Uri ? (this.ignoreCase_ = b !== void 0 ? b : a.getIgnoreCase(), this.setScheme(a.getScheme()), this.setUserInfo(a.getUserInfo()), this.setDomain(a.getDomain()), this.setPort(a.getPort()), this.setPath(a.getPath()), this.setQueryData(a.getQueryData().clone()), this.setFragment(a.getFragment())) : a && (c = goog.uri.utils.split(String(a))) ? (this.ignoreCase_ = !!b, this.setScheme(c[goog.uri.utils.ComponentIndex.SCHEME] || "", true), this.setUserInfo(c[goog.uri.utils.ComponentIndex.USER_INFO] || "", true), this.setDomain(c[goog.uri.utils.ComponentIndex.DOMAIN] || "", true), this.setPort(c[goog.uri.utils.ComponentIndex.PORT]), this.setPath(c[goog.uri.utils.ComponentIndex.PATH] || "", true), this.setQueryData(c[goog.uri.utils.ComponentIndex.QUERY_DATA] || "", true), this.setFragment(c[goog.uri.utils.ComponentIndex.FRAGMENT] || "", true)) : (this.ignoreCase_ = !!b, this.queryData_ = new goog.Uri.QueryData(null,
       this.ignoreCase_))
   };
   goog.Uri.RANDOM_PARAM = goog.uri.utils.StandardQueryParam.RANDOM;
   goog.Uri.prototype.toString = function () {
     var a = [],
       b = this.getScheme();
-    b && a.push(goog.Uri.encodeSpecialChars_(b, goog.Uri.reDisallowedInSchemeOrUserInfo_, !0), ":");
+    b && a.push(goog.Uri.encodeSpecialChars_(b, goog.Uri.reDisallowedInSchemeOrUserInfo_, true), ":");
     var c = this.getDomain();
-    if (c || b == "file") a.push("//"), (b = this.getUserInfo()) && a.push(goog.Uri.encodeSpecialChars_(b, goog.Uri.reDisallowedInSchemeOrUserInfo_, !0), "@"), a.push(goog.Uri.removeDoubleEncoding_(goog.string.urlEncode(c))), c = this.getPort(), c != null && a.push(":", String(c));
+    if (c || b == "file") a.push("//"), (b = this.getUserInfo()) && a.push(goog.Uri.encodeSpecialChars_(b, goog.Uri.reDisallowedInSchemeOrUserInfo_, true), "@"), a.push(goog.Uri.removeDoubleEncoding_(goog.string.urlEncode(c))), c = this.getPort(), c != null && a.push(":", String(c));
     if (c = this.getPath()) this.hasDomain() && c.charAt(0) != "/" && a.push("/"),
-      a.push(goog.Uri.encodeSpecialChars_(c, c.charAt(0) == "/" ? goog.Uri.reDisallowedInAbsolutePath_ : goog.Uri.reDisallowedInRelativePath_, !0));
+      a.push(goog.Uri.encodeSpecialChars_(c, c.charAt(0) == "/" ? goog.Uri.reDisallowedInAbsolutePath_ : goog.Uri.reDisallowedInRelativePath_, true));
     (c = this.getEncodedQuery()) && a.push("?", c);
     (c = this.getFragment()) && a.push("#", goog.Uri.encodeSpecialChars_(c, goog.Uri.reDisallowedInFragment_));
     return a.join("")
@@ -31230,7 +31230,7 @@
   };
   goog.Uri.prototype.setScheme = function (a, b) {
     this.enforceReadOnly();
-    if (this.scheme_ = b ? goog.Uri.decodeOrEmpty_(a, !0) : a) this.scheme_ = this.scheme_.replace(/:$/, "");
+    if (this.scheme_ = b ? goog.Uri.decodeOrEmpty_(a, true) : a) this.scheme_ = this.scheme_.replace(/:$/, "");
     return this
   };
   goog.Uri.prototype.hasScheme = function () {
@@ -31252,7 +31252,7 @@
   };
   goog.Uri.prototype.setDomain = function (a, b) {
     this.enforceReadOnly();
-    this.domain_ = b ? goog.Uri.decodeOrEmpty_(a, !0) : a;
+    this.domain_ = b ? goog.Uri.decodeOrEmpty_(a, true) : a;
     return this
   };
   goog.Uri.prototype.hasDomain = function () {
@@ -31278,7 +31278,7 @@
   };
   goog.Uri.prototype.setPath = function (a, b) {
     this.enforceReadOnly();
-    this.path_ = b ? goog.Uri.decodeOrEmpty_(a, !0) : a;
+    this.path_ = b ? goog.Uri.decodeOrEmpty_(a, true) : a;
     return this
   };
   goog.Uri.prototype.hasPath = function () {
@@ -31904,7 +31904,7 @@
       for (var b = /[\t\n\r ]*([^:;\t\n\r ]*)[\t\n\r ]*:[\t\n\r ]*([^:;\t\n\r ]*)[\t\n\r ]*(?:;|$)/g, c; c = b.exec(a);)
         if (/^white-space$/i.test(c[1])) {
           c = c[2];
-          if (/^(pre|pre-wrap|break-spaces)$/i.test(c)) return !0;
+          if (/^(pre|pre-wrap|break-spaces)$/i.test(c)) return true;
           if (/^(normal|nowrap)$/i.test(c)) return !1
         } return null
     },
@@ -31925,7 +31925,7 @@
     module$contents$soy_$$updatePreserveWhitespaceStack = function (a, b, c) {
       if (b.charAt(0) === "/")
         for (b = b.substring(1); a.length > 0 && a.pop().tag !== b;);
-      else /^pre$/.test(b) ? a.push(new module$contents$soy_TagPreservesWhitespace(b, !0)) : (c = module$contents$soy_$$getAttributesPreserveWhitespace_(c), c ==
+      else /^pre$/.test(b) ? a.push(new module$contents$soy_TagPreservesWhitespace(b, true)) : (c = module$contents$soy_$$getAttributesPreserveWhitespace_(c), c ==
         null && (c = module$contents$soy_$$shouldPreserveWhitespace_(a)), a.push(new module$contents$soy_TagPreservesWhitespace(b, c)))
     },
     module$contents$soy_BLOCK_TAGS_RE_ = /^\/?(address|blockquote|dd|div|dl|dt|h[1-6]|hr|li|ol|p|pre|table|tr|ul)$/,
@@ -32050,7 +32050,7 @@
         goog.asserts.assert(f >= 0 && f < e.length, "offset must point at a valid character of haystack");
         goog.asserts.assert(d === module$contents$soy_$$strToAsciiLowerCase(d), "needle must be lowercase");
         for (var g = Math.min(e.length - f, d.length), h = 0; h < g; h++)
-          if (d[h] !== module$contents$soy_$$charToAsciiLowerCase_(e[f + h])) return !1;
+          if (d[h] !== module$contents$soy_$$charToAsciiLowerCase_(e[f + h])) return false;
         return !0
       }, c = 0;
         (c = a.indexOf("<", c)) != -1;) {
@@ -32147,7 +32147,7 @@
       return module$contents$soy_$$filterCspNonceValueHelper(a)
     },
     module$contents$soy_$$changeNewlineToBr = function (a) {
-      var b = goog.string.newLineToBr(String(a), !1);
+      var b = goog.string.newLineToBr(String(a), false);
       return module$contents$soy_$$isHtmlOrHtmlTemplate(a) ? module$contents$soy_VERY_UNSAFE.ordainSanitizedHtml(b, module$contents$soy_getContentDir(a)) : b
     },
     module$contents$soy_$$insertWordBreaks = function (a, b) {
@@ -32311,7 +32311,7 @@
       var c = module$contents$google3$third_party$javascript$safevalues$restricted$reviewed_htmlSafeByReview(String(b), {
         justification: "Soy |bidiSpanWrap is applied on an autoescaped text."
       });
-      b = module$contents$soy_$$bidiTextDir(b, !0);
+      b = module$contents$soy_$$bidiTextDir(b, true);
       b = a.spanWrapSafeHtmlWithKnownDir(b, c);
       return (0, module$exports$google3$third_party$javascript$safevalues$index.unwrapHtml)(b).toString()
     },
@@ -32333,7 +32333,7 @@
     module$contents$soy_$$areYouAnInternalCaller = function (a) {
       goog.asserts.assert(a === module$contents$soy_$$internalCallMarkerDoNotUse, "found an incorrect call marker, was an internal function called from the top level?")
     },
-    module$contents$soy_$$debugSoyTemplateInfo = !1;
+    module$contents$soy_$$debugSoyTemplateInfo = false;
 
   function module$contents$soy_setDebugSoyTemplateInfo(a) {
     module$contents$soy_$$debugSoyTemplateInfo = a
@@ -32369,7 +32369,7 @@
   function module$contents$soy_$$getConst(a, b) {
     return module$exports$google3$javascript$common$asserts$enable_goog_asserts.ENABLE_GOOG_ASSERTS ? a(b) : a
   }
-  var module$contents$soy_SOY_CREATED_PROTOS_ARE_IMMUTABLE = !1;
+  var module$contents$soy_SOY_CREATED_PROTOS_ARE_IMMUTABLE = false;
 
   function module$contents$soy_$$emptyProto(a) {
     return module$contents$soy_SOY_CREATED_PROTOS_ARE_IMMUTABLE ? module$contents$jspb$immutable_message_defaultImmutableInstance(a) : new a
@@ -33415,7 +33415,7 @@
         } return d
   };
   module$exports$google3$third_party$javascript$safevalues$internals$html_impl.SafeHtml.ENABLE_ERROR_MESSAGES = goog.DEBUG;
-  module$exports$google3$third_party$javascript$safevalues$internals$html_impl.SafeHtml.SUPPORT_STYLE_ATTRIBUTE = !0;
+  module$exports$google3$third_party$javascript$safevalues$internals$html_impl.SafeHtml.SUPPORT_STYLE_ATTRIBUTE = true;
   module$exports$google3$third_party$javascript$safevalues$internals$html_impl.SafeHtml.from = module$exports$google3$third_party$javascript$safevalues$internals$html_impl.SafeHtml.htmlEscape;
   var module$contents$goog$html$SafeHtml_VALID_NAMES_IN_TAG = /^[a-zA-Z0-9-]+$/,
     module$contents$goog$html$SafeHtml_URL_ATTRIBUTES = {
@@ -33828,8 +33828,8 @@
   var $jscomp$optchain$tmp1005638916$0;
   ($jscomp$optchain$tmp1005638916$0 = null) == null || $jscomp$optchain$tmp1005638916$0(66);
   goog.dom.Appendable = {};
-  goog.dom.ASSUME_QUIRKS_MODE = !1;
-  goog.dom.ASSUME_STANDARDS_MODE = !1;
+  goog.dom.ASSUME_QUIRKS_MODE = false;
+  goog.dom.ASSUME_STANDARDS_MODE = false;
   goog.dom.COMPAT_MODE_KNOWN_ = goog.dom.ASSUME_QUIRKS_MODE || goog.dom.ASSUME_STANDARDS_MODE;
   goog.dom.getDomHelper = function (a) {
     return a ? new goog.dom.DomHelper(goog.dom.getOwnerDocument(a)) : goog.dom.defaultDomHelper_ || (goog.dom.defaultDomHelper_ = new goog.dom.DomHelper)
@@ -34067,7 +34067,7 @@
     return goog.dom.COMPAT_MODE_KNOWN_ ? goog.dom.ASSUME_STANDARDS_MODE : a.compatMode == "CSS1Compat"
   };
   goog.dom.canHaveChildren = function (a) {
-    if (a.nodeType != goog.dom.NodeType.ELEMENT) return !1;
+    if (a.nodeType != goog.dom.NodeType.ELEMENT) return false;
     switch (a.tagName) {
       case String(goog.dom.TagName.APPLET):
       case String(goog.dom.TagName.AREA):
@@ -34147,16 +34147,16 @@
     })
   };
   goog.dom.getFirstElementChild = function (a) {
-    return a.firstElementChild !== void 0 ? a.firstElementChild : goog.dom.getNextElementNode_(a.firstChild, !0)
+    return a.firstElementChild !== void 0 ? a.firstElementChild : goog.dom.getNextElementNode_(a.firstChild, true)
   };
   goog.dom.getLastElementChild = function (a) {
-    return a.lastElementChild !== void 0 ? a.lastElementChild : goog.dom.getNextElementNode_(a.lastChild, !1)
+    return a.lastElementChild !== void 0 ? a.lastElementChild : goog.dom.getNextElementNode_(a.lastChild, false)
   };
   goog.dom.getNextElementSibling = function (a) {
-    return goog.FEATURESET_YEAR > 2018 || a.nextElementSibling !== void 0 ? a.nextElementSibling : goog.dom.getNextElementNode_(a.nextSibling, !0)
+    return goog.FEATURESET_YEAR > 2018 || a.nextElementSibling !== void 0 ? a.nextElementSibling : goog.dom.getNextElementNode_(a.nextSibling, true)
   };
   goog.dom.getPreviousElementSibling = function (a) {
-    return a.previousElementSibling !== void 0 ? a.previousElementSibling : goog.dom.getNextElementNode_(a.previousSibling, !1)
+    return a.previousElementSibling !== void 0 ? a.previousElementSibling : goog.dom.getNextElementNode_(a.previousSibling, false)
   };
   goog.dom.getNextElementNode_ = function (a, b) {
     for (; a && a.nodeType != goog.dom.NodeType.ELEMENT;) a = b ? a.nextSibling : a.previousSibling;
@@ -34187,7 +34187,7 @@
     return a.parentElement || null
   };
   goog.dom.contains = function (a, b) {
-    if (!a || !b) return !1;
+    if (!a || !b) return false;
     if (goog.FEATURESET_YEAR > 2018 || a.contains && b.nodeType == goog.dom.NodeType.ELEMENT) return a == b || a.contains(b);
     if (typeof a.compareDocumentPosition != "undefined") return a == b || !!(a.compareDocumentPosition(b) & 16);
     for (; b && a != b;) b = b.parentNode;
@@ -34284,17 +34284,17 @@
   };
   goog.dom.findNode = function (a, b) {
     var c = [];
-    return goog.dom.findNodes_(a, b, c, !0) ? c[0] : void 0
+    return goog.dom.findNodes_(a, b, c, true) ? c[0] : void 0
   };
   goog.dom.findNodes = function (a, b) {
     var c = [];
-    goog.dom.findNodes_(a, b, c, !1);
+    goog.dom.findNodes_(a, b, c, false);
     return c
   };
   goog.dom.findNodes_ = function (a, b, c, d) {
     if (a != null)
       for (a = a.firstChild; a;) {
-        if (b(a) && (c.push(a), d) || goog.dom.findNodes_(a, b, c, d)) return !0;
+        if (b(a) && (c.push(a), d) || goog.dom.findNodes_(a, b, c, d)) return true;
         a = a.nextSibling
       }
     return !1
@@ -34361,7 +34361,7 @@
   };
   goog.dom.getTextContent = function (a) {
     var b = [];
-    goog.dom.getTextContent_(a, b, !0);
+    goog.dom.getTextContent_(a, b, true);
     a = b.join("");
     a = a.replace(/ \xAD /g, " ").replace(/\xAD/g, "");
     a = a.replace(/\u200B/g, "");
@@ -34371,7 +34371,7 @@
   };
   goog.dom.getRawTextContent = function (a) {
     var b = [];
-    goog.dom.getTextContent_(a, b, !1);
+    goog.dom.getTextContent_(a, b, false);
     return b.join("")
   };
   goog.dom.getTextContent_ = function (a, b, c) {
@@ -34418,7 +34418,7 @@
     var e = b ? String(b).toUpperCase() : null;
     return goog.dom.getAncestor(a, function (f) {
       return (!e || f.nodeName == e) && (!c || typeof f.className === "string" && module$contents$goog$array_contains(f.className.split(/\s+/), c))
-    }, !0, d)
+    }, true, d)
   };
   goog.dom.getAncestorByClass = function (a, b, c) {
     return goog.dom.getAncestorByTagNameAndClass(a, null, b, c)
@@ -34757,7 +34757,7 @@
     return a ^ jfk.PopupPosition.FLIP_POSITION_
   };
   goog.dom.classlist = {};
-  goog.dom.classlist.ALWAYS_USE_DOM_TOKEN_LIST = !1;
+  goog.dom.classlist.ALWAYS_USE_DOM_TOKEN_LIST = false;
   goog.dom.classlist.getClassName_ = function (a) {
     return typeof a.className == "string" ? a.className : a.getAttribute && a.getAttribute("class") || ""
   };
@@ -34813,7 +34813,7 @@
     (c ? goog.dom.classlist.addAll : goog.dom.classlist.removeAll)(a, b)
   };
   goog.dom.classlist.swap = function (a, b, c) {
-    return goog.dom.classlist.contains(a, b) ? (goog.dom.classlist.remove(a, b), goog.dom.classlist.add(a, c), !0) : !1
+    return goog.dom.classlist.contains(a, b) ? (goog.dom.classlist.remove(a, b), goog.dom.classlist.add(a, c), true) : !1
   };
   goog.dom.classlist.toggle = function (a, b) {
     var c = !goog.dom.classlist.contains(a, b);
@@ -35154,8 +35154,8 @@
       var d = b.x;
       b = b.y
     } else d = b, b = c;
-    a.style.left = goog.style.getPixelStyleValue_(d, !1);
-    a.style.top = goog.style.getPixelStyleValue_(b, !1)
+    a.style.left = goog.style.getPixelStyleValue_(d, false);
+    a.style.top = goog.style.getPixelStyleValue_(b, false)
   };
   goog.style.getPosition = function (a) {
     return new goog.math.Coordinate(a.offsetLeft, a.offsetTop)
@@ -35296,10 +35296,10 @@
     return a
   };
   goog.style.setHeight = function (a, b) {
-    a.style.height = goog.style.getPixelStyleValue_(b, !0)
+    a.style.height = goog.style.getPixelStyleValue_(b, true)
   };
   goog.style.setWidth = function (a, b) {
-    a.style.width = goog.style.getPixelStyleValue_(b, !0)
+    a.style.width = goog.style.getPixelStyleValue_(b, true)
   };
   goog.style.getSize = function (a) {
     return goog.style.evaluateWithTemporaryDisplay_(goog.style.getSizeWithDisplay_, a)
@@ -35836,7 +35836,7 @@
   jfk.ArrowPosition.prototype.positionArrow_ = function (a, b, c) {
     var d = this.arrowElement_;
     module$contents$goog$object_forEach(this.arrowClassMap_, function (e) {
-      goog.dom.classlist.enable(d, e, !1)
+      goog.dom.classlist.enable(d, e, false)
     }, this);
     goog.dom.classlist.add(d, this.arrowClassMap_[a]);
     d.style.top = d.style.left = d.style.right = d.style.bottom = "";
@@ -35904,13 +35904,13 @@
   };
   jfk.ArrowPosition.FLIP_ALIGNMENT_ = 1;
   jfk.ArrowPosition.MIN_ARROW_OFFSET_ = 15;
-  jfk.ArrowPosition.prototype.isAutoReposition_ = !1;
+  jfk.ArrowPosition.prototype.isAutoReposition_ = false;
   jfk.ArrowPosition.prototype.arrowAlignment_ = module$contents$jfk$ArrowAlignment_ArrowAlignment.CENTER;
   jfk.ArrowPosition.prototype.arrowOffset_ = 20;
   jfk.ArrowPosition.prototype.boxPosition_ = jfk.PopupPosition.RIGHT;
   jfk.ArrowPosition.prototype.viewport_ = null;
   jfk.ArrowPosition.prototype.offsetFromAnchor_ = -5;
-  jfk.ArrowPosition.prototype.allowBoxOverflowOnPositioningFail_ = !1;
+  jfk.ArrowPosition.prototype.allowBoxOverflowOnPositioningFail_ = false;
   goog.a11y = {};
   goog.a11y.aria = {};
   goog.a11y.aria.State = {
@@ -36210,7 +36210,7 @@
     INTERACTIVE: 2
   };
   goog.Disposable.MONITORING_MODE = 0;
-  goog.Disposable.INCLUDE_STACK_ON_CREATION = !0;
+  goog.Disposable.INCLUDE_STACK_ON_CREATION = true;
   goog.Disposable.instances_ = {};
   goog.Disposable.getUndisposedObjects = function () {
     var a = [],
@@ -36221,7 +36221,7 @@
   goog.Disposable.clearUndisposedObjects = function () {
     goog.Disposable.instances_ = {}
   };
-  goog.Disposable.prototype.disposed_ = !1;
+  goog.Disposable.prototype.disposed_ = false;
   goog.Disposable.prototype.isDisposed = function () {
     return this.disposed_
   };
@@ -36332,14 +36332,14 @@
   goog.debug.entryPointRegistry.EntryPointMonitor = function () { };
   goog.debug.entryPointRegistry.refList_ = [];
   goog.debug.entryPointRegistry.monitors_ = [];
-  goog.debug.entryPointRegistry.monitorsMayExist_ = !1;
+  goog.debug.entryPointRegistry.monitorsMayExist_ = false;
   goog.debug.entryPointRegistry.register = function (a) {
     goog.debug.entryPointRegistry.refList_[goog.debug.entryPointRegistry.refList_.length] = a;
     if (goog.debug.entryPointRegistry.monitorsMayExist_)
       for (var b = goog.debug.entryPointRegistry.monitors_, c = 0; c < b.length; c++) a(goog.bind(b[c].wrap, b[c]))
   };
   goog.debug.entryPointRegistry.monitorAll = function (a) {
-    goog.debug.entryPointRegistry.monitorsMayExist_ = !0;
+    goog.debug.entryPointRegistry.monitorsMayExist_ = true;
     for (var b = goog.bind(a.wrap, a), c = 0; c < goog.debug.entryPointRegistry.refList_.length; c++) goog.debug.entryPointRegistry.refList_[c](b);
     goog.debug.entryPointRegistry.monitors_.push(a)
   };
@@ -36360,7 +36360,7 @@
     POINTER_EVENTS: goog.FEATURESET_YEAR >= 2019 || "PointerEvent" in goog.global,
     PASSIVE_EVENTS: goog.FEATURESET_YEAR > 2018 || module$contents$goog$events$BrowserFeature_purify(function () {
       if (!goog.global.addEventListener ||
-        !Object.defineProperty) return !1;
+        !Object.defineProperty) return false;
       var a = !1,
         b = Object.defineProperty({}, "passive", {
           get: function () {
@@ -36554,9 +36554,9 @@
     this.button = this.screenY = this.screenX = this.clientY = this.clientX = this.offsetY = this.offsetX = 0;
     this.key = "";
     this.charCode = this.keyCode = 0;
-    this.metaKey = this.shiftKey = this.altKey = this.ctrlKey = !1;
+    this.metaKey = this.shiftKey = this.altKey = this.ctrlKey = false;
     this.state = null;
-    this.platformModifierKey = !1;
+    this.platformModifierKey = false;
     this.pointerId = 0;
     this.pointerType = "";
     this.timeStamp = 0;
@@ -36564,7 +36564,7 @@
     a && this.init(a, b)
   };
   goog.inherits(goog.events.BrowserEvent, goog.events.Event);
-  goog.events.BrowserEvent.USE_LAYER_XY_AS_OFFSET_XY = !1;
+  goog.events.BrowserEvent.USE_LAYER_XY_AS_OFFSET_XY = false;
   goog.events.BrowserEvent.MouseButton = {
     LEFT: 0,
     MIDDLE: 1,
@@ -36664,9 +36664,9 @@
     this.key = goog.events.ListenableKey.reserveKey();
     this.removed = this.callOnce = !1
   };
-  goog.events.Listener.ENABLE_MONITORING = !1;
+  goog.events.Listener.ENABLE_MONITORING = false;
   goog.events.Listener.prototype.markAsRemoved = function () {
-    this.removed = !0;
+    this.removed = true;
     this.handler = this.src = this.proxy = this.listener = null
   };
   goog.events.ListenerMap = function (a) {
@@ -36693,14 +36693,14 @@
   };
   goog.events.ListenerMap.prototype.remove = function (a, b, c, d) {
     a = a.toString();
-    if (!(a in this.listeners)) return !1;
+    if (!(a in this.listeners)) return false;
     var e = this.listeners[a];
     b = goog.events.ListenerMap.findListenerIndex_(e, b, c, d);
-    return b > -1 ? (e[b].markAsRemoved(), module$contents$goog$array_removeAt(e, b), e.length == 0 && (delete this.listeners[a], this.typeCount_--), !0) : !1
+    return b > -1 ? (e[b].markAsRemoved(), module$contents$goog$array_removeAt(e, b), e.length == 0 && (delete this.listeners[a], this.typeCount_--), true) : !1
   };
   goog.events.ListenerMap.prototype.removeByKey = function (a) {
     var b = a.type;
-    if (!(b in this.listeners)) return !1;
+    if (!(b in this.listeners)) return false;
     var c = module$contents$goog$array_remove(this.listeners[b], a);
     c && (a.markAsRemoved(), this.listeners[b].length == 0 && (delete this.listeners[b], this.typeCount_--));
     return c
@@ -36738,7 +36738,7 @@
       e = b !== void 0;
     return module$contents$goog$object_some(this.listeners, function (f, g) {
       for (g = 0; g < f.length; ++g)
-        if (!(c && f[g].type != d || e && f[g].capture != b)) return !0;
+        if (!(c && f[g].type != d || e && f[g].capture != b)) return true;
       return !1
     })
   };
@@ -36768,7 +36768,7 @@
       return null
     }
     c = goog.events.wrapListener(c);
-    return goog.events.Listenable.isImplementedBy(a) ? (d = goog.isObject(d) ? !!d.capture : !!d, a.listen(b, c, d, e)) : goog.events.listen_(a, b, c, !1, d, e)
+    return goog.events.Listenable.isImplementedBy(a) ? (d = goog.isObject(d) ? !!d.capture : !!d, a.listen(b, c, d, e)) : goog.events.listen_(a, b, c, false, d, e)
   };
   goog.events.listen_ = function (a, b, c, d, e, f) {
     if (!b) throw Error("Invalid event type");
@@ -36802,7 +36802,7 @@
       return null
     }
     c = goog.events.wrapListener(c);
-    return goog.events.Listenable.isImplementedBy(a) ? (d = goog.isObject(d) ? !!d.capture : !!d, a.listenOnce(b, c, d, e)) : goog.events.listen_(a, b, c, !0, d, e)
+    return goog.events.Listenable.isImplementedBy(a) ? (d = goog.isObject(d) ? !!d.capture : !!d, a.listenOnce(b, c, d, e)) : goog.events.listen_(a, b, c, true, d, e)
   };
   goog.events.listenWithWrapper = function (a, b, c, d, e) {
     b.listen(a, c, d, e)
@@ -36815,13 +36815,13 @@
     d = goog.isObject(d) ? !!d.capture : !!d;
     c = goog.events.wrapListener(c);
     if (goog.events.Listenable.isImplementedBy(a)) return a.unlisten(b, c, d, e);
-    if (!a) return !1;
+    if (!a) return false;
     if (a = goog.events.getListenerMap_(a))
       if (b = a.getListener(b, c, d, e)) return goog.events.unlistenByKey(b);
     return !1
   };
   goog.events.unlistenByKey = function (a) {
-    if (typeof a === "number" || !a || a.removed) return !1;
+    if (typeof a === "number" || !a || a.removed) return false;
     var b = a.src;
     if (goog.events.Listenable.isImplementedBy(b)) return b.unlistenByKey(a);
     var c = a.type,
@@ -36873,7 +36873,7 @@
     return goog.events.Listenable.isImplementedBy(a) ? a.fireListeners(b, c, d) : goog.events.fireListeners_(a, b, c, d)
   };
   goog.events.fireListeners_ = function (a, b, c, d) {
-    var e = !0;
+    var e = true;
     if (a = goog.events.getListenerMap_(a))
       if (b = a.listeners[b.toString()])
         for (b = b.concat(), a = 0; a < b.length; a++) {
@@ -36902,7 +36902,7 @@
     return a.removed ? !0 : goog.events.fireListener(a, new goog.events.BrowserEvent(b, this))
   };
   goog.events.markIeEvent_ = function (a) {
-    var b = !1;
+    var b = false;
     if (a.keyCode == 0) try {
       a.keyCode = -1;
       return
@@ -36972,10 +36972,10 @@
   };
   goog.events.EventTarget.prototype.listen = function (a, b, c, d) {
     this.assertInitialized_();
-    return this.eventTargetListeners_.add(String(a), b, !1, c, d)
+    return this.eventTargetListeners_.add(String(a), b, false, c, d)
   };
   goog.events.EventTarget.prototype.listenOnce = function (a, b, c, d) {
-    return this.eventTargetListeners_.add(String(a), b, !0, c, d)
+    return this.eventTargetListeners_.add(String(a), b, true, c, d)
   };
   goog.events.EventTarget.prototype.unlisten = function (a, b, c, d) {
     return this.eventTargetListeners_.remove(String(a), b, c, d)
@@ -36988,7 +36988,7 @@
   };
   goog.events.EventTarget.prototype.fireListeners = function (a, b, c) {
     a = this.eventTargetListeners_.listeners[String(a)];
-    if (!a) return !0;
+    if (!a) return true;
     a = a.concat();
     for (var d = !0, e = 0; e < a.length; ++e) {
       var f = a[e];
@@ -37025,16 +37025,16 @@
       b = new goog.events.Event(d, a);
       module$contents$goog$object_extend(b, e)
     }
-    e = !0;
+    e = true;
     if (c)
       for (var f = c.length - 1; !b.hasPropagationStopped() && f >= 0; f--) {
         var g = b.currentTarget = c[f];
-        e = g.fireListeners(d, !0, b) && e
+        e = g.fireListeners(d, true, b) && e
       }
-    b.hasPropagationStopped() || (g = b.currentTarget = a, e = g.fireListeners(d, !0, b) && e, b.hasPropagationStopped() ||
-      (e = g.fireListeners(d, !1, b) && e));
+    b.hasPropagationStopped() || (g = b.currentTarget = a, e = g.fireListeners(d, true, b) && e, b.hasPropagationStopped() ||
+      (e = g.fireListeners(d, false, b) && e));
     if (c)
-      for (f = 0; !b.hasPropagationStopped() && f < c.length; f++) g = b.currentTarget = c[f], e = g.fireListeners(d, !1, b) && e;
+      for (f = 0; !b.hasPropagationStopped() && f < c.length; f++) g = b.currentTarget = c[f], e = g.fireListeners(d, false, b) && e;
     return e
   };
   var module$contents$goog$async$FreeList_FreeList = function (a, b, c) {
@@ -37145,7 +37145,7 @@
       c = b.length;
     return function () {
       for (var d = 0; d < c; d++)
-        if (!b[d].apply(this, arguments)) return !1;
+        if (!b[d].apply(this, arguments)) return false;
       return !0
     }
   };
@@ -37154,7 +37154,7 @@
       c = b.length;
     return function () {
       for (var d = 0; d < c; d++)
-        if (b[d].apply(this, arguments)) return !0;
+        if (b[d].apply(this, arguments)) return true;
       return !1
     }
   };
@@ -37170,7 +37170,7 @@
     a.apply(c, Array.prototype.slice.call(arguments, 1));
     return c
   };
-  goog.functions.CACHE_RETURN_VALUE = !0;
+  goog.functions.CACHE_RETURN_VALUE = true;
   goog.functions.cacheReturnValue = function (a) {
     var b = !1,
       c;
@@ -37258,7 +37258,7 @@
       e = goog.bind(function (k) {
         if ((h == "*" || k.origin == h) && k.data == g) this.port1.onmessage()
       }, this);
-      f.addEventListener("message", e, !1);
+      f.addEventListener("message", e, false);
       this.port1 = {};
       this.port2 = {
         postMessage: function () {
@@ -37371,7 +37371,7 @@
     if (!goog.DEBUG) throw Error("This feature is debug-only");
     return module$contents$goog$debug$asyncStackTag_testNameProvider
   };
-  goog.ASSUME_NATIVE_PROMISE = !1;
+  goog.ASSUME_NATIVE_PROMISE = false;
   var module$contents$goog$async$run_ASSUME_NATIVE_PROMISE = goog.ASSUME_NATIVE_PROMISE,
     module$contents$goog$async$run_schedule, module$contents$goog$async$run_workQueueScheduled = !1,
     module$contents$goog$async$run_workQueue = new module$contents$goog$async$WorkQueue_WorkQueue,
@@ -37398,7 +37398,7 @@
     }
   };
   goog.DEBUG && (module$contents$goog$async$run_run.resetQueue = function () {
-    module$contents$goog$async$run_workQueueScheduled = !1;
+    module$contents$goog$async$run_workQueueScheduled = false;
     module$contents$goog$async$run_workQueue = new module$contents$goog$async$WorkQueue_WorkQueue
   }, module$contents$goog$async$run_run.resetSchedulerForTest = function () {
     module$contents$goog$async$run_initializeRunner()
@@ -37428,7 +37428,7 @@
     COMPILED ? a.prototype[module$contents$goog$Thenable_Thenable.IMPLEMENTED_BY_PROP] = !0 : a.prototype.$goog_Thenable = !0
   };
   module$contents$goog$Thenable_Thenable.isImplementedBy = function (a) {
-    if (!a) return !1;
+    if (!a) return false;
     try {
       return COMPILED ? !!a[module$contents$goog$Thenable_Thenable.IMPLEMENTED_BY_PROP] : !!a.$goog_Thenable
     } catch (b) {
@@ -37442,7 +37442,7 @@
     this.state_ = goog.Promise.State_.PENDING;
     this.result_ = void 0;
     this.callbackEntriesTail_ = this.callbackEntries_ = this.parent_ = null;
-    this.executing_ = !1;
+    this.executing_ = false;
     goog.Promise.UNHANDLED_REJECTION_DELAY > 0 ? this.unhandledRejectionId_ = 0 : goog.Promise.UNHANDLED_REJECTION_DELAY == 0 && (this.hadUnhandledRejection_ = !1);
     goog.Promise.LONG_STACK_TRACES && (this.stack_ = [], this.addStackTrace_(Error("created")), this.currentStep_ = 0);
     if (a != goog.functions.UNDEFINED) try {
@@ -37461,7 +37461,7 @@
       this.resolve_(goog.Promise.State_.REJECTED, d)
     }
   };
-  goog.Promise.LONG_STACK_TRACES = !1;
+  goog.Promise.LONG_STACK_TRACES = false;
   goog.Promise.UNHANDLED_REJECTION_DELAY = 0;
   goog.Promise.State_ = {
     PENDING: 0,
@@ -37544,7 +37544,7 @@
           };
           d == 0 && b(e)
         };
-        for (var f = 0, g; f < a.length; f++) g = a[f], goog.Promise.resolveThen_(g, goog.partial(c, f, !0), goog.partial(c, f, !1))
+        for (var f = 0, g; f < a.length; f++) g = a[f], goog.Promise.resolveThen_(g, goog.partial(c, f, true), goog.partial(c, f, false))
       } else b(e)
     })
   };
@@ -37586,7 +37586,7 @@
   goog.Promise.prototype.thenAlways = function (a, b) {
     goog.Promise.LONG_STACK_TRACES && this.addStackTrace_(Error("thenAlways"));
     a = goog.Promise.getCallbackEntry_(a, a, b);
-    a.always = !0;
+    a.always = true;
     this.addCallbackEntry_(a);
     return this
   };
@@ -37657,8 +37657,8 @@
     this.state_ == goog.Promise.State_.PENDING && (this === b && (a = goog.Promise.State_.REJECTED, b = new TypeError("Promise cannot resolve to itself")), this.state_ = goog.Promise.State_.BLOCKED, goog.Promise.maybeThen_(b, this.unblockAndFulfill_, this.unblockAndReject_, this) || (this.result_ = b, this.state_ = a, this.parent_ = null, this.scheduleCallbacks_(), a != goog.Promise.State_.REJECTED || b instanceof goog.Promise.CancellationError || goog.Promise.addUnhandledRejection_(this, b)))
   };
   goog.Promise.maybeThen_ = function (a, b, c, d) {
-    if (a instanceof goog.Promise) return a.thenVoid(b, c, d), !0;
-    if (module$contents$goog$Thenable_Thenable.isImplementedBy(a)) return a.then(b, c, d), !0;
+    if (a instanceof goog.Promise) return a.thenVoid(b, c, d), true;
+    if (module$contents$goog$Thenable_Thenable.isImplementedBy(a)) return a.then(b, c, d), true;
     if (goog.isObject(a)) try {
       var e = a.then;
       if (typeof e === "function") return goog.Promise.tryThen_(a, e, b, c, d), !0
@@ -37778,7 +37778,7 @@
   goog.inherits(goog.Timer, goog.events.EventTarget);
   goog.Timer.MAX_TIMEOUT_ = 2147483647;
   goog.Timer.INVALID_TIMEOUT_ID_ = -1;
-  goog.Timer.prototype.enabled = !1;
+  goog.Timer.prototype.enabled = false;
   goog.Timer.defaultTimerObject = goog.global;
   goog.Timer.intervalScale = .8;
   goog.Timer.prototype.timer_ = null;
@@ -37799,11 +37799,11 @@
     this.dispatchEvent(goog.Timer.TICK)
   };
   goog.Timer.prototype.start = function () {
-    this.enabled = !0;
+    this.enabled = true;
     this.timer_ || (this.timer_ = this.timerObject_.setTimeout(this.boundTick_, this.interval_), this.last_ = goog.now())
   };
   goog.Timer.prototype.stop = function () {
-    this.enabled = !1;
+    this.enabled = false;
     this.timer_ && (this.timerObject_.clearTimeout(this.timer_), this.timer_ = null)
   };
   goog.Timer.prototype.disposeInternal = function () {
@@ -38052,8 +38052,8 @@
     a = a.getDocument();
     this.listen(a, [goog.events.EventType.MOUSEOUT, goog.events.EventType.MOUSEDOWN, goog.events.EventType.CLICK, goog.events.EventType.BLUR, goog.events.EventType.FOCUSOUT,
     goog.events.EventType.KEYDOWN
-    ], this.clearActiveElement_, !0);
-    this.listen(a, [goog.events.EventType.MOUSEOVER, goog.events.EventType.FOCUS, goog.events.EventType.FOCUSIN], this.setActiveElement_, !0)
+    ], this.clearActiveElement_, true);
+    this.listen(a, [goog.events.EventType.MOUSEOVER, goog.events.EventType.FOCUS, goog.events.EventType.FOCUSIN], this.setActiveElement_, true)
   };
   $jscomp.inherits(jfk.TooltipManager_, goog.events.EventHandler);
   jfk.TooltipManager_.prototype.disposeInternal = function () {
@@ -38066,7 +38066,7 @@
       case goog.events.EventType.MOUSEOVER:
       case goog.events.EventType.MOUSEOUT:
       case goog.events.EventType.CLICK:
-        this.isKeyboardEvent_ = !1;
+        this.isKeyboardEvent_ = false;
         break;
       case goog.events.EventType.KEYDOWN:
         this.isKeyboardEvent_ = !0
@@ -38122,8 +38122,8 @@
       var a = goog.dom.getAncestor(this.activeEl_, function (h) {
         return h.getAttribute && (h.getAttribute(jfk.tooltipManager.Attribute.TOOLTIP_CONTAINED_ATTR_) || h.getAttribute(jfk.tooltipManager.Attribute.TOOLTIP_ATTR_) || h.jfkTooltipHtmlInternal) &&
           !h.getAttribute(jfk.tooltipManager.Attribute.TOOLTIP_SUSPENDED_ATTR_)
-      }, !0),
-        b = !1;
+      }, true),
+        b = false;
       this.hoverEl_ && this.hoverEl_ != a && (this.hideTooltip(), b = !0);
       if (!this.hoverEl_ && a && (this.hoverEl_ = a, this.shouldShowTooltip_(a))) {
         var c = module$exports$google3$third_party$javascript$safevalues$index.EMPTY_HTML;
@@ -38203,7 +38203,7 @@
   jfk.TooltipManager_.prototype.showTooltipImpl_ = function (a, b, c, d, e, f) {
     this.secondaryTimerId_ = 0;
     this.tooltipHideDelayMs_ = f;
-    this.tooltip_ || (this.tooltip_ = new module$contents$jfk$SilentTooltipRenderer_SilentTooltipRenderer(this.domHelper_), this.hideTooltipImpl_(), goog.dom.appendChild(this.domHelper_.getDocument().body, this.tooltip_.getElement()), this.registerDisposable(this.tooltip_), this.tooltipPos_ = new jfk.ArrowPosition(this.tooltip_.getClassName(), !0), this.tooltipPos_.setAutoReposition(!0), this.tooltipPos_.setBoxOverflowAllowedOnPositioningFail(!0),
+    this.tooltip_ || (this.tooltip_ = new module$contents$jfk$SilentTooltipRenderer_SilentTooltipRenderer(this.domHelper_), this.hideTooltipImpl_(), goog.dom.appendChild(this.domHelper_.getDocument().body, this.tooltip_.getElement()), this.registerDisposable(this.tooltip_), this.tooltipPos_ = new jfk.ArrowPosition(this.tooltip_.getClassName(), true), this.tooltipPos_.setAutoReposition(!0), this.tooltipPos_.setBoxOverflowAllowedOnPositioningFail(!0),
       this.tooltipPos_.setElements(this.tooltip_.getElement(), this.tooltip_.getArrowElement()));
     f = jfk.TooltipManager_.parseArrowAlignment_(c);
     c = jfk.TooltipManager_.parsePosition_(c);
@@ -38365,8 +38365,8 @@
     PHANTOM: 255
   };
   goog.events.KeyCodes.isTextModifyingKeyEvent = function (a) {
-    if (a.altKey && !a.ctrlKey || a.metaKey || a.keyCode >= goog.events.KeyCodes.F1 && a.keyCode <= goog.events.KeyCodes.F12) return !1;
-    if (goog.events.KeyCodes.isCharacterKey(a.keyCode)) return !0;
+    if (a.altKey && !a.ctrlKey || a.metaKey || a.keyCode >= goog.events.KeyCodes.F1 && a.keyCode <= goog.events.KeyCodes.F12) return false;
+    if (goog.events.KeyCodes.isCharacterKey(a.keyCode)) return true;
     switch (a.keyCode) {
       case goog.events.KeyCodes.ALT:
       case goog.events.KeyCodes.CAPS_LOCK:
@@ -38394,7 +38394,7 @@
       case goog.events.KeyCodes.VK_NONAME:
       case goog.events.KeyCodes.WIN_KEY:
       case goog.events.KeyCodes.WIN_KEY_RIGHT:
-        return !1;
+        return false;
       case goog.events.KeyCodes.WIN_KEY_FF_LINUX:
         return !goog.userAgent.GECKO;
       default:
@@ -38403,7 +38403,7 @@
   };
   goog.events.KeyCodes.firesKeyPressEvent = function (a, b, c, d, e, f) {
     if (goog.userAgent.MAC && e) return goog.events.KeyCodes.isCharacterKey(a);
-    if (e && !d) return !1;
+    if (e && !d) return false;
     if (!goog.userAgent.GECKO) {
       typeof b === "number" && (b = goog.events.KeyCodes.normalizeKeyCode(b));
       var g = b == goog.events.KeyCodes.CTRL || b == goog.events.KeyCodes.ALT || goog.userAgent.MAC && b == goog.events.KeyCodes.META;
@@ -38428,14 +38428,14 @@
     switch (a) {
       case goog.events.KeyCodes.ENTER:
         return goog.userAgent.GECKO ?
-          f || e ? !1 : !(c && d) : !0;
+          f || e ? !1 : !(c && d) : true;
       case goog.events.KeyCodes.ESC:
         return !goog.userAgent.WEBKIT && !goog.userAgent.GECKO
     }
     return goog.userAgent.GECKO && (d || e || f) ? !1 : goog.events.KeyCodes.isCharacterKey(a)
   };
   goog.events.KeyCodes.isCharacterKey = function (a) {
-    if (a >= goog.events.KeyCodes.ZERO && a <= goog.events.KeyCodes.NINE || a >= goog.events.KeyCodes.NUM_ZERO && a <= goog.events.KeyCodes.NUM_MULTIPLY || a >= goog.events.KeyCodes.A && a <= goog.events.KeyCodes.Z || goog.userAgent.WEBKIT && a == 0) return !0;
+    if (a >= goog.events.KeyCodes.ZERO && a <= goog.events.KeyCodes.NINE || a >= goog.events.KeyCodes.NUM_ZERO && a <= goog.events.KeyCodes.NUM_MULTIPLY || a >= goog.events.KeyCodes.A && a <= goog.events.KeyCodes.Z || goog.userAgent.WEBKIT && a == 0) return true;
     switch (a) {
       case goog.events.KeyCodes.SPACE:
       case goog.events.KeyCodes.PLUS_SIGN:
@@ -38460,7 +38460,7 @@
       case goog.events.KeyCodes.CLOSE_SQUARE_BRACKET:
       case goog.events.KeyCodes.FF_HASH:
       case goog.events.KeyCodes.FF_JP_QUOTE:
-        return !0;
+        return true;
       case goog.events.KeyCodes.FF_DASH:
       case goog.events.KeyCodes.FF_DE_PLUS:
         return goog.userAgent.GECKO;
@@ -38517,7 +38517,7 @@
   goog.events.KeyHandler.prototype.keyUpKey_ = null;
   goog.events.KeyHandler.prototype.lastKey_ = -1;
   goog.events.KeyHandler.prototype.keyCode_ = -1;
-  goog.events.KeyHandler.prototype.altKey_ = !1;
+  goog.events.KeyHandler.prototype.altKey_ = false;
   goog.events.KeyHandler.EventType = goog.events.KeyEvent.EventType;
   goog.events.KeyHandler.safariKey_ = {
     3: goog.events.KeyCodes.ENTER,
@@ -38644,14 +38644,14 @@
     this.dom_ = a || goog.dom.getDomHelper();
     this.rightToLeft_ = goog.ui.Component.defaultRightToLeft_;
     this.id_ = null;
-    this.inDocument_ = !1;
+    this.inDocument_ = false;
     this.element_ = null;
     this.googUiComponentHandler_ = void 0;
     this.childIndex_ = this.children_ = this.parent_ = this.model_ = null;
     this.pointerEventsEnabled_ = this.wasDecorated_ = !1
   };
   goog.inherits(goog.ui.Component, goog.events.EventTarget);
-  goog.ui.Component.ALLOW_DETACHED_DECORATION = !1;
+  goog.ui.Component.ALLOW_DETACHED_DECORATION = false;
   goog.ui.Component.prototype.idGenerator_ = goog.ui.IdGenerator.getInstance();
   goog.ui.Component.DEFAULT_BIDI_DIR = 0;
   goog.ui.Component.defaultRightToLeft_ = goog.ui.Component.DEFAULT_BIDI_DIR == 1 ? !1 : goog.ui.Component.DEFAULT_BIDI_DIR == -1 ? !0 : null;
@@ -38791,7 +38791,7 @@
   goog.ui.Component.prototype.decorate = function (a) {
     if (this.inDocument_) throw Error(goog.ui.Component.Error.ALREADY_RENDERED);
     if (a && this.canDecorate(a)) {
-      this.wasDecorated_ = !0;
+      this.wasDecorated_ = true;
       var b = goog.dom.getOwnerDocument(a);
       this.dom_ && this.dom_.getDocument() == b || (this.dom_ = goog.dom.getDomHelper(a));
       this.decorateInternal(a);
@@ -38808,7 +38808,7 @@
     this.element_ = a
   };
   goog.ui.Component.prototype.enterDocument = function () {
-    this.inDocument_ = !0;
+    this.inDocument_ = true;
     this.forEachChild(function (a) {
       !a.isInDocument() && a.getElement() && a.enterDocument()
     })
@@ -38971,7 +38971,7 @@
     k.forEach(function (l) {
       g || l != e ? h || l != f ? d |= this.getStateFromClass(l) : h = !0 : (g = !0, f == e && (h = !0));
       this.getStateFromClass(l) ==
-        goog.ui.Component.State.DISABLED && (goog.asserts.assertElement(c), goog.dom.isFocusableTabIndex(c) && goog.dom.setFocusableTabIndex(c, !1))
+        goog.ui.Component.State.DISABLED && (goog.asserts.assertElement(c), goog.dom.isFocusableTabIndex(c) && goog.dom.setFocusableTabIndex(c, false))
     }, this);
     a.setStateInternal(d);
     g || (k.push(e), f == e && (h = !0));
@@ -38981,7 +38981,7 @@
     return b
   };
   goog.ui.ControlRenderer.prototype.initializeDom = function (a) {
-    a.isRightToLeft() && this.setRightToLeft(a.getElement(), !0);
+    a.isRightToLeft() && this.setRightToLeft(a.getElement(), true);
     a.isEnabled() && this.setFocusable(a, a.isVisible())
   };
   goog.ui.ControlRenderer.prototype.setAriaRole = function (a, b) {
@@ -39007,7 +39007,7 @@
     goog.a11y.aria.setLabel(a, b)
   };
   goog.ui.ControlRenderer.prototype.setAllowTextSelection = function (a, b) {
-    goog.style.setUnselectable(a, !b, !0)
+    goog.style.setUnselectable(a, !b, true)
   };
   goog.ui.ControlRenderer.prototype.setRightToLeft = function (a, b) {
     this.enableClassName(a, this.getStructuralCssClass() + "-rtl", b)
@@ -39264,10 +39264,10 @@
   goog.ui.Control.prototype.supportedStates_ = goog.ui.Component.State.DISABLED | goog.ui.Component.State.HOVER | goog.ui.Component.State.ACTIVE | goog.ui.Component.State.FOCUSED;
   goog.ui.Control.prototype.autoStates_ = goog.ui.Component.State.ALL;
   goog.ui.Control.prototype.statesWithTransitionEvents_ = 0;
-  goog.ui.Control.prototype.visible_ = !0;
+  goog.ui.Control.prototype.visible_ = true;
   goog.ui.Control.prototype.extraClassNames_ = null;
-  goog.ui.Control.prototype.handleMouseEvents_ = !0;
-  goog.ui.Control.prototype.allowTextSelection_ = !1;
+  goog.ui.Control.prototype.handleMouseEvents_ = true;
+  goog.ui.Control.prototype.allowTextSelection_ = false;
   goog.ui.Control.prototype.preferredAriaRole_ = null;
   goog.ui.Control.prototype.isHandleMouseEvents = function () {
     return this.handleMouseEvents_
@@ -39294,10 +39294,10 @@
     return this.extraClassNames_
   };
   goog.ui.Control.prototype.addClassName = function (a) {
-    a && (this.extraClassNames_ ? module$contents$goog$array_contains(this.extraClassNames_, a) || this.extraClassNames_.push(a) : this.extraClassNames_ = [a], this.renderer_.enableExtraClassName(this, a, !0))
+    a && (this.extraClassNames_ ? module$contents$goog$array_contains(this.extraClassNames_, a) || this.extraClassNames_.push(a) : this.extraClassNames_ = [a], this.renderer_.enableExtraClassName(this, a, true))
   };
   goog.ui.Control.prototype.removeClassName = function (a) {
-    a && this.extraClassNames_ && module$contents$goog$array_remove(this.extraClassNames_, a) && (this.extraClassNames_.length == 0 && (this.extraClassNames_ = null), this.renderer_.enableExtraClassName(this, a, !1))
+    a && this.extraClassNames_ && module$contents$goog$array_remove(this.extraClassNames_, a) && (this.extraClassNames_.length == 0 && (this.extraClassNames_ = null), this.renderer_.enableExtraClassName(this, a, false))
   };
   goog.ui.Control.prototype.enableClassName = function (a, b) {
     b ? this.addClassName(a) : this.removeClassName(a)
@@ -39306,8 +39306,8 @@
     var a = this.renderer_.createDom(this);
     this.setElementInternal(a);
     this.renderer_.setAriaRole(a, this.getPreferredAriaRole());
-    this.isAllowTextSelection() || this.renderer_.setAllowTextSelection(a, !1);
-    this.isVisible() || this.renderer_.setVisible(a, !1)
+    this.isAllowTextSelection() || this.renderer_.setAllowTextSelection(a, false);
+    this.isVisible() || this.renderer_.setVisible(a, false)
   };
   goog.ui.Control.prototype.getPreferredAriaRole = function () {
     return this.preferredAriaRole_
@@ -39333,7 +39333,7 @@
     a = this.renderer_.decorate(this, a);
     this.setElementInternal(a);
     this.renderer_.setAriaRole(a, this.getPreferredAriaRole());
-    this.isAllowTextSelection() || this.renderer_.setAllowTextSelection(a, !1);
+    this.isAllowTextSelection() || this.renderer_.setAllowTextSelection(a, false);
     this.visible_ = a.style.display != "none"
   };
   goog.ui.Control.prototype.enterDocument = function () {
@@ -39361,7 +39361,7 @@
   goog.ui.Control.prototype.exitDocument = function () {
     goog.ui.Control.superClass_.exitDocument.call(this);
     this.keyHandler_ && this.keyHandler_.detach();
-    this.isVisible() && this.isEnabled() && this.renderer_.setFocusable(this, !1)
+    this.isVisible() && this.isEnabled() && this.renderer_.setFocusable(this, false)
   };
   goog.ui.Control.prototype.disposeInternal = function () {
     goog.ui.Control.superClass_.disposeInternal.call(this);
@@ -39405,7 +39405,7 @@
     return this.visible_
   };
   goog.ui.Control.prototype.setVisible = function (a, b) {
-    return b || this.visible_ != a && this.dispatchEvent(a ? goog.ui.Component.EventType.SHOW : goog.ui.Component.EventType.HIDE) ? ((b = this.getElement()) && this.renderer_.setVisible(b, a), this.isEnabled() && this.renderer_.setFocusable(this, a), this.visible_ = a, !0) : !1
+    return b || this.visible_ != a && this.dispatchEvent(a ? goog.ui.Component.EventType.SHOW : goog.ui.Component.EventType.HIDE) ? ((b = this.getElement()) && this.renderer_.setVisible(b, a), this.isEnabled() && this.renderer_.setFocusable(this, a), this.visible_ = a, true) : !1
   };
   goog.ui.Control.prototype.isEnabled = function () {
     return !this.hasState(goog.ui.Component.State.DISABLED)
@@ -39415,7 +39415,7 @@
     return !!a && typeof a.isEnabled == "function" && !a.isEnabled()
   };
   goog.ui.Control.prototype.setEnabled = function (a) {
-    !this.isParentDisabled_() && this.isTransitionAllowed(goog.ui.Component.State.DISABLED, !a) && (a || (this.setActive(!1), this.setHighlighted(!1)), this.isVisible() && this.renderer_.setFocusable(this, a), this.setState(goog.ui.Component.State.DISABLED, !a, !0))
+    !this.isParentDisabled_() && this.isTransitionAllowed(goog.ui.Component.State.DISABLED, !a) && (a || (this.setActive(!1), this.setHighlighted(!1)), this.isVisible() && this.renderer_.setFocusable(this, a), this.setState(goog.ui.Component.State.DISABLED, !a, true))
   };
   goog.ui.Control.prototype.isHighlighted = function () {
     return this.hasState(goog.ui.Component.State.HOVER)
@@ -39470,7 +39470,7 @@
   };
   goog.ui.Control.prototype.setSupportedState = function (a, b) {
     if (this.isInDocument() && this.hasState(a) && !b) throw Error(goog.ui.Component.Error.ALREADY_RENDERED);
-    !b && this.hasState(a) && this.setState(a, !1);
+    !b && this.hasState(a) && this.setState(a, false);
     this.supportedStates_ = b ? this.supportedStates_ | a : this.supportedStates_ & ~a
   };
   goog.ui.Control.prototype.isAutoState = function (a) {
@@ -39529,7 +39529,7 @@
     this.isAutoState(goog.ui.Component.State.FOCUSED) && this.setFocused(!1)
   };
   goog.ui.Control.prototype.handleKeyEvent = function (a) {
-    return this.isVisible() && this.isEnabled() && this.handleKeyEventInternal(a) ? (a.preventDefault(), a.stopPropagation(), !0) : !1
+    return this.isVisible() && this.isEnabled() && this.handleKeyEventInternal(a) ? (a.preventDefault(), a.stopPropagation(), true) : !1
   };
   goog.ui.Control.prototype.handleKeyEventInternal = function (a) {
     return a.keyCode == goog.events.KeyCodes.ENTER && this.performActionInternal(a)
@@ -39617,8 +39617,8 @@
   goog.ui.NativeButtonRenderer.prototype.updateAriaState = function () { };
   goog.ui.NativeButtonRenderer.prototype.setUpNativeButton_ = function (a) {
     a.setHandleMouseEvents(!1);
-    a.setAutoStates(goog.ui.Component.State.ALL, !1);
-    a.setSupportedState(goog.ui.Component.State.FOCUSED, !1)
+    a.setAutoStates(goog.ui.Component.State.ALL, false);
+    a.setSupportedState(goog.ui.Component.State.FOCUSED, false)
   };
   goog.ui.Button = function (a, b, c) {
     goog.ui.Control.call(this, a, b || goog.ui.NativeButtonRenderer.getInstance(), c)
@@ -39747,7 +39747,7 @@
   };
   jfk.Button.createToggleButton = function (a, b) {
     a = new jfk.Button(a, b);
-    a.setSupportedState(goog.ui.Component.State.CHECKED, !0);
+    a.setSupportedState(goog.ui.Component.State.CHECKED, true);
     return a
   };
   jfk.Button.createMiniButton = function (a, b) {
@@ -39898,10 +39898,10 @@
       this.getAcceptedLangs_();
       this.targetLang_ = "";
       this.showBubble_ = module$contents$gtx$Options_Options.showBubble.ICON;
-      this.detectLanguage_ = !0;
+      this.detectLanguage_ = true;
       this.targetLangList_ = {};
       this.sourceLangList_ = {};
-      this.isLoaded = !1;
+      this.isLoaded = false;
       this.fetchStale_ = !!a;
       this.load_();
       this.addChangeListener_();
@@ -39935,7 +39935,7 @@
     module$contents$gtx$Options_Options.SOURCE_LANG_LIST in
       a && (this.sourceLangList_ = this.makeSortedLanguageList_(a[module$contents$gtx$Options_Options.SOURCE_LANG_LIST]));
     module$contents$gtx$Options_Options.TARGET_LANG_LIST in a && (this.targetLangList_ = this.makeSortedLanguageList_(a[module$contents$gtx$Options_Options.TARGET_LANG_LIST]));
-    this.loaded = !0;
+    this.loaded = true;
     if (this.fetchStale_) {
       var b = (new Date).getTime(),
         c = module$contents$gtx$Options_Options.TIME_STAMP in a ? a[module$contents$gtx$Options_Options.TIME_STAMP] : 0,
@@ -40146,7 +40146,7 @@
   goog.json = {};
   goog.json.Replacer = {};
   goog.json.Reviver = {};
-  goog.json.USE_NATIVE_JSON = !1;
+  goog.json.USE_NATIVE_JSON = false;
   goog.json.isValid = function (a) {
     return /^\s*$/.test(a) ? !1 : /^[\],:{}\s\u2028\u2029]*$/.test(a.replace(/\\["\\\/bfnrtu]/g, "@").replace(/(?:"[^"\\\n\r\u2028\u2029\x00-\x08\x0a-\x1f]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)[\s\u2028\u2029]*(?=:|,|]|}|$)/g, "]").replace(/(?:^|:|,)(?:[\s\u2028\u2029]*\[)+/g, ""))
   };
@@ -40389,7 +40389,7 @@
       case goog.net.HttpStatus.PARTIAL_CONTENT:
       case goog.net.HttpStatus.NOT_MODIFIED:
       case goog.net.HttpStatus.QUIRK_IE_NO_CONTENT:
-        return !0;
+        return true;
       default:
         return !1
     }
@@ -40426,9 +40426,9 @@
   goog.net.XmlHttp = function () {
     return goog.net.XmlHttp.factory_.createInstance()
   };
-  goog.net.XmlHttp.ASSUME_NATIVE_XHR = !0;
+  goog.net.XmlHttp.ASSUME_NATIVE_XHR = true;
   goog.net.XmlHttpDefines = {};
-  goog.net.XmlHttpDefines.ASSUME_NATIVE_XHR = !0;
+  goog.net.XmlHttpDefines.ASSUME_NATIVE_XHR = true;
   goog.net.XmlHttp.getOptions = function () {
     return goog.net.XmlHttp.factory_.getOptions()
   };
@@ -40480,16 +40480,16 @@
     goog.events.EventTarget.call(this);
     this.headers = new Map;
     this.xmlHttpFactory_ = a || null;
-    this.active_ = !1;
+    this.active_ = false;
     this.xhrOptions_ = this.xhr_ = null;
     this.lastMethod_ = this.lastUri_ = "";
     this.lastErrorCode_ = goog.net.ErrorCode.NO_ERROR;
     this.lastError_ = "";
-    this.inAbort_ = this.inOpen_ = this.inSend_ = this.errorDispatched_ = !1;
+    this.inAbort_ = this.inOpen_ = this.inSend_ = this.errorDispatched_ = false;
     this.timeoutInterval_ = 0;
     this.timeoutId_ = null;
     this.responseType_ = goog.net.XhrIo.ResponseType.DEFAULT;
-    this.progressEventsEnabled_ = this.withCredentials_ = !1;
+    this.progressEventsEnabled_ = this.withCredentials_ = false;
     this.attributionReportingOptions_ =
       this.trustToken_ = null
   };
@@ -40565,17 +40565,17 @@
     this.lastError_ = "";
     this.lastErrorCode_ = goog.net.ErrorCode.NO_ERROR;
     this.lastMethod_ = b;
-    this.errorDispatched_ = !1;
-    this.active_ = !0;
+    this.errorDispatched_ = false;
+    this.active_ = true;
     this.xhr_ = this.createXhr();
     this.xhrOptions_ = this.xmlHttpFactory_ ? this.xmlHttpFactory_.getOptions() : goog.net.XmlHttp.getOptions();
     this.xhr_.onreadystatechange = goog.bind(this.onReadyStateChange_,
       this);
     this.getProgressEventsEnabled() && "onprogress" in this.xhr_ && (this.xhr_.onprogress = goog.bind(function (g) {
-      this.onProgressHandler_(g, !0)
+      this.onProgressHandler_(g, true)
     }, this), this.xhr_.upload && (this.xhr_.upload.onprogress = goog.bind(this.onProgressHandler_, this)));
     try {
-      goog.log.fine(this.logger_, this.formatMsg_("Opening Xhr")), this.inOpen_ = !0, this.xhr_.open(b, String(a), !0), this.inOpen_ = !1
+      goog.log.fine(this.logger_, this.formatMsg_("Opening Xhr")), this.inOpen_ = !0, this.xhr_.open(b, String(a), true), this.inOpen_ = !1
     } catch (g) {
       goog.log.fine(this.logger_, this.formatMsg_("Error opening Xhr: " + g.message));
       this.error_(goog.net.ErrorCode.EXCEPTION, g);
@@ -40624,7 +40624,7 @@
     typeof goog != "undefined" && this.xhr_ && (this.lastError_ = "Timed out after " + this.timeoutInterval_ + "ms, aborting", this.lastErrorCode_ = goog.net.ErrorCode.TIMEOUT, goog.log.fine(this.logger_, this.formatMsg_(this.lastError_)), this.dispatchEvent(goog.net.EventType.TIMEOUT), this.abort(goog.net.ErrorCode.TIMEOUT))
   };
   goog.net.XhrIo.prototype.error_ = function (a, b) {
-    this.active_ = !1;
+    this.active_ = false;
     this.xhr_ && (this.inAbort_ = !0, this.xhr_.abort(), this.inAbort_ = !1);
     this.lastError_ = b;
     this.lastErrorCode_ = a;
@@ -40656,7 +40656,7 @@
       else if (this.dispatchEvent(goog.net.EventType.READY_STATE_CHANGE),
         this.isComplete()) {
         goog.log.fine(this.logger_, this.formatMsg_("Request complete"));
-        this.active_ = !1;
+        this.active_ = false;
         try {
           this.isSuccess() ? (this.dispatchEvent(goog.net.EventType.COMPLETE), this.dispatchEvent(goog.net.EventType.SUCCESS)) : (this.lastErrorCode_ = goog.net.ErrorCode.HTTP_ERROR, this.lastError_ = this.getStatusText() + " [" + this.getStatus() + "]", this.dispatchErrors_())
         } finally {
@@ -40892,7 +40892,7 @@
   trans.common.TranslationAPI.AJAX_API_PATH = "/translate_a/t";
   trans.common.TranslationAPI.AJAX_SINGLE_PATH = "/translate_a/single";
   trans.common.TranslationAPI.ONE_PLATFORM_SINGLE_PATH = "/v1/translate";
-  trans.common.TranslationAPI.ALLOW_CROSS_DOMAIN = !1;
+  trans.common.TranslationAPI.ALLOW_CROSS_DOMAIN = false;
   trans.common.TranslationAPI.Param = {
     CLIENT_NAME: "client",
     SOURCE_LANGUAGE: "sl",
@@ -40956,14 +40956,18 @@
   };
   module$contents$gtx$Translation_Translation.prototype.renderTranslation = function (popup, query, translationHost, mutableTranslateTextResponse) {
     if (mutableTranslateTextResponse != null) {
-      for (var sourceLanguageCode = mutableTranslateTextResponse.getSourceLanguage(), f = module$contents$gtx$Translation_userOptions.get_targetLang(), g = [], translationResult = [], targetLanguage = mutableTranslateTextResponse.getSentencesList(), l = 0; l < targetLanguage.length; l++) g.push(targetLanguage[l].getOrig()), translationResult.push(targetLanguage[l].getTrans());
-      g = g.join("");
+        var sourceLanguageCode = mutableTranslateTextResponse.getSourceLanguage(), 
+        targetLang = module$contents$gtx$Translation_userOptions.get_targetLang(), 
+        targetLanguageOrig = [], translationResult = [], targetLanguage = mutableTranslateTextResponse.getSentencesList();
+      for (var idx = 0; idx < targetLanguage.length; idx++)
+        targetLanguageOrig.push(targetLanguage[idx].getOrig()), translationResult.push(targetLanguage[idx].getTrans());
+      
+      targetLanguageOrig = targetLanguageOrig.join("");
       translationResult = translationResult.join("");
-      targetLanguage = module$contents$gtx$Translation_userOptions.getLangList("tl")[f].toUpperCase();
-      l = module$contents$gtx$Translation_userOptions.getLangList("sl");
-      var sourceLanguageList = [],
-        n;
-      for (n in l) sourceLanguageList.push([n, l[n]]);
+      targetLanguage = module$contents$gtx$Translation_userOptions.getLangList("tl")[targetLang].toUpperCase();
+      var sourceLangs = module$contents$gtx$Translation_userOptions.getLangList("sl");
+      var sourceLanguageList = [];
+      for (var sourceLang in sourceLangs) sourceLanguageList.push([sourceLang, sourceLangs[sourceLang]]);
       module$contents$goog$soy_renderElement(translationHost, extension.translation, {
         query: query,
         translationResult: translationResult,
@@ -40973,26 +40977,54 @@
         dictionary: mutableTranslateTextResponse.getBilingualDictionaryList(),
         popup: popup
       });
-      mutableTranslateTextResponse = goog.dom.getElementByClass("gtx-lang-selector", translationHost);
-      goog.events.listen(mutableTranslateTextResponse, goog.events.EventType.CHANGE, goog.bind(this.handleSlChange_, this, popup, query, translationHost), !1, this);
+      gtxLangSelectorElement = goog.dom.getElementByClass("gtx-lang-selector", translationHost);
+      goog.events.listen(gtxLangSelectorElement, goog.events.EventType.CHANGE, goog.bind(this.handleSlChange_, this, popup, query, translationHost), false, this);
+      
       query = new module$contents$gtx$AudioButton_AudioButton;
-      mutableTranslateTextResponse = goog.dom.getElementByClass("gtx-source-audio", translationHost);
-      query.decorate(mutableTranslateTextResponse);
-      query.updateAudio(g, sourceLanguageCode);
+      gtxSourceAudioElement = goog.dom.getElementByClass("gtx-source-audio", translationHost);
+      query.decorate(gtxSourceAudioElement);
+      query.updateAudio(targetLanguageOrig, sourceLanguageCode);
+
       query = new module$contents$gtx$AudioButton_AudioButton;
-      mutableTranslateTextResponse = goog.dom.getElementByClass("gtx-target-audio", translationHost);
-      query.decorate(mutableTranslateTextResponse);
-      query.updateAudio(translationResult, f);
-      sourceLanguageCode = module$contents$gtx$utils_getTranslateUrl(sourceLanguageCode, f, window.selection, "gtx_m");
-      popup ? (jfk.Button.createFlatButton("").render(goog.dom.getElement("new-translation")), goog.style.setElementShown(goog.dom.getElement("new-translation"), !0), translationHost = goog.dom.getElement("help"), module$exports$google3$third_party$javascript$safevalues$dom$elements$anchor.setHref(translationHost, module$contents$google3$third_party$javascript$safevalues$builders$url_builders_sanitizeUrl("https://support.google.com/chrome/answer/173424?hl=" +
-        module$contents$gtx$Translation_userOptions.get_displayLang())), translationHost.className = "gtx-a", module$exports$google3$third_party$javascript$safevalues$dom$elements$element.setCssText(translationHost, module$contents$google3$third_party$javascript$safevalues$builders$style_builders_safeStyle($jscomp$templatelit$m440983117$0)), popup = goog.dom.getElement("more"), module$exports$google3$third_party$javascript$safevalues$dom$elements$anchor.setHref(popup, module$contents$google3$third_party$javascript$safevalues$builders$url_builders_sanitizeUrl(sourceLanguageCode)),
-        module$exports$google3$third_party$javascript$safevalues$dom$elements$element.setCssText(popup, module$contents$google3$third_party$javascript$safevalues$builders$style_builders_safeStyle($jscomp$templatelit$m440983117$1)), goog.dom.setTextContent(popup, module$contents$gtx$utils_getMessage("MSG_OPEN_IN_TRANSLATE")), goog.style.setElementShown(popup, !0)) : (popup = goog.dom.createElement("a"), popup.id = "off", popup.className = "gtx-a", popup.setAttribute("target", "_blank"), goog.dom.setTextContent(popup, module$contents$gtx$utils_getMessage("MSG_FOOTER_OPTIONS").toUpperCase()),
+      gtxTargetAudioElement = goog.dom.getElementByClass("gtx-target-audio", translationHost);
+      query.decorate(gtxTargetAudioElement);
+      query.updateAudio(translationResult, targetLang);
+
+      sourceLanguageCode = module$contents$gtx$utils_getTranslateUrl(sourceLanguageCode, targetLang, window.selection, "gtx_m");
+
+      if (popup) {
+        (jfk.Button.createFlatButton("").render(goog.dom.getElement("new-translation")),
+        goog.style.setElementShown(goog.dom.getElement("new-translation"), true),
+        translationHost = goog.dom.getElement("help"),
+        module$exports$google3$third_party$javascript$safevalues$dom$elements$anchor.setHref(translationHost, module$contents$google3$third_party$javascript$safevalues$builders$url_builders_sanitizeUrl("https://support.google.com/chrome/answer/173424?hl=" + module$contents$gtx$Translation_userOptions.get_displayLang())),
+        translationHost.className = "gtx-a",
+        module$exports$google3$third_party$javascript$safevalues$dom$elements$element.setCssText(translationHost, module$contents$google3$third_party$javascript$safevalues$builders$style_builders_safeStyle($jscomp$templatelit$m440983117$0)),
+        popup = goog.dom.getElement("more"),
+        module$exports$google3$third_party$javascript$safevalues$dom$elements$anchor.setHref(popup, module$contents$google3$third_party$javascript$safevalues$builders$url_builders_sanitizeUrl(sourceLanguageCode)),
+        module$exports$google3$third_party$javascript$safevalues$dom$elements$element.setCssText(popup, module$contents$google3$third_party$javascript$safevalues$builders$style_builders_safeStyle($jscomp$templatelit$m440983117$1)),
+        goog.dom.setTextContent(popup, module$contents$gtx$utils_getMessage("MSG_OPEN_IN_TRANSLATE")),
+        goog.style.setElementShown(popup, true))
+      } else {
+        (popup = goog.dom.createElement("a"),
+        popup.id = "off",
+        popup.className = "gtx-a",
+        popup.setAttribute("target", "_blank"),
+        goog.dom.setTextContent(popup, module$contents$gtx$utils_getMessage("MSG_FOOTER_OPTIONS").toUpperCase()),
           goog.events.listen(popup, goog.events.EventType.CLICK, function () {
             chrome.runtime.sendMessage({
               openOptions: 1
             })
-          }), goog.dom.appendChild(translationHost, popup), popup = goog.dom.createElement("a"), popup.id = "more", popup.setAttribute("class", "gtx-a"), popup.setAttribute("target", "_blank"), goog.dom.setTextContent(popup, module$contents$gtx$utils_getMessage("MSG_MORE")), module$exports$google3$third_party$javascript$safevalues$dom$elements$anchor.setHref(popup, module$contents$google3$third_party$javascript$safevalues$builders$url_builders_sanitizeUrl(sourceLanguageCode)), module$exports$google3$third_party$javascript$safevalues$dom$elements$element.setCssText(popup,
-            module$contents$google3$third_party$javascript$safevalues$builders$style_builders_safeStyle($jscomp$templatelit$m440983117$2)), goog.dom.appendChild(translationHost, popup))
+          }),
+          goog.dom.appendChild(translationHost, popup),
+          popup = goog.dom.createElement("a"),
+          popup.id = "more",
+          popup.setAttribute("class", "gtx-a"),
+          popup.setAttribute("target", "_blank"),
+          goog.dom.setTextContent(popup, module$contents$gtx$utils_getMessage("MSG_MORE")),
+          module$exports$google3$third_party$javascript$safevalues$dom$elements$anchor.setHref(popup, module$contents$google3$third_party$javascript$safevalues$builders$url_builders_sanitizeUrl(sourceLanguageCode)),
+          module$exports$google3$third_party$javascript$safevalues$dom$elements$element.setCssText(popup, module$contents$google3$third_party$javascript$safevalues$builders$style_builders_safeStyle($jscomp$templatelit$m440983117$2)),
+          goog.dom.appendChild(translationHost, popup))
+      }
     } else goog.dom.setTextContent(goog.dom.getElement("translation"), module$contents$gtx$utils_getMessage("MSG_TRANSLATION_ERROR"))
   };
   module$contents$gtx$Translation_Translation.prototype.handleSlChange_ = function (a, selectedText, c, d) {
@@ -41164,12 +41196,12 @@
   };
   goog.inherits(goog.fx.css3.Transition, goog.fx.TransitionBase);
   goog.fx.css3.Transition.prototype.play = function () {
-    if (this.isPlaying()) return !1;
+    if (this.isPlaying()) return false;
     this.onBegin();
     this.onPlay();
     this.startTime = goog.now();
     this.setStatePlaying();
-    if (goog.style.transition.isSupported()) return goog.style.setStyle(this.element_, this.initialStyle_), this.timerId_ = goog.Timer.callOnce(this.play_, void 0, this), !0;
+    if (goog.style.transition.isSupported()) return goog.style.setStyle(this.element_, this.initialStyle_), this.timerId_ = goog.Timer.callOnce(this.play_, void 0, this), true;
     this.stop_(!1);
     return !1
   };
@@ -41177,7 +41209,7 @@
     goog.style.getSize(this.element_);
     goog.style.transition.set(this.element_, this.transitions_);
     goog.style.setStyle(this.element_, this.finalStyle_);
-    this.timerId_ = goog.Timer.callOnce(goog.bind(this.stop_, this, !1), this.duration_ * 1E3)
+    this.timerId_ = goog.Timer.callOnce(goog.bind(this.stop_, this, false), this.duration_ * 1E3)
   };
   goog.fx.css3.Transition.prototype.stop = function () {
     this.isPlaying() && this.stop_(!0)
@@ -41229,15 +41261,15 @@
     MOVE_OFFSCREEN: "move_offscreen"
   };
   goog.ui.PopupBase.prototype.element_ = null;
-  goog.ui.PopupBase.prototype.autoHide_ = !0;
+  goog.ui.PopupBase.prototype.autoHide_ = true;
   goog.ui.PopupBase.prototype.autoHidePartners_ = null;
   goog.ui.PopupBase.prototype.autoHideRegion_ = null;
-  goog.ui.PopupBase.prototype.isVisible_ = !1;
-  goog.ui.PopupBase.prototype.shouldHideAsync_ = !1;
+  goog.ui.PopupBase.prototype.isVisible_ = false;
+  goog.ui.PopupBase.prototype.shouldHideAsync_ = false;
   goog.ui.PopupBase.prototype.lastShowTime_ = -1;
   goog.ui.PopupBase.prototype.lastHideTime_ = -1;
-  goog.ui.PopupBase.prototype.hideOnEscape_ = !1;
-  goog.ui.PopupBase.prototype.enableCrossIframeDismissal_ = !0;
+  goog.ui.PopupBase.prototype.hideOnEscape_ = false;
+  goog.ui.PopupBase.prototype.enableCrossIframeDismissal_ = true;
   goog.ui.PopupBase.prototype.type_ = goog.ui.PopupBase.Type.TOGGLE_DISPLAY;
   goog.ui.PopupBase.EventType = {
     BEFORE_SHOW: "beforeshow",
@@ -41331,22 +41363,22 @@
       if (!this.element_) throw Error("Caller must call setElement before trying to show the popup");
       this.reposition();
       var a = goog.dom.getOwnerDocument(this.element_);
-      this.hideOnEscape_ && this.handler_.listen(a, goog.events.EventType.KEYDOWN, this.onDocumentKeyDown_, !0);
-      this.autoHide_ && (this.handler_.listen(a, goog.events.EventType.MOUSEDOWN, this.onDocumentMouseDown_, !0), this.handler_.listen(a, goog.events.EventType.BLUR, this.onDocumentBlur_));
+      this.hideOnEscape_ && this.handler_.listen(a, goog.events.EventType.KEYDOWN, this.onDocumentKeyDown_, true);
+      this.autoHide_ && (this.handler_.listen(a, goog.events.EventType.MOUSEDOWN, this.onDocumentMouseDown_, true), this.handler_.listen(a, goog.events.EventType.BLUR, this.onDocumentBlur_));
       this.type_ == goog.ui.PopupBase.Type.TOGGLE_DISPLAY ? this.showPopupElement() : this.type_ == goog.ui.PopupBase.Type.MOVE_OFFSCREEN && this.reposition();
-      this.isVisible_ = !0;
+      this.isVisible_ = true;
       this.lastShowTime_ = Date.now();
       this.lastHideTime_ = -1;
-      if (this.showTransition_) goog.events.listenOnce(this.showTransition_, goog.fx.Transition.EventType.END, this.onShow, !1, this), this.showTransition_.play();
+      if (this.showTransition_) goog.events.listenOnce(this.showTransition_, goog.fx.Transition.EventType.END, this.onShow, false, this), this.showTransition_.play();
       else this.onShow()
     }
   };
   goog.ui.PopupBase.prototype.hide_ = function (a) {
-    if (!this.isVisible_ || !this.onBeforeHide(a)) return !1;
+    if (!this.isVisible_ || !this.onBeforeHide(a)) return false;
     this.handler_ && this.handler_.removeAll();
-    this.isVisible_ = !1;
+    this.isVisible_ = false;
     this.lastHideTime_ = Date.now();
-    this.hideTransition_ ? (goog.events.listenOnce(this.hideTransition_, goog.fx.Transition.EventType.END, goog.partial(this.continueHidingPopup_, a), !1, this), this.hideTransition_.play()) : this.continueHidingPopup_(a);
+    this.hideTransition_ ? (goog.events.listenOnce(this.hideTransition_, goog.fx.Transition.EventType.END, goog.partial(this.continueHidingPopup_, a), false, this), this.hideTransition_.play()) : this.continueHidingPopup_(a);
     return !0
   };
   goog.ui.PopupBase.prototype.continueHidingPopup_ = function (a) {
@@ -41355,11 +41387,11 @@
   };
   goog.ui.PopupBase.prototype.showPopupElement = function () {
     this.element_.style.visibility = "visible";
-    goog.style.setElementShown(this.element_, !0)
+    goog.style.setElementShown(this.element_, true)
   };
   goog.ui.PopupBase.prototype.hidePopupElement = function () {
     this.element_.style.visibility = "hidden";
-    goog.style.setElementShown(this.element_, !1)
+    goog.style.setElementShown(this.element_, false)
   };
   goog.ui.PopupBase.prototype.moveOffscreen_ = function () {
     this.element_.style.top = "-10000px"
@@ -41449,15 +41481,15 @@
     if (this.position_) {
       var a = !this.isVisible() && this.getType() != goog.ui.PopupBase.Type.MOVE_OFFSCREEN,
         b = this.getElement();
-      a && (b.style.visibility = "hidden", goog.style.setElementShown(b, !0));
+      a && (b.style.visibility = "hidden", goog.style.setElementShown(b, true));
       this.position_.reposition(b, this.popupCorner_, this.margin_);
-      a && goog.style.setElementShown(b, !1)
+      a && goog.style.setElementShown(b, false)
     }
   };
 
   function module$contents$jfk$Bubble_Bubble(a) {
     goog.ui.Component.call(this, a);
-    this.arrowPosition_ = new jfk.ArrowPosition(this.className_, !0);
+    this.arrowPosition_ = new jfk.ArrowPosition(this.className_, true);
     this.popup_ = new goog.ui.Popup;
     this.registerDisposable(this.popup_);
     this.hideYPosition_ = 0;
@@ -41465,8 +41497,8 @@
   }
   goog.inherits(module$contents$jfk$Bubble_Bubble, goog.ui.Component);
   module$contents$jfk$Bubble_Bubble.prototype.className_ = "jfk-bubble";
-  module$contents$jfk$Bubble_Bubble.prototype.showCloseButton_ = !0;
-  module$contents$jfk$Bubble_Bubble.prototype.disposeOnHide_ = !1;
+  module$contents$jfk$Bubble_Bubble.prototype.showCloseButton_ = true;
+  module$contents$jfk$Bubble_Bubble.prototype.disposeOnHide_ = false;
   module$contents$jfk$Bubble_Bubble.prototype.setAnchorElement = function (a) {
     this.arrowPosition_.setAnchorElement(a);
     this.reposition()
@@ -41527,7 +41559,7 @@
       uid: "bubble-" + goog.getUid(this)
     }, void 0, this.getDomHelper()));
     this.setContentInternal_(this.content_);
-    goog.style.setElementShown(this.getElement(), !1);
+    goog.style.setElementShown(this.getElement(), false);
     this.popup_.setElement(this.getElement());
     this.configurePopupTransition(this.popup_);
     goog.dom.classlist.addAll(this.getElement(), this.extraCssClasses_)
@@ -41628,6 +41660,11 @@
   module$contents$gtx$Bubble_Bubble.getAnchor = function (selectedRect) {
     var gtxAnchorDiv = goog.dom.createElement("div");
     var topValue = selectedRect.top + goog.dom.getDocumentScrollElement().scrollTop;
+    if (topValue < 250) {
+      topValue = 250;
+      selectedRect.y = 250;
+      selectedRect.top = 250;
+    }
     gtxAnchorDiv.id = "gtx-anchor";
     gtxAnchorDiv.style.position = "absolute";
     gtxAnchorDiv.style.visibility = "hidden";
@@ -41682,8 +41719,8 @@
   module$contents$gtx$Bubble_Bubble.EXTRA_CSS_CLASS_ = "gtx-bubble";
   module$contents$gtx$Bubble_Bubble.MAX_WIDTH_ = 800;
   module$contents$gtx$Bubble_Bubble.MAX_LENGTH_ = 2000;
-  module$contents$gtx$Bubble_Bubble.SHOW_TRANSLATE_ICON_ = !0;
-  module$contents$gtx$Bubble_Bubble.DETECT_LANGUAGE_ = !1;
+  module$contents$gtx$Bubble_Bubble.SHOW_TRANSLATE_ICON_ = true;
+  module$contents$gtx$Bubble_Bubble.DETECT_LANGUAGE_ = false;
   module$contents$gtx$Bubble_Bubble.prototype.host_ = null;
   module$contents$gtx$Bubble_Bubble.prototype.root_ = null;
   var module$contents$gtx$Bubble_noBubbleExists = function () {
@@ -41776,7 +41813,7 @@
       };
   gtx.get = function (cssURL, callback) {
     var xmlHttpRequest = new XMLHttpRequest;
-    xmlHttpRequest.open("GET", cssURL, !0);
+    xmlHttpRequest.open("GET", cssURL, true);
     xmlHttpRequest.onload = function () {
       var textContent = null;
       xmlHttpRequest.status === 200 && (textContent = xmlHttpRequest.response);
@@ -41793,7 +41830,7 @@
   var module$contents$gtx$Bubble_optionsInBubble = new module$contents$gtx$Options_Options,
     module$contents$gtx$Bubble_translator = module$contents$gtx$Translation_Translation.getInstance();
   goog.events.listen(window, goog.events.EventType.MOUSEUP, module$contents$gtx$Bubble_onMouseUp);
-  goog.events.listen(window, goog.events.EventType.MOUSEDOWN, module$contents$gtx$Bubble_onMouseDown, !0);
+  goog.events.listen(window, goog.events.EventType.MOUSEDOWN, module$contents$gtx$Bubble_onMouseDown, true);
   goog.exportSymbol("disposeWindowBubble", module$contents$gtx$Bubble_disposeWindowBubble);
   gtx.Bubble = module$contents$gtx$Bubble_Bubble;
 })();
